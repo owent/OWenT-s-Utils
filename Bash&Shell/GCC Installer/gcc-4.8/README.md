@@ -8,7 +8,7 @@ GCC4.8发布啦，这个脚本在之前4.7的基础上做了点改进，移除�
 PS：4.8的新功能对于4.7貌似不是太多，生成属性、align模板、继承构造、线程内存池,还有什么来着？
 
 编译安装 GCC 4.8.X
-#### 准备环境及依赖项
+<h4><span style="color:#4B0082;">准备环境及依赖项</span></h4>
 1. 支持 ISO C++ 98 的编译器（GCC 4.7.2 的中期一个patch导致的整个项目开始转为由C++编译）
 2. 用于创建Ada编译器的GNAT
 3. 支持POSIX的shell或GNU bash
@@ -26,11 +26,11 @@ PS：4.8的新功能对于4.7貌似不是太多，生成属性、align模板、�
 15. isl 版本 0.11.1 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org  中gcc目录中的infrastructure目录下载 ）
 16. cloog 版本0.18.0（此处可下载 ftp://gcc.gnu.org/pub/gcc/infrastructure/ ）
 
-### 我编译的环境
-#### 系统：
+<h3><span style="color:#008080;">我编译的环境</span></h3>
+<h4><span style="color:#4B0082;">系统：</span></h4>
 CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 
-#### 系统库：
+<h4><span style="color:#4B0082;">系统库：</span></h4>
 + gzip 1.3.12
 + zip/unzip 3.0
 + GNU make 3.81
@@ -39,22 +39,21 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 + bzip2 1.0.5
 + gcc 4.4.7 or gcc 4.1.2 or gcc 4.4.5
 
-#### 编译的依赖库：
+<h4><span style="color:#4B0082;">编译的依赖库：</span></h4>
 + gmp 5.1.1
 + mpfr 3.1.2
 + mpc 1.0.1
 + isl 0.11.1
 + cloog 0.18.0
 
-####编译目标：
+<h4><span style="color:#4B0082;">编译目标：</span></h4>
 + gcc 4.8.0
 + binutils 2.32.2 (如果存在ppl库)
 + gdb 7.5.1 (如果存在ppl库和ncurses ncurses-libs ncurses-devel包)
 
-#### 注：
+<h4><span style="color:#4B0082;">注：</span></h4>
 + (所有的库都会被安装在**$PREFEX_DIR**里)
 
-
-##### History:
+#### History:
 + 2013-03-26     Created
-+ 2013-04-11	 改进脚本，增加统一编译选项，增加对binutils和gdb可选包的编译，增加自动把PREFIX_DIR变为绝对路径的问题，统一目录组织，修复环境变量的一些小问题
++ 2013-04-11     改进脚本，增加统一编译选项，增加对binutils和gdb可选包的编译，增加自动把PREFIX_DIR变为绝对路径的问题，统一目录组织，修复环境变量的一些小问题
