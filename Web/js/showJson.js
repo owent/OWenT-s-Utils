@@ -1,7 +1,7 @@
 /** 
  * Show json in a new page.(For debug)
  *
- * Licensed under the MIT or GPL Version 3 licenses.
+ * Licensed under the MIT licenses.
  * @version 1.3
  * @author OWenT
  * @link http://www.owent.net
