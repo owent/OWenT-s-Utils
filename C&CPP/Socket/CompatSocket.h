@@ -12,12 +12,12 @@
  *
  */
 
-#ifndef __COMPAT_SOCKET_H__
-#define __COMPAT_SOCKET_H__
+#ifndef _UTIL_SOCKET_COMPAT_SOCKET_H__
+#define _UTIL_SOCKET_COMPAT_SOCKET_H__
 
 #ifdef WIN32
     #include <winsock.h>
-    typedef int				socklen_t;
+    typedef int                socklen_t;
 #else
     #include <sys/socket.h>
     #include <netinet/in.h>
@@ -29,70 +29,78 @@
     #include <arpa/inet.h>
     #include <errno.h>
     #include <unistd.h>
-    typedef int				SOCKET;
+    typedef int                SOCKET;
 
     //#pragma region define win32 const variable in linux
-    #define INVALID_SOCKET	-1
-    #define SOCKET_ERROR	-1
+    #define INVALID_SOCKET    -1
+    #define SOCKET_ERROR    -1
     //#pragma endregion
 #endif
 
-
-class CompatSocket 
+namespace util
 {
 
-public:
-    CompatSocket(SOCKET sock = INVALID_SOCKET);
-    ~CompatSocket();
+    namespace socket
+    {
 
-    // set option
-    int SetOption(int optmame, const void* optval, int optlen, int level = SOL_SOCKET);
+        class CompatSocket 
+        {
 
-    // Create socket object for snd/recv data
-    bool Create(int af = PF_INET, int type = SOCK_STREAM, int protocol = 0);
+        public:
+            CompatSocket(SOCKET sock = INVALID_SOCKET);
+            ~CompatSocket();
 
-    // Connect socket
-    bool Connect(const char* ip, unsigned short port);
-    // #region server
-    // Bind socket
-    bool Bind(unsigned short port);
+            // set option
+            int SetOption(int optmame, const void* optval, int optlen, int level = SOL_SOCKET);
 
-    // Listen socket
-    bool Listen(int backlog = 5); 
+            // Create socket object for snd/recv data
+            bool Create(int af = PF_INET, int type = SOCK_STREAM, int protocol = 0);
 
-    // Accept socket
-    bool Accept(CompatSocket& s, char* fromip = NULL);
-    // #endregion
-    
-    // Send socket
-    int Send(const char* buf, int len, int iMicroSeconds = 0);
+            // Connect socket
+            bool Connect(const char* ip, unsigned short port);
+            // #region server
+            // Bind socket
+            bool Bind(unsigned short port);
 
-    // Recv socket
-    int Recv(char* buf, int len, int iMicroSeconds = 0);
-    
-    // Close socket
-    int Close();
+            // Listen socket
+            bool Listen(int backlog = 5); 
 
-    // Get errno
-    int GetError();
-    
-    //#pragma region just for win32
-    // Init winsock DLL 
-    static int Init();	
-    // Clean winsock DLL
-    static int Clean();
-    //#pragma endregion
+            // Accept socket
+            bool Accept(CompatSocket& s, char* fromip = NULL);
+            // #endregion
+            
+            // Send socket
+            int Send(const char* buf, int len, int iMicroSeconds = 0);
 
-    // Domain parse
-    static bool DnsParse(const char* domain, char* ip);
+            // Recv socket
+            int Recv(char* buf, int len, int iMicroSeconds = 0);
+            
+            // Close socket
+            int Close();
 
-    CompatSocket& operator = (SOCKET s);
+            // Get errno
+            int GetError();
+            
+            //#pragma region just for win32
+            // Init winsock DLL 
+            static int Init();    
+            // Clean winsock DLL
+            static int Clean();
+            //#pragma endregion
 
-    operator SOCKET ();
+            // Domain parse
+            static bool DnsParse(const char* domain, char* ip);
 
-protected:
-    SOCKET m_uSock;
+            CompatSocket& operator = (SOCKET s);
 
-};
+            operator SOCKET ();
+
+        protected:
+            SOCKET m_uSock;
+
+        };
+
+    }
+}
 
 #endif
