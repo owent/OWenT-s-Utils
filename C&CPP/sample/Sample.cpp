@@ -240,5 +240,6 @@ int main(int argc, char** argv)
 {
     TQueryStringSample();
     AttributeManagerSample();
+	HashSample();
     return 0;
 }
