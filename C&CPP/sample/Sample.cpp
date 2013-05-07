@@ -7,6 +7,7 @@
 
 #include "String/TQueryString.h"
 #include "Logic/AttributeManager.h"
+#include "Algorithm/Hash.h"
 
 //=======================================================================================================
 void TQueryStringSample()
@@ -212,9 +213,32 @@ void AttributeManagerSample()
 }
 
 //=======================================================================================================
+
+//=======================================================================================================
+void HashSample()
+{
+    puts("");
+    puts("===============begin hash sample==============");
+    char strBuff[] = "Hello World!\nI'm OWenT\n";
+    printf("Hashed String: \n%s\n", strBuff);
+
+    std::cout<< "FNV-1:   "<< util::hash::HashFNV1<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "FNV-1A:  "<< util::hash::HashFNV1A<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "SDBM:    "<< util::hash::HashSDBM<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "RS:      "<< util::hash::HashRS<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "JS:      "<< util::hash::HashJS<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "PJW:     "<< util::hash::HashPJW<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "ELF:     "<< util::hash::HashELF<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "BKDR:    "<< util::hash::HashBKDR<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "DJB:     "<< util::hash::HashDJB<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    std::cout<< "AP:      "<< util::hash::HashAP<uint32_t>(strBuff, strlen(strBuff)) <<std::endl;
+    puts("===============end hash sample==============");
+}
+//=======================================================================================================
+
 int main(int argc, char** argv)
 {
-	TQueryStringSample();
-	AttributeManagerSample();
+    TQueryStringSample();
+    AttributeManagerSample();
     return 0;
 }
