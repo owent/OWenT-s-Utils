@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="Player.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="143" d:DesignWidth="311" xmlns:dataInput="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Data.Input">
+
+    <Grid x:Name="LayoutRoot" Background="White" Height="133" Width="301">
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,5,0,0" Name="TBK_Title" Text="" VerticalAlignment="Top" />
+        <Button Content="播放" Height="23" HorizontalAlignment="Left" Margin="228,48,0,0" Name="BTN_Play" VerticalAlignment="Top" Width="48" Click="BTN_Player_Click" />
+        <MediaElement Height="32" HorizontalAlignment="Left" Margin="131,93,0,0" Name="Player" VerticalAlignment="Top" Width="160" AutoPlay="True" MediaEnded="Player_MediaEnded" CurrentStateChanged="Player_CurrentStateChanged" DownloadProgressChanged="Player_DownloadProgressChanged" BufferingProgressChanged="Player_BufferingProgressChanged"  />
+        <Button Content="＜|" Height="23" HorizontalAlignment="Left" Margin="12,48,0,0" Name="BTN_Back" VerticalAlignment="Top" Width="48" Click="BTN_Back_Click" />
+        <Button Content="|＞" Height="23" HorizontalAlignment="Right" Margin="0,48,187,0" Name="BTN_Next" VerticalAlignment="Top" Width="48" Click="BTN_Next_Click" />
+        <Button Height="23" HorizontalAlignment="Left" Margin="120,48,0,0" Name="BTN_Stop" VerticalAlignment="Top" Width="48" Click="BTN_Stop_Click" Content="停止" />
+        <Slider Height="23" HorizontalAlignment="Left" Margin="57,77,0,0" Name="SLD_Volume" VerticalAlignment="Top" ValueChanged="SLD_Volume_ValueChanged" Minimum="0" Maximum="1" Width="70" SmallChange="0.01" LargeChange="0.1" BorderBrush="White" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="27,77,0,0" Name="TBK_Volume" Text="音量：" VerticalAlignment="Top" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="133,77,0,0" Name="TBK_Volume_Show" Text="50%" VerticalAlignment="Top" />
+        <Button Content=" ▎▎" Height="23" HorizontalAlignment="Left" Margin="174,48,0,0" Name="BTN_Pause" VerticalAlignment="Top" Width="48" Click="BTN_Pause_Click" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="174,24,0,0" Name="TBK_Time_Run" Text="00:00:00" VerticalAlignment="Top" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="230,24,0,0" Name="TBK_Time_Total" Text="/ 00:00:00" VerticalAlignment="Top" />
+        <ProgressBar Height="10" HorizontalAlignment="Left" Margin="213,81,0,0" Name="PRB_Download" VerticalAlignment="Top" Width="68" Maximum="1" SmallChange="0.05" Value="0" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="165,77,0,0" Name="TBK_Download" Text="下载进度" VerticalAlignment="Top" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="19,102,0,0" Name="TBK_Buffer" Text="缓冲中" VerticalAlignment="Top" />
+        <ProgressBar Height="10" HorizontalAlignment="Left" Margin="59,105,0,0" Name="PRB_Buffer" VerticalAlignment="Top" Width="100" Maximum="1" SmallChange="0.05" />
+        <ProgressBar Height="18" HorizontalAlignment="Left" Margin="14,24,0,0" Name="PRB_Run_Time" VerticalAlignment="Top" Width="154" MouseLeftButtonDown="PRB_Run_Time_MouseLeftButtonDown" Maximum="1" SmallChange="0.01" LargeChange="0.1" Value="0.3" Foreground="#FF103636" Background="#FFD4FFFF" BorderBrush="#FF030908" IsEnabled="True" />
+    </Grid>
+</UserControl>
