@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>Canvas 作业 3 & 4</title>
+</head>
+<body>
+    <div style="text-align: center;">
+        <canvas id="m_canvas" width="800" height="600" style="border: 1px solid #c3c3c3;">
+        	Your browser does not support the HTML5 canvas element.
+    </canvas></div>
+    <br />
+    <button onclick="DrawPolygon();">
+        画多边形</button>
+    <button onclick="FillPolygon();">
+        填充多边形</button>
+    <button onclick="ClipPolygon();">
+        切割多边形</button>
+    <input type="radio" name="color" onclick="SetColor('#FF0000');" checked="checked">红色</input>
+    <input type="radio" name="color" onclick="SetColor('#0000FF');">蓝色</input>
+    <input type="radio" name="color" onclick="SetColor('#00FF00');">绿色</input>
+    <script type="text/javascript" language="javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        var cssStyle = ({
+            'width': 800,
+            'height': 600
+        });
+
+        var canvas = $("#m_canvas")[0];
+        canvas.context = canvas.getContext("2d");
+
+        var TPoint = function (event) {
+            this.x = 0;
+            this.y = 0;
+
+            if (typeof (event) != "undefined" && typeof (event.clientX) != "undefined"
+                && event.clientY != "undefined") {
+                this.x = parseInt(event.clientX + $(window).scrollLeft() - $(canvas).position().left);
+                this.y = parseInt(event.clientY + $(window).scrollTop() - $(canvas).position().top);
+            }
+        }
+
+        var TLine = function () {
+            this.x1 = 0;
+            this.x2 = 0;
+            this.y1 = 0;
+            this.y2 = 0;
+        }
+		
+        var TTableItem = function() {
+            this.xpos = 0;
+            this.delx = 0;
+            this.ymax = 0;
+        }
+
+        $(canvas).css(cssStyle);
+        canvas.clear = function () {
+            canvas.context.clearRect(0, 0, cssStyle.width, cssStyle.height);
+        }
+
+        canvas.drawPolygon = function (polygon) {
+            var points = polygon.points;
+            canvas.context.beginPath();
+            if (points.length > 0) {
+                canvas.context.moveTo(points[0].x, points[0].y);
+            }
+            for (var i = 1; i < points.length; i++) {
+                canvas.context.lineTo(points[i].x, points[i].y);
+            }
+            canvas.context.lineTo(points[0].x, points[0].y);
+            canvas.context.stroke();
+        }
+
+        canvas.drawLine = function (line, style) {
+			if (!style)
+				style = "#000000";
+            if (line) {
+                canvas.context.strokeStyle = style;
+                canvas.context.beginPath();
+                canvas.context.moveTo(line.x1, line.y1);
+                canvas.context.lineTo(line.x2, line.y2);
+                canvas.context.stroke();
+            }
+        }
+		
+        canvas.fillPolygon = function (polygon, ClipRect) {
+            //canvas.context.fillStyle = "#FF0000";
+            //canvas.context.fill();
+            var table = new TFillTable(polygon);
+            while (table.nowy < table.ymax) {
+                var lines;
+                if (typeof(ClipRect) == "undefined") {
+                    lines = table.nextLines();
+                } else {
+                    lines = table.nextLines(ClipRect.leftbottom, ClipRect.righttop);
+                }
+                for (var i = 0; i < lines.length; i++) {
+                    canvas.drawLine(lines[i], polygon.color);
+                }
+            }
+        }
+
+        var TFillTable = function (polygon) {
+            this.edgeTable = [];
+            this.activeEdgeTable = [];
+			
+            this.nowy;
+            this.ymax;
+			
+            this.init = function(polygon) {
+                var edges = polygon.getLines();
+                if (edges.length > 0) {
+                    this.nowy = edges[0].y1;
+                    this.ymax = edges[0].y2;
+                }
+                for (var i = 0; i < edges.length; i++) {
+                    if (edges[i].y1 == edges[i].y2)
+                        continue;
+                    if (typeof(this.edgeTable[edges[i].y1]) == "undefined") {
+                        this.edgeTable[edges[i].y1] = [];
+                    }
+                    var item = new TTableItem();
+                    item.xpos = edges[i].x1;
+                    item.delx = (edges[i].x2 - edges[i].x1) / (edges[i].y2 - edges[i].y1);
+                    item.ymax = edges[i].y2;
+                    this.edgeTable[edges[i].y1].push(item);
+                    this.nowy = Math.min(this.nowy, edges[i].y1);
+                    this.ymax = Math.max(this.ymax, edges[i].y2);
+                }
+                this.nowy--;
+            }
+            
+                this.nextLines = function(leftbottom, righttop) {
+                if (this.nowy >= this.ymax)
+                    return [];
+                this.nowy++;
+                for (var i = 0; i < this.activeEdgeTable.length; i++) {
+                    if (this.nowy >= this.activeEdgeTable[i].ymax) {
+                        this.activeEdgeTable.splice(i, 1);
+                        i--;
+                        continue;
+                    }
+                    this.activeEdgeTable[i].xpos += this.activeEdgeTable[i].delx;
+                }
+                if (typeof(this.edgeTable[this.nowy]) != "undefined") {
+                    for (var i = 0; i < this.edgeTable[this.nowy].length; i++) {
+                        this.activeEdgeTable.push(this.edgeTable[this.nowy][i]);
+                    }
+                }
+                //this.activeEdgeTable.sort(TTableItemCmp);
+                for (var i = 0; i < this.activeEdgeTable.length - 1; i++) {
+                    for (var j = i; j < this.activeEdgeTable.length; j++) {
+                        if (TTableItemCmp(this.activeEdgeTable[i], this.activeEdgeTable[j])) {
+                            var t = this.activeEdgeTable[i];
+                            this.activeEdgeTable[i] = this.activeEdgeTable[j];
+                            this.activeEdgeTable[j] = t;
+                        }
+                    }
+                }
+                var ret = [];
+                if (leftbottom && righttop && (this.nowy < leftbottom.y || this.nowy >= righttop.y))
+                    return ret;
+                for (var i = 0; i < this.activeEdgeTable.length; i += 2) {
+                    var line = new TLine();
+                    line.x1 = this.activeEdgeTable[i].xpos;
+                    if (!this.activeEdgeTable[i + 1])
+                        continue;
+                    line.x2 = this.activeEdgeTable[i + 1].xpos;
+                    line.y1 = line.y2 = this.nowy;
+                    if (leftbottom && righttop) {
+                        if (line.x2 < leftbottom.x || line.x1 >= righttop.x)
+                            continue;
+                        line.x1 = Math.max(line.x1, leftbottom.x);
+                        line.x2 = Math.min(line.x2, righttop.x);
+                    }
+                    ret.push(line);
+                }
+                return ret;
+            }
+            
+            this.init(polygon);
+            
+            function TTableItemCmp(a, b) {
+                return a.xpos > b.xpos;
+            }
+        }
+    	
+        var polygon = {
+            points: new Array(),
+            isDrawing: false,
+            color: "#FF0000",
+            clearPoints: function () {
+                this.points = [];
+            },
+            getLineByPoints: function (i, j) {
+                var line = new TLine();
+                if (i.y < j.y || i.y == j.y	&& i.x < j.x) {
+                    line.x1 = i.x;
+                    line.y1 = i.y;
+                    line.x2 = j.x;
+                    line.y2 = j.y;
+                } else {
+                    line.x1 = j.x;
+                    line.y1 = j.y;
+                    line.x2 = i.x;
+                    line.y2 = i.y;
+                }
+	            return line;
+            },
+            getLastLine: function () {
+                if (this.points.length <= 1) {
+                    return null;
+                }
+                return this.getLineByPoints(this.points[this.points.length - 1], this.points[this.points.length - 2]);
+            },
+            getFirstLine: function () {
+                if (this.points.length <= 1) {
+                    return null;
+                }
+                return this.getLineByPoints(this.points[this.points.length - 1], this.points[0]);
+            },
+            getLines: function() {
+                var ret = [];
+                if (this.points.length <= 1)
+                    return ret;
+                for (var i = 0; i < this.points.length - 1; i++) {
+                    ret.push(this.getLineByPoints(this.points[i], this.points[i + 1]));
+                }
+                ret.push(this.getLineByPoints(this.points[0], this.points[this.points.length - 1]));
+                return ret;
+            },
+        };
+
+        var ClipRect = {
+	        leftbottom: new TPoint(),
+	        righttop: new TPoint(),
+	        isClip: 0
+        };
+		
+        $(canvas).click(function (event) {
+            var point = new TPoint(event);
+            if (polygon.isDrawing) {
+                polygon.points.push(point);
+                canvas.drawLine(polygon.getLastLine());
+            } else if (ClipRect.isClip > 0) {
+                ClipRect.isClip--;
+                if (ClipRect.isClip == 1)
+                    ClipRect.leftbottom = point;
+                else {
+                    ClipRect.righttop = point;
+                    if (ClipRect.leftbottom.x > ClipRect.righttop.x) {
+	                    var t = ClipRect.leftbottom.x;
+	                    ClipRect.leftbottom.x = ClipRect.righttop.x;
+	                    ClipRect.righttop.x = t;
+                    }
+                    if (ClipRect.leftbottom.y > ClipRect.righttop.y) {
+	                    var t = ClipRect.leftbottom.y;
+	                    ClipRect.leftbottom.y = ClipRect.righttop.y;
+	                    ClipRect.righttop.y = t;
+                    }
+                    canvas.clear();
+                    var leftbottom = ClipRect.leftbottom;
+                    var righttop = ClipRect.righttop;
+                    var edge = new TLine();
+                    edge.x2 = leftbottom.x;
+                    edge.y2 = righttop.y;
+                    edge.x1 = leftbottom.x;
+                    edge.y1 = leftbottom.y;
+                    canvas.drawLine(edge);
+                    edge.x2 = righttop.x;
+                    edge.y2 = leftbottom.y;
+                    canvas.drawLine(edge);
+                    edge.x1 = righttop.x;
+                    edge.y1 = righttop.y;
+                    canvas.drawLine(edge);
+                    edge.x2 = leftbottom.x;
+                    edge.y2 = righttop.y;
+                    canvas.drawLine(edge);
+                    canvas.fillPolygon(polygon, ClipRect);
+                }
+            }
+        });
+		
+		$(canvas).mousedown(function (event) {
+            if (event.button == 2 && polygon.isDrawing) {
+                canvas.drawLine(polygon.getFirstLine());
+                polygon.isDrawing = false;
+            }
+        });
+
+        $(canvas).dblclick(function (event) {
+            var point = new TPoint(event);
+            if (polygon.isDrawing) {
+                polygon.points.push(point);
+                canvas.drawLine(polygon.getLastLine());
+                canvas.drawLine(polygon.getFirstLine());
+                polygon.isDrawing = false;
+            }
+        })
+
+        function DrawPolygon() {
+            canvas.clear();
+            polygon.clearPoints();
+            polygon.isDrawing = true;
+        }
+		
+        function FillPolygon() {
+            canvas.clear();
+            if (polygon.points.length >= 3) {
+                canvas.drawPolygon(polygon);
+                canvas.fillPolygon(polygon);
+            }
+        }
+		
+        function ClipPolygon() {
+            if (polygon.points.length >= 3) {
+                ClipRect.isClip = 2;
+            }
+        }
+		
+        function SetColor(c) {
+            polygon.color = c;
+    	}
+    </script>
+	
+<!-- 腾讯分析服务 -->
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
+
+<!-- 百度统计服务 -->
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F31388d91e09374a027d6c0f4fc5888e7' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>

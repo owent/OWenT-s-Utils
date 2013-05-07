@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+ 
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.min.js"></script>
+<title>Canvas 作业 1 & 2</title>
+</head>
+<body>
+<div style="text-align: center;"><canvas id="canvas" style="border: 1px solid Blue;">您的浏览器不支持HTML5</canvas></div> &nbsp;
+<div>点大小: <input type="text" id="point" /> <a href="javascript:clear_canvas();">清屏</a> 
+当前功能：<a id="draw_fun" href="javascript:switch_draw_fun();"></a></div>
+<script type="text/javascript">
+	/// <reference src="jquery-vsdoc.js"/>
+	var cssStyle = ({
+		'width': 800,
+		'height': 600
+	});
+	var pointLength = 5;
+	var draw = ["画直线", "画圆"], draw_index = 0;
+	var canvas = document.getElementById("canvas");
+	var context = canvas.getContext('2d');
+	var prePoint = null;
+
+	// 功能切换
+	function switch_draw_fun() {
+		draw_index = (draw_index + 1) % draw.length;
+		$("#draw_fun").html(draw[draw_index]);
+	}
+
+	// 清空
+	function clear_canvas(point) {
+		if (point) {
+			context.clearRect(pointLength * point.x,
+					pointLength * point.y,
+					pointLength,
+					pointLength);
+		} else {
+			context.clearRect(0, 0, cssStyle.width, cssStyle.height);
+		}
+		context.beginPath();
+	}
+	// 画点
+	function set_pixel(point) {
+		context.fillRect(pointLength * point.x,
+					pointLength * point.y,
+					pointLength,
+					pointLength);
+	}
+
+	// 画线
+	function line(start, end) {
+		// 默认变换（第一象限，m<1）
+		var defTransFunc = (function (p) { return p; });
+		// m>1时的变换
+		if (Math.abs(end.y - start.y) > Math.abs(end.x - start.x)) {
+			start = ({ x: start.y, y: start.x });
+			end = ({ x: end.y, y: end.x });
+			defTransFunc = (function (p) {
+				return ({ x: p.y, y: p.x });
+			});
+		}
+		// start设为左边的点
+		if (start.x > end.x) {
+			var tmp = start;
+			start = end;
+			end = tmp;
+		}
+		// 第四象限变换
+		if (end.y < start.y) {
+			var oldFun = defTransFunc;
+			var da = 2 * (start.y - end.y);
+			end.y += da;
+			defTransFunc = (function (p) {
+				return oldFun({ x: p.x, y: p.y + 2 * (start.y - p.y) });
+			});
+		}
+
+		var bresenham_line = function (x0, y0, x1, y1) {
+			var x = x0, y = y0,
+			dx = x1 - x0, dy = y1 - y0,
+			f = 2 * dy - dx,
+			incX = 2 * dy, incXY = 2 * (dy - dx);
+			for (var x = x0; x <= x1; ++x) {
+				set_pixel(defTransFunc({ x: x, y: y }));
+				if (f <= 0) {
+					f += incX;
+				} else {
+					f += incXY;
+					++y;
+				}
+			}
+		}
+
+		bresenham_line(start.x, start.y, end.x, end.y);
+	}
+
+	// 画圆
+	function circle(center, edge) {
+		// 计算半径的平方
+		var r2 = (center.x - edge.x) * (center.x - edge.x)
+				+ (center.y - edge.y) * (center.y - edge.y);
+		// 计算半径并取整
+		var r = parseInt(Math.sqrt(r2));
+		var pi = {x: 0, y: r};
+		// 4个对称点
+		var vec = [{ x: 1, y: 1 }, { x: -1, y: 1 }, { x: 1, y: -1 }, { x: -1, y: -1}];
+
+		// MidpointCircle
+		var deltaE = 3;
+		var deltaSE = 5 - 2 * r;
+		var d = 1 - r;
+
+		while (pi.x <= pi.y) {
+			// 画点
+			for (var i = 0; i < vec.length; ++i) {
+				set_pixel({ x: center.x + vec[i].x * pi.x,
+					y: center.y + vec[i].y * pi.y
+				});
+				set_pixel({ x: center.x + vec[i].y * pi.y,
+					y: center.y + vec[i].x * pi.x
+				});
+			}
+
+			// 计算下一个点
+			if (d < 0)   //Select E
+			{
+				d += deltaE;
+				deltaE += 2;
+				deltaSE += 2;
+			}
+			else       //Select SE
+			{
+				d += deltaSE;
+				deltaE += 2;
+				deltaSE += 4;
+				-- pi.y;
+			}
+			++ pi.x;
+		}
+	}
+
+	var draw_fun = { "画直线": line, "画圆": circle };
+
+	function on_change_pointLength() {
+		if (prePoint)
+			clear_canvas(prePoint);
+		pointLength = $("#point").val();
+		prePoint = null;
+	}
+	function on_mouse_lButtonDown(ev) {
+		var jca = $("#canvas");
+		var tb = { 'x': jca.position().left - $(window).scrollLeft(),
+			'y': jca.position().top - $(window).scrollTop()
+		};
+		var tp = { 'x': parseInt((ev.clientX - tb.x) / pointLength),
+			'y': parseInt((ev.clientY - tb.y) / pointLength)
+		};
+		if (null === prePoint) {
+			prePoint = tp;
+			set_pixel(prePoint);
+		}
+		else {
+			draw_fun[draw[draw_index]](prePoint, tp);
+			prePoint = null;
+		}
+	}
+
+	$(document).ready(function () {
+		$("#canvas").attr(cssStyle).css(cssStyle).click(on_mouse_lButtonDown);
+		$("#point").change(on_change_pointLength).val(pointLength);
+		$("#draw_fun").html(draw[draw_index]);
+	});
+</script>
+
+<!-- 腾讯分析服务 -->
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
+
+<!-- 百度统计服务 -->
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F31388d91e09374a027d6c0f4fc5888e7' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body></html>
