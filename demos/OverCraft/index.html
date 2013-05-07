@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>OverCraft</title>
+	<style type="text/css">
+		.style1
+		{
+			font-size: xx-large;
+			text-align: center;
+		}
+		.style2
+		{
+			width: 100%;
+		}
+		textarea.input
+		{
+			width: 100%;
+			color: darkcyan;
+			font-style: normal;
+			font-weight: bolder;
+			font-size: larger;
+		}
+		textarea.nothing
+		{
+			width: 100%;
+			color: Gray;
+			font-style: italic;
+			font-size: larger;
+		}
+	</style>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript" src="../../resource/js/jquery.browser.js"></script>
+	<script type="text/javascript">
+		// <!--
+		function InitLink() {
+			var sl4 = "window.open('sl3.html', 'OverCraft', 'width=600, height=600, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');";
+			var sl3 = "window.open('sl4.html', 'OverCraft', 'width=600, height=600, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');";
+			var errie = "alert('由于缺乏必要的Silverlight/.net运行时，请下载相关运行时。');";
+			var errwp = "alert('检测到您的系统是Windows Phone，如果您的系统是Windows Phone 7.0，请下载Windows Phone 7版');";
+			var erroth = "alert('由于缺乏Silverlight运行时，如果您安装了.net 3.5/4.0C请根据相应版本下载玩，或者更换Internet Explorer浏览器。若没有安装，请安装至少一种必要的运行时，谢谢');";
+			var bro = $.environment;
+			var but = $("#onlinebutton");
+			if (bro._silverlight4_0) {
+				$(but).attr("onclick", sl4);
+			} else if (bro._silverlight3_0) {
+				$(but).attr("onclick", sl3);
+			} else if (bro._silverlight) {
+				$(but).attr("onclick", sl3);
+			} else if (bro._OSName.match(/windows phone/)) {
+				$(but).attr("onclick", errwp);
+			} else if (bro._kbrow == "Microsoft Trident by IE") {
+				$(but).attr("onclick", errie);
+			} else {
+				$(but).attr("onclick", erroth);
+			}
+		}
+		// -->
+	</script>
+</head>
+<body>
+	<p class="style1">
+		<strong>OverCraft Public Test</strong></p>
+	<div style="text-align: center;">
+		<input id="onlinebutton"
+			type="button" value="Play Online" style="width: 256px; height: 64px;
+			margin: 25px auto 25px auto;" /></div>
+	游戏说明: <a href="readme.txt" target="_blank">Readme(cn-zh)</a> 注:在线开启需要安装 <a href="http://www.microsoft.com/getsilverlight/get-started/install/default.aspx"
+			target="_blank">Microsoft Silverlight 4</a> 组件<br />
+	<a href="./OverCraft.zip">（WPF Edition，download）</a>(Require:<a href="http://www.microsoft.com/downloads/zh-cn/details.aspx?FamilyID=0A391ABD-25C1-4FC0-919F-B21F31AB88B7"
+		target="_blank">Microsoft .net Framework 4 Client Profile</a>)<br />
+	<p>
+		If you find Bugs, please mail to:<br />
+		<a href="mailto:qchu03@hotmail.com">qchu03@hotmail.com</a><br />
+		<a href="mailto:owt5008137@live.com">owt5008137@live.com</a><br />
+	</p>
+	<p>Now Release v1.0.0.0</p>
+	Playing Online in Browser<br />
+	<ul>
+		<li><a href="#" onclick="window.open('sl3.html', 'OverCraft', 'width=600, height=600, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');">Silverlight 3</a></li>
+		<li><a href="#" onclick="window.open('sl4.html', 'OverCraft', 'width=600, height=600, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no');">Silverlight 4</a></li>
+	</ul>
+	Download<br />
+	<ul>
+		<li><a href="../../release/OverCraft/WPF3.5/OverCraft.zip">WPF 3.5</a></li>
+		<li><a href="../../release/OverCraft/WPF4/OverCraft.zip">WPF 4</a></li>
+		<li><a href="../../release/OverCraft/SL3/OverCraft.xap">Silverlight 3</a></li>
+		<li><a href="../../release/OverCraft/SL4/OverCraft.xap">Silverlight 4</a></li>
+		<li><a href="../../release/OverCraft/WP7/OverCraft.xap">Silverlight for Windows Phone 7</a></li>
+	</ul>
+	<hr />
+	© Ecust Team Overmind
+	
+<!-- 腾讯分析服务 -->
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
+
+<!-- 百度统计服务 -->
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F31388d91e09374a027d6c0f4fc5888e7' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</body>
+</html>

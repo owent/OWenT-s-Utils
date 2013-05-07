@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>Testing Brower && Operation System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <style type="text/css">
+        .style1
+        {
+            width: 301px;
+            text-align: center;
+        }
+        .style2
+        {
+            text-align: center;
+        }
+    </style>
+    <script language="javascript" type="text/javascript" src="../../resource/js/jquery.browser.js"></script>
+    <script language="javascript" type="text/javascript">
+        var res = "";
+        (function () {
+
+            var bro = Util.getEnvironment();
+            res += "<tr><td style='width: 200px;'>UserAgent</td><td>" + bro._userAgent + "</td></tr>";
+            res += "<tr><td>Environment</td><td>" + bro.toString() + "</td></tr>";
+            res += "<tr><td>Cookie</td><td>" + bro._cookieEnabled + "</td></tr>";
+            res += "<tr><td>Browser Name</td><td>" + bro._browserName + "</td></tr>";
+            res += "<tr><td>Short Name</td><td>" + bro._browserShort + "</td></tr>";
+            res += "<tr><td>Browser Version</td><td>" + bro._browserVersion + "</td></tr>";
+            res += "<tr><td>Operating System Name</td><td>" + bro._OSName + "</td></tr>";
+            res += "<tr><td>Operating System Kernal</td><td>" + bro._kos + "</td></tr>";
+            res += "<tr><td>Browser Kernal</td><td>" + bro._kbrow + "</td></tr>";
+            res += "<tr><td>Browser Kernal Version</td><td>" + bro._kver + "</td></tr>";
+            res += "<tr><td>Browser Platfrom</td><td>" + bro._platbr + "</td></tr>";
+            res += "<tr><td>Operating System Platfrom</td><td>" + bro._platos + "</td></tr>";
+            res += bro._platform? ("<tr><td>Environment Platform</td><td>" + bro._platform + "</td></tr>"): "";
+            res += "<tr><td>Rendering Mode</td><td>" + (bro._compatMode == "CSS1Compat" ? "Standard Mode" : (bro._compatMode == "BackCompat") ? "BackCompat Mode" : bro._compatMode) + "</td></tr>";
+            res += bro._isCompatMode ? ("<tr><td>Compatibility view</td><td>" + "You are in Compatibility View" + "</td></tr>") : "";
+        })();
+    </script>
+</head>
+<body>
+    <script language="javascript" type="text/javascript">
+        document.body.innerHTML = "<table>" + res + "</table>";
+    </script>
+    
+<!-- 腾讯分析服务 -->
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
+
+<!-- 百度统计服务 -->
+<script type="text/javascript">
+var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F31388d91e09374a027d6c0f4fc5888e7' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+</body>
+</html>
