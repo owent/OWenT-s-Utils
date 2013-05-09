@@ -2,16 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(OWenTsUtilsCPP)
 
-# ±àÒëÑ¡Ïî
+# ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
 #####################################################################
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Compile Version.")
 
 #add_definitions(-D_POSIX_MT_)
 #remove_definitions(-D_POSIX_MT_)
-# ¿âÎÄ¼þµÄ¸½¼Ó²ÎÊý -fPIC, ¶àÏß³Ì¸½¼Ó²ÎÊý -pthread
+# ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ä¸ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ -fPIC, ï¿½ï¿½ï¿½Ì¸ß³ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ -pthread
 set(ALL_FLAGS_IN_ONE_COMMON "-Wall -Werror -Wno-invalid-offsetof -Wno-unused-local-typedefs") 
 set(ALL_FLAGS_IN_ONE_DEBUG "-g -ggdb -O0 ${ALL_FLAGS_IN_ONE_COMMON}")
 set(ALL_FLAGS_IN_ONE_RELEASE "-O2 ${ALL_FLAGS_IN_ONE_COMMON} -DNDEBUG")
@@ -28,7 +26,7 @@ set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_RELEASE}")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_RELWITHDEBINFO}")
 set(CMAKE_C_FLAGS_MINSIZEREL "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_MINSIZEREL}")
 
-# Éú³É¿âÎÄ¼þ
+# ï¿½ï¿½ï¿½É¿ï¿½ï¿½Ä¼ï¿½
 set(PROJECT_ALL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(PROJECT_ALL_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_ALL_INCLUDE_DIR}")
