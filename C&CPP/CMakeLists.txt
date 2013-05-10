@@ -5,7 +5,9 @@ project(OWenTsUtilsCPP)
 # 编译选项 
 #####################################################################
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
-set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Compile Version.")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Compile Version.")
+endif()
 
 #add_definitions(-D_POSIX_MT_)
 #remove_definitions(-D_POSIX_MT_)
