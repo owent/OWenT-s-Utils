@@ -1,9 +1,9 @@
-
 # 默认配置选项
 #####################################################################
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Default Compile Version.")
-# set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Compile Version.")
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Compile Version.")
+endif()
 
 # 编译器选项 (仅做了GCC、VC和Clang兼容)
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -37,4 +37,4 @@ set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_RELEASE}")
 set(CMAKE_C_FLAGS_RELWITHDEBINFO "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_RELWITHDEBINFO}")
 set(CMAKE_C_FLAGS_MINSIZEREL "$ENV{CFLAGS} ${ALL_FLAGS_IN_ONE_MINSIZEREL}")
 
-# 库文件的附加参数 -fPIC, 多线程附加参数 -pthread
+# 库文件的附加参数 -fPIC, 多线程附加参数 -pthread -D_POSIX_MT_
