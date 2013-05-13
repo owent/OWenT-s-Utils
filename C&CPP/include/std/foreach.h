@@ -1,12 +1,12 @@
 /**
  * @file foreach.hpp
- * @brief foreach ¶¨Òå
- *        Ö§³ÖVC++¡¢GCC
- *        foreach·ÖÖ§
- *        1. ÔÚ±àÒëÆ÷Ö§³Ö²¢ÆôÓÃÁËC++11±ê×¼ÊÇ»áÊ¹ÓÃC++11µÄ range-based-loop
- *        2. ÀÏ°æ±¾µÄVCÔÚÖ§³Öfor each(var obj in arr)Ê±»áÊ¹ÓÃVC±àÒëÆ÷µÄfor eachÓï·¨
- *        3. Èç¹ûÏîÄ¿Ê¹ÓÃÁËBOOST¿â£¬»áÊ¹ÓÃBOOST_FOREACH
- *        4. Èç¹ûÒÔÉÏÇé¿ö¶¼²»Âú×ã£¬Ôò»áÊ¹ÓÃ×Ô¼ºÊµÏÖµÄ¼òµ¥foreach [½öÔÚ GCC 4.1.2 4.4.5 4.7.1 ºÍ VC 11.0 RC ÏÂ²âÊÔ¹ı]
+ * @brief foreach å®šä¹‰
+ *        æ”¯æŒVC++ã€GCC
+ *        foreachåˆ†æ”¯
+ *        1. åœ¨ç¼–è¯‘å™¨æ”¯æŒå¹¶å¯ç”¨äº†C++11æ ‡å‡†æ˜¯ä¼šä½¿ç”¨C++11çš„ range-based-loop
+ *        2. è€ç‰ˆæœ¬çš„VCåœ¨æ”¯æŒfor each(var obj in arr)æ—¶ä¼šä½¿ç”¨VCç¼–è¯‘å™¨çš„for eachè¯­æ³•
+ *        3. å¦‚æœé¡¹ç›®ä½¿ç”¨äº†BOOSTåº“ï¼Œä¼šä½¿ç”¨BOOST_FOREACH
+ *        4. å¦‚æœä»¥ä¸Šæƒ…å†µéƒ½ä¸æ»¡è¶³ï¼Œåˆ™ä¼šä½¿ç”¨è‡ªå·±å®ç°çš„ç®€å•foreach [ä»…åœ¨ GCC 4.1.2 4.4.5 4.7.1 å’Œ VC 11.0 RC ä¸‹æµ‹è¯•è¿‡]
  *
  *
  * Licensed under the MIT licenses.
@@ -15,7 +15,7 @@
  * @author OWenT, owt5008137@live.com
  * @date 2012.06.27
  * @example
- *       //Êı×é
+ *       //æ•°ç»„
  *       const int arr[] = {1, 7, 3, 9, 5, 6, 2, 8, 4};
  *       owent_foreach(const int& v, arr) {
  *           printf("%d\n", v);
@@ -31,13 +31,13 @@
  *       //std::map
  *       std::map<int, int> mp;
  *       //...
- *       typedef std::pair<const int, int> map_pair; // ÓÉÓÚforeachÊÇºê¶¨Òå£¬ËùÒÔÀàĞÍÀï´ø¶ººÅµÄ»°±ØĞëÕâÃ´´¦Àí£¬·ñÔò±àÒëÆ÷»áÈÏÎªÕâ¸ö¶ººÅÊÇ²ÎÊı·Ö¸ô·û
+ *       typedef std::pair<const int, int> map_pair; // ç”±äºforeachæ˜¯å®å®šä¹‰ï¼Œæ‰€ä»¥ç±»å‹é‡Œå¸¦é€—å·çš„è¯å¿…é¡»è¿™ä¹ˆå¤„ç†ï¼Œå¦åˆ™ç¼–è¯‘å™¨ä¼šè®¤ä¸ºè¿™ä¸ªé€—å·æ˜¯å‚æ•°åˆ†éš”ç¬¦
  *       owent_foreach(map_pair& pr, mp) {
  *           pr.second = 0;
  *       }
  *
  * @history
- *   2012.07.19 Ôö¼Ó¶ÔÓĞconstÉêÃ÷µÄstlÈİÆ÷µÄÖ§³Ö
+ *   2012.07.19 å¢åŠ å¯¹æœ‰constç”³æ˜çš„stlå®¹å™¨çš„æ”¯æŒ
  *
  */
  
@@ -48,50 +48,50 @@
 #endif
  
 // ============================================================
-// ¹«¹²»ù´¡¿â
-// foreach£¬ÊµÏÖÔ­ÀíÀàËÆboostµÄforeach
-// ×Ô¶¯²ÉÓÃ±àÒëÆ÷Ìá¹©µÄforeach¹¦ÄÜ
+// å…¬å…±åŸºç¡€åº“
+// foreachï¼Œå®ç°åŸç†ç±»ä¼¼boostçš„foreach
+// è‡ªåŠ¨é‡‡ç”¨ç¼–è¯‘å™¨æä¾›çš„foreachåŠŸèƒ½
 // ============================================================
   
 /**
- * foreachº¯Êı
- * Èç¹ûÊÇG++ÇÒ°æ±¾¸ßÓÚ4.6ÇÒ¿ªÆôÁËc++0x»òc++11, »òÕßÊÇÖ§³ÖC++11µÄVC++
- * Ôò»áÆôÓÃC++11±ê×¼µÄrange-based-forÑ­»·
+ * foreachå‡½æ•°
+ * å¦‚æœæ˜¯G++ä¸”ç‰ˆæœ¬é«˜äº4.6ä¸”å¼€å¯äº†c++0xæˆ–c++11, æˆ–è€…æ˜¯æ”¯æŒC++11çš„VC++
+ * åˆ™ä¼šå¯ç”¨C++11æ ‡å‡†çš„range-based-forå¾ªç¯
  *
- * Èç¹ûÊÇVC++ÇÒ°æ±¾¸ßÓÚ9.0 SP1
- * Ôò»áÆôÓÃVC++µÄ for each (object var in collection_to_loop)
+ * å¦‚æœæ˜¯VC++ä¸”ç‰ˆæœ¬é«˜äº9.0 SP1
+ * åˆ™ä¼šå¯ç”¨VC++çš„ for each (object var in collection_to_loop)
  *
- * Èç¹ûÆôÓÃÁËBOOST¿â (Ôö¼Óºê¶¨Òå FOREACH_WITH_BOOST_HPP )
- * Ôò»áÊ¹ÓÃBOOST_FOREACH
+ * å¦‚æœå¯ç”¨äº†BOOSTåº“ (å¢åŠ å®å®šä¹‰ FOREACH_WITH_BOOST_HPP )
+ * åˆ™ä¼šä½¿ç”¨BOOST_FOREACH
  *
- * ·ñÔò×Ô¶¨Òåforeach·½·¨
+ * å¦åˆ™è‡ªå®šä¹‰foreachæ–¹æ³•
  */
   
-// VC11.0 SP1ÒÔÉÏ·ÖÖ§ÅĞ¶Ï
+// VC11.0 SP1ä»¥ä¸Šåˆ†æ”¯åˆ¤æ–­
 #if defined(_MSC_VER) && (_MSC_VER > 1500 || (_MSC_VER == 1500 && defined (_HAS_TR1)))
     #if _MSC_VER >= 1700
-        // ²ÉÓÃ VC µÄrange-based-forÑ­»·
+        // é‡‡ç”¨ VC çš„range-based-forå¾ªç¯
         #define owent_foreach(VAR, COL) for(VAR : COL)
     #else
-        // ²ÉÓÃ VC µÄ for each (object var in collection_to_loop)
+        // é‡‡ç”¨ VC çš„ for each (object var in collection_to_loop)
         #define owent_foreach(VAR, COL) for each (VAR in COL)
     #endif
 #elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
-    // ²ÉÓÃG++ µÄrange-based-forÑ­»·
+    // é‡‡ç”¨G++ çš„range-based-forå¾ªç¯
     #define owent_foreach(VAR, COL) for(VAR : COL)
 #elif defined(FOREACH_WITH_BOOST_HPP) || defined(BOOST_FOREACH)
     #include <boost/foreach.hpp>
     #define owent_foreach(VAR, COL) BOOST_FOREACH(VAR, COL)
 #else
     #include <cstddef>
-    // ¹¦ÄÜÊÜÏŞµÄforeachº¯Êı
+    // åŠŸèƒ½å—é™çš„foreachå‡½æ•°
     namespace foreach_detail{
         ///////////////////////////////////////////////////////////////////////////////
-        // ×Ô¶¯ÀàĞÍ
+        // è‡ªåŠ¨ç±»å‹
         ///////////////////////////////////////////////////////////////////////////////
         struct auto_any_base
         {
-            // ÓÃÓÚºê¶¨ÒåÖĞµÄ³õÊ¼»¯ÅĞ¶Ï
+            // ç”¨äºå®å®šä¹‰ä¸­çš„åˆå§‹åŒ–åˆ¤æ–­
             operator bool() const
             {
                 return false;
@@ -106,7 +106,7 @@
             {
             }
  
-            // ÉùÃ÷ÎªÓÀ¾Ã¿É±ä
+            // å£°æ˜ä¸ºæ°¸ä¹…å¯å˜
             mutable T item;
         };
  
@@ -115,8 +115,8 @@
         #define OWENT_FOREACH_ARRAY_DECL(x, y, z) x (&y)[z]
         #define OWENT_FOREACH_ALLOC_DECL(x, y) x& y
         #if defined(_MSC_VER) && _MSC_VER <= 1500
-        // Ä³Ğ©°æ±¾µÄVC,ÓÉÓÚÓï¾ä¿é±äÁ¿×÷ÓÃÓòµÄÎÊÌâ(±ÈÈçVC 6)
-        // ĞèÒªÊ¹ÓÃ__LINE__À´´´½¨Î¨Ò»±êÊ¶·û£¨²Î×ÔBOOST_FOREACH£©
+        // æŸäº›ç‰ˆæœ¬çš„VC,ç”±äºè¯­å¥å—å˜é‡ä½œç”¨åŸŸçš„é—®é¢˜(æ¯”å¦‚VC 6)
+        // éœ€è¦ä½¿ç”¨__LINE__æ¥åˆ›å»ºå”¯ä¸€æ ‡è¯†ç¬¦ï¼ˆå‚è‡ªBOOST_FOREACHï¼‰
             #define OWENT_FOREACH_CAT(x, y) x ## y
             #define OWENT_FOREACH_ID(x) OWENT_FOREACH_CAT(x, __LINE__)
         #else
@@ -130,23 +130,23 @@
         }
  
         /////////////////////////////////////////////////////////////////////////////
-        // »ñÈ¡¿ªÊ¼Î»ÖÃ
+        // è·å–å¼€å§‹ä½ç½®
         /////////////////////////////////////////////////////////////////////////////
      
-        // Ä£°åÀàµü´úÆ÷
+        // æ¨¡æ¿ç±»è¿­ä»£å™¨
         template<typename _Ty> inline
         OWENT_FOREACH_ANY_TYPE(typename _Ty::const_iterator) begin(OWENT_FOREACH_ALLOC_DECL(const _Ty, c))
-        {   // »ñÈ¡ÈİÆ÷ÆğÊ¼µü´úÆ÷
+        {   // è·å–å®¹å™¨èµ·å§‹è¿­ä»£å™¨
             return OWENT_FOREACH_ANY_TYPE(typename _Ty::const_iterator)(c.begin());
         }
  
         template<typename _Ty> inline
         OWENT_FOREACH_ANY_TYPE(typename _Ty::iterator) begin(OWENT_FOREACH_ALLOC_DECL(_Ty, c))
-        {   // »ñÈ¡ÈİÆ÷ÆğÊ¼µü´úÆ÷
+        {   // è·å–å®¹å™¨èµ·å§‹è¿­ä»£å™¨
             return OWENT_FOREACH_ANY_TYPE(typename _Ty::iterator)(c.begin());
         }
  
-        // Êı×éÖ¸Õë
+        // æ•°ç»„æŒ‡é’ˆ
         template<typename _Ty, std::size_t _Size> inline
         OWENT_FOREACH_ANY_TYPE(const _Ty*) begin(OWENT_FOREACH_ARRAY_DECL(const _Ty, arr, _Size))
         {   
@@ -160,10 +160,10 @@
         }
  
         /////////////////////////////////////////////////////////////////////////////
-        // ÒÆ¶¯ÓÎ±ê
+        // ç§»åŠ¨æ¸¸æ ‡
         /////////////////////////////////////////////////////////////////////////////
      
-        // Ä£°åÀàµü´úÆ÷
+        // æ¨¡æ¿ç±»è¿­ä»£å™¨
         template<typename _Ty> inline
         void next(OWENT_FOREACH_ALLOC_DECL(const _Ty, _Array), auto_any_t cur)
         {
@@ -176,7 +176,7 @@
             ++ auto_any_cast<typename _Ty::iterator>(cur);
         }
  
-        // Êı×éÖ¸Õë
+        // æ•°ç»„æŒ‡é’ˆ
         template<typename _Ty, std::size_t _Size> inline
         void next(OWENT_FOREACH_ARRAY_DECL(const _Ty, arr, _Size), auto_any_t cur)
         {
@@ -191,10 +191,10 @@
      
      
         /////////////////////////////////////////////////////////////////////////////
-        // ÅĞ¶ÏÊÇ·ñ½áÊø
+        // åˆ¤æ–­æ˜¯å¦ç»“æŸ
         /////////////////////////////////////////////////////////////////////////////
  
-        // Ä£°åÀàµü´úÆ÷
+        // æ¨¡æ¿ç±»è¿­ä»£å™¨
         template<typename _Ty> inline
         bool end(OWENT_FOREACH_ALLOC_DECL(const _Ty, _Array), auto_any_t cur)
         {
@@ -207,7 +207,7 @@
             return auto_any_cast<typename _Ty::iterator>(cur) == _Array.end();
         }
  
-        // Êı×éÖ¸Õë
+        // æ•°ç»„æŒ‡é’ˆ
         template<typename _Ty, std::size_t _Size> inline
         bool end(OWENT_FOREACH_ARRAY_DECL(const _Ty, arr, _Size), auto_any_t cur)
         {
@@ -221,10 +221,10 @@
         }
  
         /////////////////////////////////////////////////////////////////////////////
-        // Êı¾İ×ª»»
+        // æ•°æ®è½¬æ¢
         /////////////////////////////////////////////////////////////////////////////
      
-        // Ä£°åÀàµü´úÆ÷ÄÚÈİ
+        // æ¨¡æ¿ç±»è¿­ä»£å™¨å†…å®¹
         template<typename _Ty> inline
         typename _Ty::const_iterator& deref(OWENT_FOREACH_ALLOC_DECL(const _Ty, arr), auto_any_t cur)
         {
@@ -237,7 +237,7 @@
             return auto_any_cast<typename _Ty::iterator>(cur);
         }
  
-        // Êı×éÔªËØ
+        // æ•°ç»„å…ƒç´ 
         template<typename _Ty, std::size_t _Size> inline
         const _Ty*& deref(OWENT_FOREACH_ARRAY_DECL(const _Ty, arr, _Size), auto_any_t cur)
         {
