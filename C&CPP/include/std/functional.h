@@ -1,6 +1,6 @@
 /**
  * @file functional.h
- * @brief µ¼Èë¸ß¼¶¿â£¬hash¡¢ÒýÓÃ°ü×°µÈ
+ * @brief å¯¼å…¥é«˜çº§åº“ï¼Œhashã€å¼•ç”¨åŒ…è£…ç­‰
  * Licensed under the MIT licenses.
  *
  * @version 1.0
@@ -19,28 +19,28 @@
 #endif
  
 // ============================================================
-// ¹«¹²°üº¬²¿·Ö
-// ×Ô¶¯µ¼ÈëTR1¿â
+// å…¬å…±åŒ…å«éƒ¨åˆ†
+// è‡ªåŠ¨å¯¼å…¥TR1åº“
 // ============================================================
   
 /**
-* µ¼Èë¿Éµ÷ÓÃ¶ÔÏó£¨functional£©
-* Èç¹ûÊÇG++ÇÒÖ§³Öc++0x²Ý°¸1£¨tr1°æ±¾£©µÄfunctional[GCC°æ±¾¸ßÓÚ4.3]
-* Ôò»áÆôÓÃGNU-C++µÄfunctional
+* å¯¼å…¥å¯è°ƒç”¨å¯¹è±¡ï¼ˆfunctionalï¼‰
+* å¦‚æžœæ˜¯G++ä¸”æ”¯æŒc++0xè‰æ¡ˆ1ï¼ˆtr1ç‰ˆæœ¬ï¼‰çš„functional[GCCç‰ˆæœ¬é«˜äºŽ4.3]
+* åˆ™ä¼šå¯ç”¨GNU-C++çš„functional
 *
-* Èç¹ûÊÇVC++ÇÒÖ§³Öc++0x²Ý°¸1£¨tr1°æ±¾£©µÄfunctional[VC++°æ±¾¸ßÓÚ9.0 SP1]
-* Ôò»áÆôÓÃVC++µÄfunctional
+* å¦‚æžœæ˜¯VC++ä¸”æ”¯æŒc++0xè‰æ¡ˆ1ï¼ˆtr1ç‰ˆæœ¬ï¼‰çš„functional[VC++ç‰ˆæœ¬é«˜äºŽ9.0 SP1]
+* åˆ™ä¼šå¯ç”¨VC++çš„functional
 *
-* ·ñÔòÆôÓÃboostÖÐµÄfunctional¿â£¨Èç¹ûÊÇÕâÖÖÇé¿öÐèÒª¼ÓÈëboost¿â£©
+* å¦åˆ™å¯ç”¨boostä¸­çš„functionalåº“ï¼ˆå¦‚æžœæ˜¯è¿™ç§æƒ…å†µéœ€è¦åŠ å…¥booståº“ï¼‰
 */
   
-// VC9.0 SP1ÒÔÉÏ·ÖÖ§ÅÐ¶Ï
+// VC9.0 SP1ä»¥ä¸Šåˆ†æ”¯åˆ¤æ–­
 #if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1) || _MSC_VER > 1500)
-    // ²ÉÓÃVC std::tr1¿â
+    // é‡‡ç”¨VC std::tr1åº“
     #include <functional>
 #elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 3
-    // ²ÉÓÃG++ std::tr1¿â
-    #ifndef __GXX_EXPERIMENTAL_CXX0X__
+    // é‡‡ç”¨G++ std::tr1åº“
+    #if !defined(__GXX_EXPERIMENTAL_CXX0X__) && !defined(__clang__)
         #include <tr1/functional>
         namespace std {
             using tr1::ref;
@@ -66,7 +66,7 @@
         #include <functional>
     #endif
 #else
-    // ²ÉÓÃboost tr1¿â
+    // é‡‡ç”¨boost tr1åº“
     #include <boost/tr1/functional>
     namespace std {
         using tr1::ref;
