@@ -1,6 +1,6 @@
 /**
  * @file tuple.h
- * @brief µ¼Èë¶àÔª×é¿â
+ * @brief å¯¼å…¥å¤šå…ƒç»„åº“
  * Licensed under the MIT licenses.
  *
  * @version 1.0
@@ -20,32 +20,32 @@
 #endif
  
 // ============================================================
-// ¹«¹²°üº¬²¿·Ö
-// ×Ô¶¯µ¼ÈëTR1¿â
+// å…¬å…±åŒ…å«éƒ¨åˆ†
+// è‡ªåŠ¨å¯¼å…¥TR1åº“
 // ============================================================
   
 /**
-* µ¼Èë¶àÎ¬Ôª×é£¨tuple£©
-* Ïàµ±ÓÚstd::pairµÄÔöÇ¿°æ£¬×î¶àÖ§³Ö10Î¬
-* Èç¹ûÊÇG++ÇÒÖ§³Öc++0x²Ý°¸1£¨tr1°æ±¾£©µÄtuple[GCC°æ±¾¸ßÓÚ4.0]
-* Ôò»áÆôÓÃGNU-C++µÄ¶àÎ¬Ôª×é
+* å¯¼å…¥å¤šç»´å…ƒç»„ï¼ˆtupleï¼‰
+* ç›¸å½“äºŽstd::pairçš„å¢žå¼ºç‰ˆï¼Œæœ€å¤šæ”¯æŒ10ç»´
+* å¦‚æžœæ˜¯G++ä¸”æ”¯æŒc++0xè‰æ¡ˆ1ï¼ˆtr1ç‰ˆæœ¬ï¼‰çš„tuple[GCCç‰ˆæœ¬é«˜äºŽ4.0]
+* åˆ™ä¼šå¯ç”¨GNU-C++çš„å¤šç»´å…ƒç»„
 *
-* Èç¹ûÊÇVC++ÇÒÖ§³Öc++0x²Ý°¸1£¨tr1°æ±¾£©µÄtuple[VC++°æ±¾¸ßÓÚ9.0 SP1]
-* Ôò»áÆôÓÃVC++µÄ¶àÎ¬Ôª×é
+* å¦‚æžœæ˜¯VC++ä¸”æ”¯æŒc++0xè‰æ¡ˆ1ï¼ˆtr1ç‰ˆæœ¬ï¼‰çš„tuple[VC++ç‰ˆæœ¬é«˜äºŽ9.0 SP1]
+* åˆ™ä¼šå¯ç”¨VC++çš„å¤šç»´å…ƒç»„
 *
-* ·ñÔòÆôÓÃboostÖÐµÄtuple¿â£¨Èç¹ûÊÇÕâÖÖÇé¿öÐèÒª¼ÓÈëboost¿â£©
+* å¦åˆ™å¯ç”¨boostä¸­çš„tupleåº“ï¼ˆå¦‚æžœæ˜¯è¿™ç§æƒ…å†µéœ€è¦åŠ å…¥booståº“ï¼‰
 */
   
  
 #include "utility.h"
  
-// VC9.0 SP1ÒÔÉÏ·ÖÖ§ÅÐ¶Ï
+// VC9.0 SP1ä»¥ä¸Šåˆ†æ”¯åˆ¤æ–­
 #if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1) || _MSC_VER > 1500)
-    // ²ÉÓÃVC std::tr1¿â
+    // é‡‡ç”¨VC std::tr1åº“
     #include <tuple>
 #elif defined(__GNUC__) && __GNUC__ >= 4
-    // ²ÉÓÃG++ std::tr1¿â
-    #ifndef __GXX_EXPERIMENTAL_CXX0X__
+    // é‡‡ç”¨G++ std::tr1åº“
+    #if !defined(__GXX_EXPERIMENTAL_CXX0X__) && !defined(__clang__)
         #include <tr1/tuple>
         namespace std {
             using tr1::get;
@@ -60,7 +60,7 @@
         #include <tuple>
     #endif
 #else
-// ²ÉÓÃboost¿â
+// é‡‡ç”¨booståº“
 #include <boost/tr1/tuple.hpp>
 namespace std {
     using tr1::get;
