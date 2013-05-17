@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# ¹«¹²±äÁ¿
+# å…¬å…±å˜é‡
 WORKING_DIR=$PWD
 
-# »ñÈ¡µ±Ç°½Å±¾Ä¿Â¼
+# è·å–å½“å‰è„šæœ¬ç›®å½•
 function get_script_dir()
 {
 	echo "$( cd "$( dirname "$0" )" && pwd )";
 }
 
-# ÉèÖÃ±¾µØÓïÑÔ
+# è®¾ç½®æœ¬åœ°è¯­è¨€
 function set_local_lang()
 {
 	TARGET_LANG="zh_CN.UTF-8";
@@ -36,7 +36,7 @@ function set_local_lang()
 	export AUTO_DETECT_UTF8="yes"
 }
 
-# ±£ÁôÖ¸¶¨¸öÊıµÄÎÄ¼ş
+# ä¿ç•™æŒ‡å®šä¸ªæ•°çš„æ–‡ä»¶
 function remove_more_than()
 {
     filter="$1";
@@ -48,7 +48,7 @@ function remove_more_than()
     done
 }
 
-# Ô¶³ÌÖ¸Áî
+# è¿œç¨‹æŒ‡ä»¤
 function auto_scp()
 {
     src=$1
@@ -76,7 +76,7 @@ function auto_ssh_exec()
             "
 }
 
-# Çå¿ÕLinux»º´æ
+# æ¸…ç©ºLinuxç¼“å­˜
 function free_useless_memory()
 {
 	CURRENT_USER_NAME=$(whoami)
@@ -89,7 +89,7 @@ function free_useless_memory()
 	echo 3 > /proc/sys/vm/drop_caches
 }
 
-# Çå¿ÕÎ´±»ÒıÓÃµÄÓÃ»§¹²ÏíÄÚ´æ
+# æ¸…ç©ºæœªè¢«å¼•ç”¨çš„ç”¨æˆ·å…±äº«å†…å­˜
 function remove_user_empty_ipc()
 {
 	CURRENT_USER_NAME=$(whoami)
@@ -99,7 +99,7 @@ function remove_user_empty_ipc()
 	done
 }
 
-# Çå¿ÕÓÃ»§¹²ÏíÄÚ´æ
+# æ¸…ç©ºç”¨æˆ·å…±äº«å†…å­˜
 function remove_user_ipc()
 {
 	CURRENT_USER_NAME=$(whoami)
@@ -109,4 +109,32 @@ function remove_user_ipc()
 	done
 }
 
+# è·å–ç³»ç»ŸIPv4åœ°å€
+function get_ipv4_address()
+{
+	ALL_IP_ADDRESS=($(ifconfig | grep 'inet addr' | awk '{print $2}' | cut -d: -f2));
+	if [ $# -gt 0 ]; then
+		if [ "$1" == "count" ] || [ "$1" == "number" ]; then
+			echo ${#ALL_IP_ADDRESS[@]};
+		else
+			echo ${ALL_IP_ADDRESS[$1]};
+		fi
+		return;
+	fi
+	echo ${ALL_IP_ADDRESS[@]};
+}
 
+# è·å–ç³»ç»ŸIPv6åœ°å€
+function get_ipv6_address()
+{
+	ALL_IP_ADDRESS=($(ifconfig | grep 'inet6 addr' | awk '{print $3}' | cut -d/ -f1));
+	if [ $# -gt 0 ]; then
+		if [ "$1" == "count" ] || [ "$1" == "number" ]; then
+			echo ${#ALL_IP_ADDRESS[@]};
+		else
+			echo ${ALL_IP_ADDRESS[$1]};
+		fi
+		return;
+	fi
+	echo ${ALL_IP_ADDRESS[@]};
+}
