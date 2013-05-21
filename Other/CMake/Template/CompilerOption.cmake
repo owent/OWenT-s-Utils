@@ -1,4 +1,3 @@
-
 # 默认配置选项
 #####################################################################
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
@@ -10,7 +9,12 @@ endif()
 
 # 编译器选项 (仅做了GCC、VC和Clang兼容)
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	add_definitions(-Wall -Werror -Wno-unused-local-typedefs -rdynamic -fPIC -D_POSIX_MT_)
+	add_definitions(-Wall -Werror -rdynamic -fPIC -D_POSIX_MT_)
+	# 检测GCC版本大于等于4.8时，默认-Wno-unused-local-typedefs (普片用于type_traits，故而关闭该警告)
+	if ( CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8.0" OR CMAKE_CXX_COMPILER_VERSION  VERSION_EQUAL "4.8.0" )
+		add_definitions(-Wno-unused-local-typedefs)
+		message(STATUS "GCC Version ${CMAKE_CXX_COMPILER_VERSION} Found, -Wno-unused-local-typedefs added.")
+	endif()
 elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_definitions(-Wall -Werror -fPIC -D_POSIX_MT_)
 endif()
