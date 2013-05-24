@@ -54,6 +54,27 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 <h4><span style="color:#4B0082;">注：</span></h4>
 + (所有的库都会被安装在**$PREFEX_DIR**里)
 
+<h4><span style="color:#4B0082;">额外建议：</span></h4>
+给特定用户安装**gdb的pretty-printer**用以友好打印stdc++的stl容器
+
+1. 把[GCC源码目录]/libstdc++-v3/python 复制到[用户目录]/.gdb
+2. 在install.sh的gdb编译那里添加--with-python
+3. 安装python-devel python-libs
+4. 编辑[用户目录]/.gdbinit,添加
+<pre>
+python
+import sys
+import os
+p = os.path.expanduser('~/.gdb/python')
+print p
+if os.path.exists(p):
+    sys.path.insert(0, p)
+    from libstdcxx.v6.printers import register_libstdcxx_printers
+    register_libstdcxx_printers(None)
+end
+</pre>
+5. 编译安装gdb
+
 #### History:
 + 2013-03-26     Created
 + 2013-04-11     改进脚本，增加统一编译选项，增加对binutils和gdb可选包的编译，增加自动把PREFIX_DIR变为绝对路径的问题，统一目录组织，修复环境变量的一些小问题
