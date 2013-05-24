@@ -55,7 +55,7 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 + (所有的库都会被安装在**$PREFEX_DIR**里)
 
 <h4><span style="color:#4B0082;">额外建议：</span></h4>
-给特定用户安装**gdb的pretty-printer**用以友好打印stdc++的stl容器
+给特定用户安装 gdb的pretty-printer 用以友好打印stdc++的stl容器
 
 1. 把[GCC源码目录]/libstdc++-v3/python 复制到[用户目录]/.gdb
 2. 在install.sh的gdb编译那里添加--with-python
