@@ -40,7 +40,7 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 + gcc 4.4.7 or gcc 4.1.2 or gcc 4.4.5
 
 <h4><span style="color:#4B0082;">编译的依赖库：</span></h4>
-+ gmp 5.1.1
++ gmp 5.1.2
 + mpfr 3.1.2
 + mpc 1.0.1
 + isl 0.11.1
