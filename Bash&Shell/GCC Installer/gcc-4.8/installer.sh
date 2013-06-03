@@ -1,33 +1,39 @@
 #!/bin/sh
  
-# ======================================= ÅäÖÃ ======================================= 
-PREFIX_DIR=/usr/local/gcc-4.8.0
+# ======================================= é…ç½® ======================================= 
+PREFIX_DIR=/usr/local/gcc-4.8.1
  
-# ======================= ·Ç½»²æ±àÒë ======================= 
+# ======================= éäº¤å‰ç¼–è¯‘ ======================= 
 BUILD_TARGET_CONF_OPTION=""
 BUILD_OTHER_CONF_OPTION=""
  
-# ======================= ½»²æ±àÒëÅäÖÃÊ¾Àı ======================= 
+# ======================= äº¤å‰ç¼–è¯‘é…ç½®ç¤ºä¾‹(æš‚ä¸å¯ç”¨) ======================= 
 # BUILD_TARGET_CONF_OPTION="--target=arm-linux --enable-multilib --enable-interwork --disable-shared"
 # BUILD_OTHER_CONF_OPTION="--disable-shared"
   
-# ======================================= ¼ì²â ======================================= 
+# ======================================= æ£€æµ‹ ======================================= 
  
-# ======================= ¼ì²âÍêºóµÈ´ıÊ±¼ä ======================= 
+# ======================= æ£€æµ‹å®Œåç­‰å¾…æ—¶é—´ ======================= 
 CHECK_INFO_SLEEP=3
  
-# ======================= °²×°Ä¿Â¼³õÊ¼»¯ ======================= 
+# ======================= å®‰è£…ç›®å½•åˆå§‹åŒ–/å·¥ä½œç›®å½•æ¸…ç† ======================= 
 if [ $# -gt 0 ]; then
-    PREFIX_DIR=$1
+ if [ "$1" == "clean" ]; then
+		rm -rf $(ls -A -d -p * | grep -E "(.*)/$" | grep -v "addition/");
+		echo -e "\\033[32;1mnotice: clear work dir(s) done.\\033[39;49;0m"
+		exit;
+	else
+		PREFIX_DIR="$1";
+	fi
 fi
  
 mkdir -p "$PREFIX_DIR"
 PREFIX_DIR="$( cd "$PREFIX_DIR" && pwd )";
  
-# ======================= ×ªµ½½Å±¾Ä¿Â¼ ======================= 
+# ======================= è½¬åˆ°è„šæœ¬ç›®å½• ======================= 
 WORKING_DIR="$PWD";
  
-# ======================= Èç¹ûÊÇ64Î»ÏµÍ³ÇÒÃ»°²×°32Î»µÄ¿ª·¢°ü£¬Ôò±àÒëÒªgcc¼ÓÉÏ --disable-multilib ²ÎÊı, ²»Éú³É32Î»¿â ======================= 
+# ======================= å¦‚æœæ˜¯64ä½ç³»ç»Ÿä¸”æ²¡å®‰è£…32ä½çš„å¼€å‘åŒ…ï¼Œåˆ™ç¼–è¯‘è¦gccåŠ ä¸Š --disable-multilib å‚æ•°, ä¸ç”Ÿæˆ32ä½åº“ ======================= 
 SYS_LONG_BIT=$(getconf LONG_BIT)
 GCC_OPT_DISABLE_MULTILIB=""
 if [ $SYS_LONG_BIT == "64" ]; then
@@ -50,7 +56,7 @@ if [ $SYS_LONG_BIT == "64" ]; then
     fi
 fi
  
-# ======================= Èç¹ûÇ¿ÖÆ¿ªÆô£¬Ôò¿ªÆô ======================= 
+# ======================= å¦‚æœå¼ºåˆ¶å¼€å¯ï¼Œåˆ™å¼€å¯ ======================= 
 if [ ! -z "$GCC_OPT_DISABLE_MULTILIB" ]; then
     for opt in $BUILD_TARGET_CONF_OPTION ; do
         if [ "$opt" == "--enable-multilib" ]; then
@@ -62,7 +68,7 @@ if [ ! -z "$GCC_OPT_DISABLE_MULTILIB" ]; then
     done
 fi
  
-# ======================= ¼ì²âCPUÊıÁ¿£¬±àÒëÏß³ÌÊı²»ÄÜ´óÓÚCPUÊıÁ¿µÄ2±¶£¬·ñÔò¿ÉÄÜ³öÎÊÌâ ======================= 
+# ======================= æ£€æµ‹CPUæ•°é‡ï¼Œç¼–è¯‘çº¿ç¨‹æ•°ä¸èƒ½å¤§äºCPUæ•°é‡çš„2å€ï¼Œå¦åˆ™å¯èƒ½å‡ºé—®é¢˜ ======================= 
 BUILD_THREAD_OPT=8;
 BUILD_CPU_NUMBER=$(cat /proc/cpuinfo | grep -c "^processor[[:space:]]*:[[:space:]]*[0-9]*");
 let BUILD_THREAD_OPT=$BUILD_CPU_NUMBER*2;
@@ -72,7 +78,7 @@ fi
 BUILD_THREAD_OPT="-j$BUILD_THREAD_OPT";
 echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile."
  
-# ======================= Í³Ò»µÄ°ü¼ì²éºÍÏÂÔØº¯Êı ======================= 
+# ======================= ç»Ÿä¸€çš„åŒ…æ£€æŸ¥å’Œä¸‹è½½å‡½æ•° ======================= 
 function check_and_download(){
     PKG_NAME="$1";
     PKG_MATCH_EXPR="$2";
@@ -86,7 +92,7 @@ function check_and_download(){
      
     if [ -z "$PKG_URL" ]; then
         echo -e "\\033[31;1m$PKG_NAME not found.\\033[39;49;0m" 
-        exit -1;
+        return -1;
     fi
      
     wget -c "$PKG_URL";
@@ -94,16 +100,16 @@ function check_and_download(){
      
     if [ -z "$PKG_VAR_VAL" ]; then
         echo -e "\\033[31;1m$PKG_NAME not found.\\033[39;49;0m" 
-        exit -1;
+        return -1;
     fi
      
     echo "$PKG_VAR_VAL";
 }
  
-# ======================================= ¸ãÆğ ======================================= 
+# ======================================= æèµ· ======================================= 
 echo -e "\\033[31;1mcheck complete.\\033[39;49;0m"
  
-# ======================= ×¼±¸»·¾³, °Ñ¿âºÍ¶ş½øÖÆÄ¿Â¼µ¼Èë£¬·ñÔò±àÒë»áÕÒ²»µ½¿â»òÎÄ¼ş ======================= 
+# ======================= å‡†å¤‡ç¯å¢ƒ, æŠŠåº“å’ŒäºŒè¿›åˆ¶ç›®å½•å¯¼å…¥ï¼Œå¦åˆ™ç¼–è¯‘ä¼šæ‰¾ä¸åˆ°åº“æˆ–æ–‡ä»¶ ======================= 
 export LD_LIBRARY_PATH=$PREFIX_DIR/lib:$PREFIX_DIR/lib64:$LD_LIBRARY_PATH
 export PATH=$PREFIX_DIR/bin:$PATH
  
@@ -123,11 +129,11 @@ echo "SYS_LONG_BIT = $SYS_LONG_BIT"
 echo -e "\\033[32;1mnotice: now, sleep for $CHECK_INFO_SLEEP seconds.\\033[39;49;0m"; 
 sleep $CHECK_INFO_SLEEP
   
-# ======================= ¹Ø±Õ½»»»·ÖÇø£¬·ñÔò¾ÍË¬ËÀÁË ======================= 
+# ======================= å…³é—­äº¤æ¢åˆ†åŒºï¼Œå¦åˆ™å°±çˆ½æ­»äº† ======================= 
 swapoff -a
  
 # install gmp
-GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-5.1.1.tar.bz2" );
+GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-5.1.2.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GMP_PKG"
     exit -1;
@@ -192,13 +198,13 @@ make $BUILD_THREAD_OPT && make check && make install
 cd "$WORKING_DIR"
    
 # ======================= install gcc ======================= 
-# ======================= ½â¾ö¼ì²âISLÓĞÊ±ºò»áÊ§Ğ§µÄÎÊÌâ ======================= 
+# ======================= è§£å†³æ£€æµ‹ISLæœ‰æ—¶å€™ä¼šå¤±æ•ˆçš„é—®é¢˜ ======================= 
 cd $ISL_DIR
 make install
 cd "$WORKING_DIR"
  
-# ======================= gcc°ü ======================= 
-GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.0/gcc-4.8.0.tar.bz2" );
+# ======================= gccåŒ… ======================= 
+GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.1/gcc-4.8.1.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GCC_PKG"
     exit -1;
@@ -207,7 +213,7 @@ tar -jxvf $GCC_PKG
 GCC_DIR=$(ls -d gcc-* | grep -v \.tar\.bz2)
 mkdir objdir
 cd objdir
-# ======================= ÕâÒ»ĞĞµÄ×îºóÒ»¸ö²ÎÊıÇë×¢Òâ£¬Èç¹ûÒªÖ§³ÖÆäËûÓïÑÔÒª°²×°ÒÀÀµ¿â²¢´ò¿ª¶Ô¸ÃÓïÑÔµÄÖ§³Ö ======================= 
+# ======================= è¿™ä¸€è¡Œçš„æœ€åä¸€ä¸ªå‚æ•°è¯·æ³¨æ„ï¼Œå¦‚æœè¦æ”¯æŒå…¶ä»–è¯­è¨€è¦å®‰è£…ä¾èµ–åº“å¹¶æ‰“å¼€å¯¹è¯¥è¯­è¨€çš„æ”¯æŒ ======================= 
 GCC_CONF_OPTION_ALL="--prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-bootstrap --enable-build-with-cxx --enable-cloog-backend=isl --disable-libjava-multilib --enable-checking=release $GCC_OPT_DISABLE_MULTILIB $BUILD_TARGET_CONF_OPTION";
 ../$GCC_DIR/configure $GCC_CONF_OPTION_ALL
 make $BUILD_THREAD_OPT && make install
@@ -219,15 +225,15 @@ if [ $? -ne 0 ]; then
     exit -1;
 fi
  
-# ======================= ½¨Á¢ccÈíÁ´½Ó ======================= 
+# ======================= å»ºç«‹ccè½¯é“¾æ¥ ======================= 
 ln -s $PREFIX_DIR/bin/gcc $PREFIX_DIR/bin/cc
- 
-CHECK_PPL_PATH="$(whereis libppl.so.* | awk '{print $2;}')";
-# ##### [ÒÔÏÂÁ½¸ö×é¼şÒÀÀµPPL¿â£¬ ÓÉÓÚĞÂ°æGCCÒÑ¾­È¥³ı¶ÔPPLµÄÒÀÀµ£¬²¢ÇÒÏÂÃæÁ½¸ö²»ÊÇ±ØĞëÏî£¬ËùÒÔÈç¹ûÃ»ÓĞ¾ÍÌø¹ı] #####
-if [ -z "$CHECK_PPL_PATH" ]; then
+
+
+# ##### [binutilsç»„ä»¶ä¾èµ–PPLåº“ï¼Œ ç”±äºæ–°ç‰ˆGCCå’ŒGDBå·²ç»å»é™¤å¯¹PPLçš„ä¾èµ–ï¼Œå¹¶ä¸”ä¸‹é¢çš„éƒ½ä¸æ˜¯å¿…é¡»é¡¹ï¼Œæ‰€ä»¥å¦‚æœæ²¡æœ‰å°±è·³è¿‡] #####
+if [ -z "$(whereis libppl.so.* | awk '{print $2;}')" ]; then
     echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils] and [gdb].\\033[39;49;0m"
 else
-    # ======================= install binutils(Á´½ÓÆ÷,»ã±àÆ÷ µÈ) ======================= 
+    # ======================= install binutils(é“¾æ¥å™¨,æ±‡ç¼–å™¨ ç­‰) ======================= 
     BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.23.2.tar.bz2" );
     if [ $? -ne 0 ]; then
         echo -e "$BINUTILS_PKG"
@@ -239,33 +245,52 @@ else
     ./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --enable-build-with-cxx $BUILD_TARGET_CONF_OPTION
     make $BUILD_THREAD_OPT && make check && make install
     cd "$WORKING_DIR"
- 
-    # ======================= install gdb(µ÷ÊÔÆ÷) [ÒÀÀµPPL¿â, libtermcap¿â] ======================= 
-    CHECK_TERMCAP_PATH="$(whereis libtermcap | awk '{print $2;}')";
-    if [ -z "$CHECK_TERMCAP_PATH" ]; then
-        echo -e "\\033[32;1mwarning: libtermcap not found, skip build [gdb].\\033[39;49;0m"
-    else
-        GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.5.1.tar.bz2" );
-        if [ $? -ne 0 ]; then
-            echo -e "$GDB_PKG"
-            exit -1;
-        fi
-        tar -jxvf $GDB_PKG
-        GDB_DIR=$(ls -d gdb-* | grep -v \.tar\.bz2)
-        cd $GDB_DIR
-        ./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --enable-build-with-cxx $BUILD_TARGET_CONF_OPTION
-        make $BUILD_THREAD_OPT && make install
-        cd "$WORKING_DIR"
-    fi
+fi
+
+# ======================= install gdb(è°ƒè¯•å™¨) [ä¾èµ– ncurses-devel åŒ…] ======================= 
+if [ -z "$(whereis libncurses | awk '{print $2;}')" ]; then
+	echo -e "\\033[32;1mwarning: libncurses not found, skip build [gdb].\\033[39;49;0m"
+else
+	# ======================= æ£€æŸ¥Pythonå¼€å‘åŒ…ï¼Œå¦‚æœå­˜åœ¨ï¼Œåˆ™å¢åŠ  --with-pyton é€‰é¡¹ =======================
+	if [ ! -z "$(find /usr/include -name Python.h)" ]; then
+		GDB_PYTHON_OPT="--with-python";
+	elif [ ! -z "$(find $PREFIX_DIR -name Python.h)" ]; then
+		GDB_PYTHON_OPT="--with-python=$PREFIX_DIR"
+	else
+		# =======================  å°è¯•ç¼–è¯‘å®‰è£…python  =======================
+		PYTHON_PKG=$(check_and_download "python" "Python-2.*.tar.bz2" "http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2" );
+		if [ $? -ne 0 ]; then
+			return;
+		fi
+
+		tar -jxvf $PYTHON_PKG
+		PYTHON_DIR=$(ls -d Python-2.* | grep -v \.tar\.bz2)
+		cd $PYTHON_DIR
+		./configure --prefix=$PREFIX_DIR
+		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
+	fi
+	
+	# ======================= æ­£å¼å®‰è£…GDB =======================
+	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.tar.bz2" );
+	if [ $? -ne 0 ]; then
+		echo -e "$GDB_PKG"
+		exit -1;
+	fi
+	tar -jxvf $GDB_PKG
+	GDB_DIR=$(ls -d gdb-* | grep -v \.tar\.bz2)
+	cd $GDB_DIR
+	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
+	make $BUILD_THREAD_OPT && make install
+	cd "$WORKING_DIR"
 fi
  
- 
-# Ó¦¸Ã¾Í±àÒëÍêÀ²
-# 64Î»ÏµÍ³ÄÚ£¬Èç¹û±àÒëjavaÖ§³ÖµÄ»°¿ÉÄÜÔÚgmpÉÏ»áÓĞÎÊÌâ£¬¿ÉÒÔÓÃÕâ¸öÑ¡Ïî¹Ø±ÕjavaÖ§³Ö --enable-languages=c,c++,objc,obj-c++,fortran,ada
-# ÔÙ°Ñ$PREFIX_DIR/bin·Åµ½PATH
-# $PREFIX_DIR/lib £¨Èç¹ûÊÇ64Î»»úÆ÷»¹ÓĞ$PREFIX_DIR/lib64£©[ÁíÍâ»¹ÓĞ$PREFIX_DIR/libexecÎÒÒ²²»ÖªµÀÒª²»Òª¼Ó£¬·´ÕıÎÒ¼ÓÁË]·Åµ½LD_LIBRARY_PATH»òÕß/etc/ld.so.confÀï
-# ÔÙÖ´ĞĞldconfig¾Í¿ÉÒÔÓÃĞÂµÄgccÀ²  
- 
+
+# åº”è¯¥å°±ç¼–è¯‘å®Œå•¦
+# 64ä½ç³»ç»Ÿå†…ï¼Œå¦‚æœç¼–è¯‘javaæ”¯æŒçš„è¯å¯èƒ½åœ¨gmpä¸Šä¼šæœ‰é—®é¢˜ï¼Œå¯ä»¥ç”¨è¿™ä¸ªé€‰é¡¹å…³é—­javaæ”¯æŒ --enable-languages=c,c++,objc,obj-c++,fortran,ada
+# å†æŠŠ$PREFIX_DIR/binæ”¾åˆ°PATH
+# $PREFIX_DIR/lib ï¼ˆå¦‚æœæ˜¯64ä½æœºå™¨è¿˜æœ‰$PREFIX_DIR/lib64ï¼‰[å¦å¤–è¿˜æœ‰$PREFIX_DIR/libexecæˆ‘ä¹Ÿä¸çŸ¥é“è¦ä¸è¦åŠ ï¼Œåæ­£æˆ‘åŠ äº†]æ”¾åˆ°LD_LIBRARY_PATHæˆ–è€…/etc/ld.so.confé‡Œ
+# å†æ‰§è¡Œldconfigå°±å¯ä»¥ç”¨æ–°çš„gccå•¦  
+
 echo -e "\\033[33;1mAddition, run the cmds below to add environment var(s).\\033[39;49;0m"
 echo -e "\\033[31;1mexport PATH=$PREFIX_DIR/bin:$PATH\\033[39;49;0m"
 echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$PREFIX_DIR/lib:$PREFIX_DIR/libexec:$LD_LIBRARY_PATH\\033[39;49;0m"
