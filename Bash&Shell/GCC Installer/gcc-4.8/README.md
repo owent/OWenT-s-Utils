@@ -47,9 +47,9 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 + cloog 0.18.0
 
 <h4><span style="color:#4B0082;">编译目标：</span></h4>
-+ gcc 4.8.0
++ gcc 4.8.X
 + binutils 2.32.2 (如果存在ppl库)
-+ gdb 7.5.1 (如果存在ppl库和ncurses ncurses-libs ncurses-devel包)
++ gdb 7.6 (如果存在ncurses-devel包)
 
 <h4><span style="color:#4B0082;">注：</span></h4>
 + (所有的库都会被安装在**$PREFEX_DIR**里)
