@@ -231,7 +231,7 @@ ln -s $PREFIX_DIR/bin/gcc $PREFIX_DIR/bin/cc
 
 # ##### [binutils组件依赖PPL库， 由于新版GCC和GDB已经去除对PPL的依赖，并且下面的都不是必须项，所以如果没有就跳过] #####
 if [ -z "$(whereis libppl.so.* | awk '{print $2;}')" ]; then
-    echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils] and [gdb].\\033[39;49;0m"
+    echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils].\\033[39;49;0m"
 else
     # ======================= install binutils(链接器,汇编器 等) ======================= 
     BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.23.2.tar.bz2" );
