@@ -45,7 +45,7 @@ if [ $SYS_LONG_BIT == "64" ]; then
     fi
     for FILE_PATH in ${GCC_OPT_DISABLE_MULTILIB_DEV_LIBS[@]}; do
         if [ ${FILE_PATH:0:9} == "/usr/lib/" ]; then
-            echo -e "\\033[32;1mnotice: librt x86_64 found multilib enabled.\\033[39;49;0m"
+            echo -e "\\033[32;1mnotice: librt x86 found in x86_64 system, multilib enabled.\\033[39;49;0m"
             GCC_OPT_DISABLE_MULTILIB=""
         fi
     done
