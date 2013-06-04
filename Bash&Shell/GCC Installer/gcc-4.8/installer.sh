@@ -268,6 +268,7 @@ else
 		cd $PYTHON_DIR
 		./configure --prefix=$PREFIX_DIR
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
+		cd "$WORKING_DIR"
 	fi
 	
 	# ======================= 正式安装GDB =======================
