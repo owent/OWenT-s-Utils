@@ -8,10 +8,10 @@
  * @brief 固定下标链表（动态增长）<br />
  * @warning 注意：不可用于共享内存，故而不需要像StaticIdxList那样第一次构造前调用construct函数<br />
  *              构造时会清空数据
- * @note 测试编译器 GCC 4.8.1, VC 11.0
+ * @note 测试编译器 GCC 4.4.6, 4.8.1, VC 11.0
  *
  * @version 1.0
- * @author owentou, owentou@tencent.com
+ * @author OWenT
  * @date 2013-06-04
  *
  * @history
