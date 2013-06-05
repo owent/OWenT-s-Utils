@@ -313,7 +313,7 @@ namespace util
              * capacity操作
              * @return 单元元素个数，类似std::vector<T,A>::capacity
              */
-            size_type capacity()
+            size_type capacity() const
             {
                 return m_stData.capacity();
             }
