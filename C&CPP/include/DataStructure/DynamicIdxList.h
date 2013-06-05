@@ -6,7 +6,7 @@
  *
  * @file DynamicIdxList.h
  * @brief 固定下标链表（支持动态增长，支持随机访问，地址可能变化，但是index不会变化）<br />
- * @warning 注意：不可用于共享内存，故而不需要像StaticIdxList那样第一次构造前调用construct函数<br />
+ * @warning 注意：不可用于共享内存，内部采用了std::vector实现<br />
  *              构造时会清空数据
  * @note 测试编译器 GCC 4.4.6, 4.8.1, VC 11.0
  *
