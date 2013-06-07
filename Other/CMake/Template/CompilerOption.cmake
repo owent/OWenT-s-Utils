@@ -2,9 +2,15 @@
 #####################################################################
 option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 
-if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-	#set(CMAKE_BUILD_TYPE "Debug")
-	set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+if (CMAKE_CONFIGURATION_TYPES)
+	message(STATUS "Available Build Type: ${CMAKE_CONFIGURATION_TYPES}")
+else()
+	message(STATUS "Available Build Type: Unknown")
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Debug")
+	#set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
 # 设置公共编译选项 
