@@ -110,6 +110,14 @@
             mutable T item;
         };
  
+         // 设置flag为false
+        inline bool set_false(bool &b)
+        {
+            b = false;
+            return false;
+        }
+
+
         typedef auto_any_base const& auto_any_t;
         #define OWENT_FOREACH_ANY_TYPE(x) auto_any<x>
         #define OWENT_FOREACH_ARRAY_DECL(x, y, z) x (&y)[z]
@@ -251,15 +259,15 @@
         }
     }
  
-    #define OWENT_FOREACH(VAR, COL)                                                                                   \
-        if (foreach_detail::auto_any_t OWENT_FOREACH_ID(_owent_foreach_cur) = foreach_detail::begin(COL)){ } else     \
-        for (bool OWENT_FOREACH_ID(_owent_foreach_flag) = true;                                                       \
-            OWENT_FOREACH_ID(_owent_foreach_flag) && !foreach_detail::end(COL, OWENT_FOREACH_ID(_owent_foreach_cur)); \
-            foreach_detail::next(COL, OWENT_FOREACH_ID(_owent_foreach_cur)))                                          \
-                                                                                                                      \
-            if (bool OWENT_FOREACH_ID(_owent_foreach_flag) = false){ } else                                           \
-            for (VAR = *foreach_detail::deref(COL, OWENT_FOREACH_ID(_owent_foreach_cur));                             \
-                !OWENT_FOREACH_ID(_owent_foreach_flag);                                                               \
+    #define OWENT_FOREACH(VAR, COL)                                                                                         \
+        if (foreach_detail::auto_any_t OWENT_FOREACH_ID(_owent_foreach_cur) = foreach_detail::begin(COL)){ } else           \
+        for (bool OWENT_FOREACH_ID(_owent_foreach_flag) = true;                                                             \
+            OWENT_FOREACH_ID(_owent_foreach_flag) && !foreach_detail::end(COL, OWENT_FOREACH_ID(_owent_foreach_cur));       \
+            OWENT_FOREACH_ID(_owent_foreach_flag)? foreach_detail::next(COL, OWENT_FOREACH_ID(_owent_foreach_cur)): (void)0)\
+                                                                                                                            \
+            if (foreach_detail::set_false(OWENT_FOREACH_ID(_owent_foreach_flag))){ } else                                   \
+            for (VAR = *foreach_detail::deref(COL, OWENT_FOREACH_ID(_owent_foreach_cur));                                   \
+                !OWENT_FOREACH_ID(_owent_foreach_flag);                                                                     \
                 OWENT_FOREACH_ID(_owent_foreach_flag) = true)
  
     #define owent_foreach(VAR, COL) OWENT_FOREACH(VAR, COL)
