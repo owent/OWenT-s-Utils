@@ -6,7 +6,7 @@
 
 TEST(owent_foreach, Array) 
 {
-	//数组
+	//鏁扮粍
 	const int arr[] = {1, 7, 3, 9, 5, 6, 2, 8, 4};
 	int sum1 = 0, sum2 = 0;
 	owent_foreach(const int& v, arr) {
@@ -22,7 +22,7 @@ TEST(owent_foreach, Array)
 
 TEST(owent_foreach, STL) 
 {
-	//数组
+	//鏁扮粍
 	std::vector<int> vec;
 	for (unsigned int i = 0; i < 128; ++ i)
 	vec.push_back((i * i + i / 33));
@@ -44,13 +44,13 @@ TEST(owent_foreach, STL)
 
 TEST(owent_foreach, STL_Pair) 
 {
-	//数组
+	//鏁扮粍
 	std::map<int, int> mp;
 	for (unsigned int i = 0; i < 128; ++ i)
 		mp[i] = i * i + i / 33;
 		
 	unsigned int count = 0;
-	typedef std::map<int, int>::value_type map_pair; // 由于foreach是宏定义，所以类型里带逗号的话必须这么处理，否则编译器会认为这个逗号是参数分隔符
+	typedef std::map<int, int>::value_type map_pair; // 鐢变簬foreach鏄畯瀹氫箟锛屾墍浠ョ被鍨嬮噷甯﹂�楀彿鐨勮瘽蹇呴』杩欎箞澶勭悊锛屽惁鍒欑紪璇戝櫒浼氳涓鸿繖涓�楀彿鏄弬鏁板垎闅旂
     owent_foreach(map_pair& pr, mp) {
 		++ count;
         pr.second = 0;
@@ -75,7 +75,7 @@ TEST(owent_foreach, RefCopyLimit)
 {
     SeedForeachRefCopyLimit arr[10];
     int idx = 1, sum = 0;
-	owent_foreach(SeedForeachRefCopyLimit& stNode, arr)
+    owent_foreach(SeedForeachRefCopyLimit& stNode, arr)
     {
         stNode.count = idx*= 2;
         sum += stNode.count;
@@ -83,3 +83,36 @@ TEST(owent_foreach, RefCopyLimit)
 
     EXPECT_EQ(sum, 2046);
 } 
+
+TEST(owent_foreach, Continue)
+{
+    //鏁扮粍
+    const int arr[] = {1, 7, 3, 9, 5, 6, 2, 8, 4};
+    int sum = 0;
+    owent_foreach(const int& v, arr) {
+        if (v == 3 || v == 8)
+            continue;
+
+        sum += v;
+    }
+
+    EXPECT_EQ(34, sum);
+}
+
+
+TEST(owent_foreach, Break)
+{
+    //鏁扮粍
+    const int arr[] = {1, 7, 3, 9, 5, 6, 2, 8, 4};
+    int sum = 0;
+    owent_foreach(const int& v, arr) {
+        if (v == 5)
+            break;
+
+        sum += v;
+    }
+
+    EXPECT_EQ(20, sum);
+}
+
+
