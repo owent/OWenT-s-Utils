@@ -58,7 +58,7 @@ namespace util
             typedef DynamicIdxList<TObj, TContainer> self_type;
 
             /** 无效节点 **/
-            static const size_type npos = SIZE_MAX;
+            static const size_type npos = static_cast<size_type>(-1);
 
             /**
              * 迭代器类型
