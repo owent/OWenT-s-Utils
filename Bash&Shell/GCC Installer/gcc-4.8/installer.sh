@@ -76,7 +76,7 @@ if [ $BUILD_THREAD_OPT -gt 8 ]; then
     BUILD_THREAD_OPT=8;
 fi
 BUILD_THREAD_OPT="-j$BUILD_THREAD_OPT";
-echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile."
+echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile.\\033[39;49;0m"
  
 # ======================= 统一的包检查和下载函数 ======================= 
 function check_and_download(){
