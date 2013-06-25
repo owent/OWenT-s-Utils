@@ -1,19 +1,19 @@
 /**
  * @file IdxList.h
- * @brief ¹Ì¶¨ÏÂ±êÁ´±í<br />
- *        ¿ÉÓÃÓÚ¹²ÏíÄÚ´æ<br />
+ * @brief å›ºå®šä¸‹æ ‡é“¾è¡¨<br />
+ *        å¯ç”¨äºå…±äº«å†…å­˜<br />
  * Licensed under the MIT licenses.
  *
- * @warning ×¢Òâ£ºÈç¹ûÊÇĞÂ´´½¨µÄ½á¹¹£¬ĞèÒªÖ´ĞĞconstructº¯Êı³õÊ¼»¯
- * @note ²âÊÔ±àÒëÆ÷ GCC 4.7.2, VC 11.0
+ * @warning æ³¨æ„ï¼šå¦‚æœæ˜¯æ–°åˆ›å»ºçš„ç»“æ„ï¼Œéœ€è¦æ‰§è¡Œconstructå‡½æ•°åˆå§‹åŒ–
+ * @note æµ‹è¯•ç¼–è¯‘å™¨ GCC 4.7.2, VC 11.0
  *
  * @version 1.0
  * @author OWenT
  * @date 2013-2-26
  *
  * @history
- *      2013.02.28 Ôö¼ÓconstÏŞ¶¨Ö§³Ö
- *      2013.02.29 ÓÅ»¯µü´úÆ÷½á¹¹£¬Ôö¼ÓÏÂ±êË÷Òı·ÃÎÊÈ¨ÏŞ
+ *      2013.02.28 å¢åŠ consté™å®šæ”¯æŒ
+ *      2013.02.29 ä¼˜åŒ–è¿­ä»£å™¨ç»“æ„ï¼Œå¢åŠ ä¸‹æ ‡ç´¢å¼•è®¿é—®æƒé™
  *
  */
 
@@ -28,698 +28,725 @@
 #include <cstdlib>
 #include <assert.h>
 
+#include "MemPool/StaticAllocator.h"
+
 namespace util
 {
     namespace ds
     {
-    
-        template<typename TObj, typename TSize>
-        struct StaticIdxListNode
-        {
-            TSize iPreIdx;
-            TSize iNextIdx;
-            bool bIsInited;
-            char stObjBin[sizeof(TObj)];
-        };
-
-        /**
-         * ¿ÉÓÃÓÚ¹²ÏíÄÚ´æµÄC++ĞÍÁ´±í
-         * @warning ×¢Òâ£ºÈç¹ûÊÇĞÂ´´½¨µÄ½á¹¹£¬ĞèÒªÖ´ĞĞconstructº¯Êı³õÊ¼»¯,Èç¹û´Ó¹²ÏíÄÚ´æ»Ö¸´£¬ÎŞĞèÖ´ĞĞ
-         * @note Ä¿±ê½á¹¹ÌåÖÁÉÙÒªÓĞÄ¬ÈÏ¹¹Ôìº¯Êı, ¹¹Ôìº¯Êı×î¶àÈı¸ö²ÎÊı
-         * @note ÄÚ´æÏûºÄÎª (sizeof(TObj) + 2 * sizeof(size_type)) * (MAX_SIZE + 1)
-         */
-        template<typename TObj, int MAX_SIZE>
-        class StaticIdxList
-        {
-        public:
-            typedef int size_type;
-            typedef StaticIdxListNode<TObj, size_type> node_type;
-            typedef TObj value_type;
-            typedef StaticIdxList<TObj, MAX_SIZE> self_type;
-
-            /**
-             * µü´úÆ÷ÀàĞÍ
-             */
-            template<typename ITObj>
-            class Iterator
-            {
-            public:
-                typedef Iterator<ITObj> self_type;
-                typedef typename StaticIdxList<TObj, MAX_SIZE>::self_type list_type;
-
-            private:
-                mutable size_type iIndex;
-                mutable list_type* m_pListPtr;
-
-            public:
-                Iterator(size_type index, const list_type* const pListPtr):
-                    iIndex(index),
-                    m_pListPtr(const_cast<list_type*>(pListPtr))
-                {
-                }
-
-                inline size_type index() const { return iIndex; }
-
-                self_type& operator++() const
-                {
-                    iIndex = m_pListPtr->GetNextIdx(iIndex);
-
-                    return const_cast<Iterator&>(*this);
-                }
-
-                self_type operator++(int) const
-                {
-                    Iterator stRet = (*this);
-                    ++ stRet;
-                    return stRet;
-                }
-
-                self_type& operator--() const
-                {
-                    iIndex = m_pListPtr->GetPreIdx(iIndex);
-
-                    return const_cast<Iterator&>(*this);
-                }
-
-                self_type operator--(int) const
-                {
-                    Iterator stRet = (*this);
-                    -- stRet;
-                    return stRet;
-                }
-
-                ITObj* get()
-                {
-                    return reinterpret_cast<ITObj*>(m_pListPtr->m_stData[iIndex].stObjBin);
-                }
-
-                const ITObj* get() const
-                {
-                    return reinterpret_cast<const ITObj*>(m_pListPtr->m_stData[iIndex].stObjBin);
-                }
-
-                friend bool operator==(const Iterator& l, const Iterator& r)
-                {
-                    return l.m_pListPtr == r.m_pListPtr && l.iIndex == r.iIndex;
-                }
-
-                friend bool operator!=(const Iterator& l, const Iterator& r)
-                {
-                    return !(l == r);
-                }
-
-                inline ITObj* operator->()
-                {
-                    return get();
-                }
-
-                inline const ITObj* operator->() const
-                {
-                    return get();
-                }
-
-                inline ITObj& operator*()
-                {
-                    return *get();
-                }
-
-                inline const ITObj& operator*() const
-                {
-                    return *get();
-                }
-
-                void swap(const self_type& stIter) const // never throws
-                {
-                    using std::swap;
-
-                    swap(m_pListPtr, stIter.m_pListPtr);
-                    swap(iIndex, stIter.iIndex);
-                }
-
-            };
-
-            typedef Iterator<TObj> iterator;
-            typedef const Iterator<TObj> const_iterator;
-
-        private:
-            /**
-             * Êı¾İ½»»»º¯ÊıÓÅ»¯(size_type)
-             * @param [in] left
-             * @param [in] right
-             */
-            inline void swap(size_type& left, size_type& right)
-            {
-                left ^= right ^= left ^= right;
-            }
-
-            struct IdxListHeader
-            {
-                size_type m_iLastUsedNode;
-                size_type m_iSize;
-            };
-
-            IdxListHeader m_stHeader;
-            node_type m_stData[MAX_SIZE + 1];
-
-            size_type _create_node()
-            {
-                assert(m_stHeader.m_iLastUsedNode >= 0 && m_stHeader.m_iLastUsedNode <= MAX_SIZE);
-
-                size_type iNewIdx = m_stData[m_stHeader.m_iLastUsedNode].iNextIdx;
-                while (IsExists(iNewIdx))
-                {
-                    iNewIdx = m_stData[iNewIdx].iNextIdx;
-                }
-
-                // ¶ÓÁĞÂú£¬·µ»Ø-1
-                if (iNewIdx < 0 || iNewIdx >= MAX_SIZE || IsExists(iNewIdx))
-                {
-                    return -1;
-                }
-
-                // ¹Ø±ÕÎ´³õÊ¼»¯·ûºÅ¡¢ÒÆ¶¯×îºó½Úµã¡¢¼ÆÊı +1
-                m_stData[iNewIdx].bIsInited = true;
-                m_stHeader.m_iLastUsedNode = iNewIdx;
-                ++ m_stHeader.m_iSize;
-
-                return iNewIdx;
-            }
-
-
-            /**
-             * Îö¹¹º¯ÊıÊ¹ÓÃ
-             */
-            template<typename CObj>
-            struct _destruct_obj
-            {
-                self_type& stSelf;
-
-                _destruct_obj(self_type& self): stSelf(self){}
-
-                void operator()(size_type idx, CObj& stObj)
-                {
-                    stSelf.m_stData[idx].bIsInited = false;
-                    stObj.~TObj();
-                }
-            };
-
-            /**
-             * Ìõ¼ş¼ÆÊıº¯ÊıÎªÆÕÍ¨º¯ÊıÊ±Ê¹ÓÃ
-             */
-            template<typename CObj>
-            struct _count_cc_func
-            {
-                size_type& counter;
-                bool (*fn)(size_type, CObj&);
-
-                _count_cc_func(size_type& _counter, bool (*_fn)(size_type, CObj&)):
-                    counter(_counter), fn(_fn){}
-
-                void operator()(size_type idx, CObj& stObj)
-                {
-                    counter += (*fn)(idx, stObj)? 1: 0;
-                }
-            };
-
-            /**
-             * Ìõ¼ş¼ÆÊıº¯ÊıÎª·Âº¯ÊıÊ±Ê¹ÓÃ
-             */
-            template<typename _F, typename CObj>
-            struct _count_obj_func
-            {
-                size_type& counter;
-                _F& fn;
-
-                _count_obj_func(size_type& _counter, _F& _fn):
-                    counter(_counter), fn(_fn){}
-
-                void operator()(size_type idx, CObj& stObj)
-                {
-                    counter += fn(idx, stObj)? 1: 0;
-                }
-            };
-
-        public:
-            StaticIdxList()
-            {
-            }
-
-            ~StaticIdxList()
-            {
-                destruct();
-            }
-
-            /**
-             * Èç¹ûÊÇµÚÒ»´Î´´½¨£¬±ØĞëµ÷ÓÃ´Îº¯Êı½øĞĞ³õÊ¼»¯
-             */
-            void construct()
-            {
-                m_stHeader.m_iSize = 0;
-                m_stHeader.m_iLastUsedNode = MAX_SIZE; // ×îºóÒ»¸öÎªÍ·½áµã
-
-                for (size_type i = 0; i <= MAX_SIZE; ++i)
-                {
-                    m_stData[i].iPreIdx = (i - 1);
-                    m_stData[i].iNextIdx = (i + 1);
-                    m_stData[i].bIsInited = false;
-                }
-                m_stData[0].iPreIdx = MAX_SIZE;
-                m_stData[MAX_SIZE].iNextIdx = 0;
-                m_stData[MAX_SIZE].bIsInited = true;
-            }
-
-            /**
-             * µ÷ÓÃËùÓĞ¶ÔÏóµÄÎö¹¹º¯Êı(¿ÉÑ¡)
-             */
-            void destruct()
-            {
-                // É¾³ıËùÓĞÎ´ÊÍ·Å¶ÔÏó
-                Foreach(_destruct_obj<TObj>(*this));
-            }
-
-            /**
-             * ÅĞ¶ÏÏÂ±ê½Úµã´æÔÚ
-             * @param [in] idx idx
-             * @return ´æÔÚ·µ»Øtrue£¬·ñÔò·µ»Øfalse
-             */
-            bool IsExists(size_type idx) const
-            {
-                // ³¬³ö×î´ó¸öÊıÏŞÖÆ
-                if (idx >= MAX_SIZE)
-                {
-                    return false;
-                }
-
-                // Ğ¡ÓÚ0
-                if (idx < 0)
-                {
-                    return false;
-                }
-
-                // flag ¼ì²é
-                return m_stData[idx].bIsInited;
-            }
-
-            /**
-             * »ñÈ¡ÏÂÒ»¸öÔªËØµÄÏÂ±ê
-             * @param [in] idx µ±Ç°ÔªËØÏÂ±ê
-             * @return ´æÔÚ·µ»ØÏÂÒ»¸öÔªËØÏÂ±ê£¬²»´æÔÚ·µ»Ø-1
-             */
-            size_type GetNextIdx(size_type idx) const
-            {
-                size_type iRet = -1;
-
-                if (IsExists(idx))
-                {
-                    iRet = m_stData[idx].iNextIdx;
-                }
-
-                iRet = IsExists(iRet)? iRet: -1;
-
-                return iRet;
-
-            }
-
-            /**
-             * »ñÈ¡ÉÏÒ»¸öÔªËØµÄÏÂ±ê
-             * @param [in] idx µ±Ç°ÔªËØÏÂ±ê
-             * @return ´æÔÚ·µ»ØÉÏÒ»¸öÔªËØÏÂ±ê£¬²»´æÔÚ·µ»Ø-1
-             */
-            size_type GetPreIdx(size_type idx) const
-            {
-                size_type iRet = -1;
-
-                if (IsExists(idx))
-                {
-                    iRet = m_stData[idx].iPreIdx;
-                }
-
-                iRet = IsExists(iRet)? iRet: -1;
-
-                return iRet;
-
-            }
-
-            /**
-             * °´Idx»ñÈ¡½Úµã
-             * @param [in] idx
-             * @return ´æÔÚÔò·µ»ØÊı¾İµü´úÆ÷£¬²»´æÔÚÔò·µ»Øendµü´úÆ÷
-             */
-            inline iterator Get(size_type idx)
-            {
-                return get(idx);
-            }
-
-            /**
-             * °´Idx»ñÈ¡½Úµã(const)
-             * @param [in] idx
-             * @return ´æÔÚÔò·µ»ØÊı¾İµü´úÆ÷£¬²»´æÔÚÔò·µ»Øendµü´úÆ÷
-             */
-            inline const_iterator Get(size_type idx) const
-            {
-                return get(idx);
-            }
-
-            /**
-             * °´Idx»ñÈ¡½Úµã(const)
-             * @param [in] idx
-             * @return ´æÔÚÔò·µ»ØÊı¾İÒıÓÃ
-             */
-            inline TObj& operator[](size_type idx) { return *get(idx); };
-
-            /**
-             * °´Idx»ñÈ¡½Úµã(const)
-             * @param [in] idx
-             * @return ´æÔÚÔò·µ»ØÊı¾İ³£Á¿ÒıÓÃ
-             */
-            inline const TObj& operator[](size_type idx) const { return *get(idx); };
-
-            /**
-             * ´´½¨½Úµã£¬·µ»Øidx
-             * @return ĞÂ½ÚµãµÄidx£¬Ê§°Ü·µ»Ø-1
-             */
-            size_type Create()
-            {
-                size_type ret = _create_node();
-                if (ret >= 0)
-                {
-                    new (m_stData[ret].stObjBin)TObj();
-                }
-
-                return ret;
-            }
-
-            /**
-             * ´´½¨½Úµã£¬·µ»Øidx
-             * @param [in] param1 ¹¹Ôìº¯Êı²ÎÊı1
-             * @return ĞÂ½ÚµãµÄidx£¬Ê§°Ü·µ»Ø-1
-             */
-            template<typename _TP1>
-            size_type Create(const _TP1& param1)
-            {
-                size_type ret = _create_node();
-                if (ret >= 0)
-                {
-                    new (m_stData[ret].stObjBin)TObj(param1);
-                }
-
-                return ret;
-            }
-
-            /**
-             * ´´½¨½Úµã£¬·µ»Øidx
-             * @param [in] param1 ¹¹Ôìº¯Êı²ÎÊı1
-             * @param [in] param2 ¹¹Ôìº¯Êı²ÎÊı2
-             * @return ĞÂ½ÚµãµÄidx£¬Ê§°Ü·µ»Ø-1
-             */
-            template<typename _TP1, typename _TP2>
-            size_type Create(const _TP1& param1, const _TP2& param2)
-            {
-                size_type ret = _create_node();
-                if (ret >= 0)
-                {
-                    new (m_stData[ret].stObjBin)TObj(param1, param2);
-                }
-
-                return ret;
-            }
-
-            /**
-             * ´´½¨½Úµã£¬·µ»Øidx
-             * @param [in] param1 ¹¹Ôìº¯Êı²ÎÊı1
-             * @param [in] param2 ¹¹Ôìº¯Êı²ÎÊı2
-             * @param [in] param3 ¹¹Ôìº¯Êı²ÎÊı3
-             * @return ĞÂ½ÚµãµÄidx£¬Ê§°Ü·µ»Ø-1
-             */
-            template<typename _TP1, typename _TP2, typename _TP3>
-            size_type Create(const _TP1& param1, const _TP2& param2, const _TP3& param3)
-            {
-                size_type ret = _create_node();
-                if (ret >= 0)
-                {
-                    new (m_stData[ret].stObjBin)TObj(param1, param2, param3);
-                }
-
-                return ret;
-            }
-
-            /**
-             * ÒÆ³ıÒ»¸öÔªËØ
-             * @param [in] idx ÏÂ±ê
-             */
-            void Remove(size_type idx)
-            {
-                using std::swap;
-
-                // ²»´æÔÚÖ±½Ó·µ»Ø
-                if(!IsExists(idx))
-                {
-                    return;
-                }
-
-                size_type iPreIdx = m_stData[idx].iPreIdx;
-                size_type iNextIdx = m_stData[idx].iNextIdx;
-                size_type iFreeFirst = m_stData[m_stHeader.m_iLastUsedNode].iNextIdx;
-
-                // É¾³ı½Úµã£¬½»»»Á´½Ó
-                swap(m_stData[iPreIdx].iNextIdx, m_stData[idx].iNextIdx);
-                swap(m_stData[iNextIdx].iPreIdx, m_stData[idx].iPreIdx);
-
-                // ·ÀÖ¹×Ô¼ººÍ×Ô¼º½»»»
-                if (idx == m_stHeader.m_iLastUsedNode)
-                {
-                    m_stHeader.m_iLastUsedNode = iPreIdx;
-                }
-
-                // ´¦Àí×ÔÓÉ½Úµã£¬½»»»Á´½Ó
-                swap(m_stData[m_stHeader.m_iLastUsedNode].iNextIdx, m_stData[idx].iNextIdx);
-                swap(m_stData[iFreeFirst].iPreIdx, m_stData[idx].iPreIdx);
-
-                // ½ÚµãĞĞÎª
-                m_stData[idx].bIsInited = false;
-                m_stHeader.m_iLastUsedNode = iPreIdx;
-
-                // Ö´ĞĞÎö¹¹
-				TObj* pRemovedDataSect = reinterpret_cast<TObj*>(m_stData[idx].stObjBin);
-                pRemovedDataSect->~TObj();
-                // ¼ÆÊı¼õÒ»
-                -- m_stHeader.m_iSize;
-            }
-
-            /**
-             * ÊÇ·ñÎª¿Õ
-             * @return Îª¿Õ·µ»Øtrue
-             */
-            inline bool IsEmpty() const { return empty(); }
-
-            /**
-             * ÊÇ·ñÒÑÂú
-             * @return ÒÑÂú·µ»Øtrue
-             */
-            inline bool IsFull() const { return size() >= max_size(); }
-
-            // ===============================
-            // =====        µü´úÆ÷ ²Ù×÷                  =====
-            // ===============================
-            iterator get(size_type idx)
-            {
-                if (!IsExists(idx))
-                {
-                    return iterator(-1, this);
-                }
-
-                return iterator(idx, this);
-            }
-
-            const_iterator get(size_type idx) const
-            {
-                if (!IsExists(idx))
-                {
-                    return const_iterator(-1, this);
-                }
-
-                return const_iterator(idx, this);
-            }
-
-            iterator begin()
-            {
-                return get(m_stData[MAX_SIZE].iNextIdx);
-            }
-
-            const_iterator begin() const
-            {
-                return get(m_stData[MAX_SIZE].iNextIdx);
-            }
-
-            iterator end()
-            {
-                return get(-1);
-            }
-
-            const_iterator end() const
-            {
-                return get(-1);
-            }
-
-            size_t size() const
-            {
-                return static_cast<size_t>(Count());
-            }
-
-            size_t max_size() const
-            {
-                return MAX_SIZE;
-            }
-
-            iterator erase(iterator iter)
-            {
-                size_type idx = iter.index();
-                ++iter;
-
-                Remove(idx);
-
-                return iter;
-            }
-
-            inline bool empty() const
-            {
-                return size() == 0;
-            }
-
-            // ¸ß¼¶¹¦ÄÜ
-            // ===============================
-            // =====       Lambda ²Ù×÷             =====
-            // ===============================
-
-
-            /**
-             * foreach ²Ù×÷
-             * @param fn Ö´ĞĞ·Âº¯Êı£¬²ÎÊı±ØĞëÎª (size_type, TObj&)
-             */
-            template<typename _F>
-            void Foreach(_F fn)
-            {
-                size_type iIter = m_stData[MAX_SIZE].iNextIdx;
-                while (IsExists(iIter))
-                {
-                    fn(iIter, *get(iIter));
-                    iIter = m_stData[iIter].iNextIdx;
-                }
-            }
-
-            /**
-             * const foreach ²Ù×÷
-             * @param fn Ö´ĞĞ·Âº¯Êı£¬²ÎÊı±ØĞëÎª (size_type, TObj&)
-             */
-            template<typename _F>
-            void Foreach(_F fn) const
-            {
-                size_type iIter = m_stData[MAX_SIZE].iNextIdx;
-                while (IsExists(iIter))
-                {
-                    fn(iIter, *reinterpret_cast<const TObj*>(m_stData[iIter].stObjBin));
-                    iIter = m_stData[iIter].iNextIdx;
-                }
-            }
-
-            /**
-             * foreach ²Ù×÷
-             * @param fn Ö´ĞĞº¯Êı£¬²ÎÊı±ØĞëÎª (size_type, TObj&)
-             */
-            template<typename _R>
-            void Foreach(_R (*fn)(size_type, TObj&))
-            {
-                size_type iIter = m_stData[MAX_SIZE].iNextIdx;
-                while (IsExists(iIter))
-                {
-                    (*fn)(iIter, *reinterpret_cast<TObj*>(m_stData[iIter].stObjBin));
-                    iIter = m_stData[iIter].iNextIdx;
-                }
-            };
-
-            /**
-             * const foreach ²Ù×÷
-             * @param fn Ö´ĞĞº¯Êı£¬²ÎÊı±ØĞëÎª (size_type, TObj&)
-             */
-            template<typename _R>
-            void Foreach(_R (*fn)(size_type, const TObj&)) const
-            {
-                size_type iIter = m_stData[MAX_SIZE].iNextIdx;
-                while (IsExists(iIter))
-                {
-                    (*fn)(iIter, *reinterpret_cast<const TObj*>(m_stData[iIter].stObjBin));
-                    iIter = m_stData[iIter].iNextIdx;
-                }
-            };
-
-            /**
-             * »ñÈ¡ÔªËØ¸öÊı
-             * @return ÔªËØ¸öÊı
-             */
-            size_type Count() const { return m_stHeader.m_iSize; };
-
-        public:
-            /**
-             * »ñÈ¡·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             * @param [in] fn Ìõ¼şº¯Êı
-             * @return ·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             */
-            size_type Count(bool (*fn)(size_type, const TObj&)) const
-            {
-                size_type iRet = 0;
-
-                Foreach(_count_cc_func<const TObj>(iRet, fn));
-
-                return iRet;
-            };
-
-            /**
-             * »ñÈ¡·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             * @param [in] fn Ìõ¼şº¯Êı
-             * @return ·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             */
-            size_type Count(bool (*fn)(size_type, TObj&))
-            {
-                size_type iRet = 0;
-
-                Foreach(_count_cc_func<TObj>(iRet, fn));
-
-                return iRet;
-            };
-
-        public:
-            /**
-             * »ñÈ¡·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             * @param [in] fn Ìõ¼ş·Âº¯Êı
-             * @return ·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             */
-            template<typename _F>
-            size_type Count(_F fn) const
-            {
-                size_type iRet = 0;
-
-                Foreach(_count_obj_func<_F, const TObj>(iRet, fn));
-
-                return iRet;
-            };
-
-            /**
-             * »ñÈ¡·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             * @param [in] fn Ìõ¼ş·Âº¯Êı
-             * @return ·ûºÏÌõ¼şµÄÔªËØ¸öÊı
-             */
-            template<typename _F>
-            size_type Count(_F fn)
-            {
-                size_type iRet = 0;
-
-                Foreach(_count_obj_func<_F, TObj>(iRet, fn));
-
-                return iRet;
-            };
-
-        };
-
+		template<typename TSize>
+		struct StaticIdxListBase
+		{
+			/** æ— æ•ˆèŠ‚ç‚¹Idx **/
+			static const TSize npos = static_cast<TSize>(-1);
+		};
+
+		template<typename TObj, typename TSize>
+		struct StaticIdxListNode
+		{
+			TSize iPreIdx;
+			TSize iNextIdx;
+			bool bIsInited;
+			TObj stObjData;
+		};
+
+		/**
+		 * å¯ç”¨äºå…±äº«å†…å­˜çš„C++å‹å¾ªç¯é“¾è¡¨
+		 * @warning æ³¨æ„ï¼šå¦‚æœæ˜¯æ–°åˆ›å»ºçš„ç»“æ„ï¼Œéœ€è¦æ‰§è¡Œconstructå‡½æ•°åˆå§‹åŒ–,å¦‚æœä»å…±äº«å†…å­˜æ¢å¤ï¼Œæ— éœ€æ‰§è¡Œ
+		 * @warning å¦‚æœè‡ªå®šä¹‰å†…å­˜åˆ†é…å™¨ï¼Œéœ€è¦åˆ†é…ä¸€ä¸ªå†—ä½™èŠ‚ç‚¹ç”¨äºå­˜å‚¨èµ·ç‚¹ä¿¡æ¯
+		 * @note ç›®æ ‡ç»“æ„ä½“è‡³å°‘è¦æœ‰é»˜è®¤æ„é€ å‡½æ•°, æ„é€ å‡½æ•°æœ€å¤šä¸‰ä¸ªå‚æ•°
+		 * @note å†…å­˜æ¶ˆè€—ä¸º (sizeof(TObj) + 2 * sizeof(size_type)) * (MAX_SIZE + 1)
+		 */
+		template<
+			typename TObj,
+			size_t MAX_SIZE,
+			typename TAlloc = ::util::mempool::StaticAllocator< StaticIdxListNode<TObj, size_t>, MAX_SIZE + 1>
+		>
+		class StaticIdxList: public StaticIdxListBase<size_t>
+		{
+		public:
+			typedef TAlloc alloc_type;
+			typedef size_t size_type;
+			typedef typename alloc_type::value_type node_type;
+			typedef typename alloc_type::pointer node_ptr_type;
+
+			typedef TObj value_type;
+			typedef StaticIdxList<TObj, MAX_SIZE, TAlloc> self_type;
+
+			/**
+			 * è¿­ä»£å™¨ç±»å‹
+			 */
+			template<typename ITObj>
+			class Iterator
+			{
+			public:
+				typedef Iterator<ITObj> self_type;
+				typedef const self_type const_self_type;
+				typedef typename StaticIdxList<TObj, MAX_SIZE>::self_type list_type;
+
+			private:
+				mutable size_type iIndex;
+				mutable list_type* m_pListPtr;
+
+			public:
+				Iterator(size_type index, const list_type* const pListPtr):
+					iIndex(index),
+					m_pListPtr(const_cast<list_type*>(pListPtr))
+				{
+				}
+
+				inline size_type index() const { return iIndex; }
+
+				const_self_type& operator++() const
+				{
+					iIndex = m_pListPtr->GetNextIdx(iIndex);
+
+					return (*this);
+				}
+
+				self_type operator++(int) const
+				{
+					Iterator stRet = (*this);
+					++ stRet;
+					return stRet;
+				}
+
+				const_self_type& operator--() const
+				{
+					iIndex = m_pListPtr->GetPreIdx(iIndex);
+
+					return (*this);
+				}
+
+				self_type operator--(int) const
+				{
+					Iterator stRet = (*this);
+					-- stRet;
+					return stRet;
+				}
+
+				ITObj* get()
+				{
+					return &(m_pListPtr->m_stData.get(iIndex)->stObjData);
+				}
+
+				const ITObj* get() const
+				{
+					return &(m_pListPtr->m_stData.get(iIndex)->stObjData);
+				}
+
+				friend bool operator==(const Iterator& l, const Iterator& r)
+				{
+					return l.m_pListPtr == r.m_pListPtr && l.iIndex == r.iIndex;
+				}
+
+				friend bool operator!=(const Iterator& l, const Iterator& r)
+				{
+					return !(l == r);
+				}
+
+				inline ITObj* operator->()
+				{
+					return get();
+				}
+
+				inline const ITObj* operator->() const
+				{
+					return get();
+				}
+
+				inline ITObj& operator*()
+				{
+					return *get();
+				}
+
+				inline const ITObj& operator*() const
+				{
+					return *get();
+				}
+
+				void swap(const self_type& stIter) const // never throws
+				{
+					using std::swap;
+
+					swap(m_pListPtr, stIter.m_pListPtr);
+					swap(iIndex, stIter.iIndex);
+				}
+
+			};
+
+			typedef Iterator<TObj> iterator;
+			typedef const Iterator<TObj> const_iterator;
+
+		private:
+			/**
+			 * æ•°æ®äº¤æ¢å‡½æ•°ä¼˜åŒ–(size_type)
+			 * @param [in] left
+			 * @param [in] right
+			 */
+			inline void swap(size_type& left, size_type& right)
+			{
+				left ^= right ^= left ^= right;
+			}
+
+			struct IdxListHeader
+			{
+				size_type m_iLastUsedNode;
+				size_type m_iSize;
+			};
+
+			IdxListHeader m_stHeader;
+			alloc_type m_stData;
+
+			size_type _create_node()
+			{
+				assert(m_stHeader.m_iLastUsedNode >= 0 && m_stHeader.m_iLastUsedNode <= MAX_SIZE);
+
+				size_type iNewIdx = m_stData.get(m_stHeader.m_iLastUsedNode)->iNextIdx;
+				while (IsExists(iNewIdx))
+				{
+					iNewIdx = m_stData.get(iNewIdx)->iNextIdx;
+				}
+
+				// é˜Ÿåˆ—æ»¡ï¼Œè¿”å›npos
+				if (iNewIdx == npos || iNewIdx >= MAX_SIZE || IsExists(iNewIdx))
+				{
+					return npos;
+				}
+
+				// å…³é—­æœªåˆå§‹åŒ–ç¬¦å·ã€ç§»åŠ¨æœ€åèŠ‚ç‚¹ã€è®¡æ•° +1
+				m_stData.get(iNewIdx)->bIsInited = true;
+				m_stHeader.m_iLastUsedNode = iNewIdx;
+				++ m_stHeader.m_iSize;
+
+				return iNewIdx;
+			}
+
+
+			/**
+			 * ææ„å‡½æ•°ä½¿ç”¨
+			 */
+			template<typename CObj>
+			struct _destruct_obj
+			{
+				self_type& stSelf;
+
+				_destruct_obj(self_type& self): stSelf(self){}
+
+				void operator()(size_type idx, CObj& stObj)
+				{
+					stSelf.m_stData.get(idx)->bIsInited = false;
+					stObj.~TObj();
+				}
+			};
+
+			/**
+			 * æ¡ä»¶è®¡æ•°å‡½æ•°ä¸ºæ™®é€šå‡½æ•°æ—¶ä½¿ç”¨
+			 */
+			template<typename CObj>
+			struct _count_cc_func
+			{
+				size_type& counter;
+				bool (*fn)(size_type, CObj&);
+
+				_count_cc_func(size_type& _counter, bool (*_fn)(size_type, CObj&)):
+					counter(_counter), fn(_fn){}
+
+				void operator()(size_type idx, CObj& stObj)
+				{
+					counter += (*fn)(idx, stObj)? 1: 0;
+				}
+			};
+
+			/**
+			 * æ¡ä»¶è®¡æ•°å‡½æ•°ä¸ºä»¿å‡½æ•°æ—¶ä½¿ç”¨
+			 */
+			template<typename _F, typename CObj>
+			struct _count_obj_func
+			{
+				size_type& counter;
+				_F& fn;
+
+				_count_obj_func(size_type& _counter, _F& _fn):
+					counter(_counter), fn(_fn){}
+
+				void operator()(size_type idx, CObj& stObj)
+				{
+					counter += fn(idx, stObj)? 1: 0;
+				}
+			};
+
+		public:
+			StaticIdxList()
+			{
+			}
+
+			~StaticIdxList()
+			{
+				destruct();
+			}
+
+			/**
+			 * å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡åˆ›å»ºï¼Œå¿…é¡»è°ƒç”¨æ¬¡å‡½æ•°è¿›è¡Œåˆå§‹åŒ–
+			 */
+			void construct()
+			{
+				m_stHeader.m_iSize = 0;
+				m_stHeader.m_iLastUsedNode = MAX_SIZE; // æœ€åä¸€ä¸ªä¸ºå¤´ç»“ç‚¹
+
+				for (size_type i = 0; i <= MAX_SIZE; ++i)
+				{
+					node_ptr_type pNode = m_stData.get(i);
+					pNode->iPreIdx = (i - 1);
+					pNode->iNextIdx = (i + 1);
+					pNode->bIsInited = false;
+				}
+				m_stData.get(0)->iPreIdx = MAX_SIZE;
+				node_ptr_type pHeadNode = m_stData.get(MAX_SIZE);
+				pHeadNode->iNextIdx = 0;
+				pHeadNode->bIsInited = true;
+			}
+
+			/**
+			 * è°ƒç”¨æ‰€æœ‰å¯¹è±¡çš„ææ„å‡½æ•°(å¯é€‰)
+			 */
+			void destruct()
+			{
+				// åˆ é™¤æ‰€æœ‰æœªé‡Šæ”¾å¯¹è±¡
+				Foreach(_destruct_obj<TObj>(*this));
+			}
+
+			/**
+			 * åˆ¤æ–­ä¸‹æ ‡èŠ‚ç‚¹å­˜åœ¨
+			 * @param [in] idx idx
+			 * @return å­˜åœ¨è¿”å›trueï¼Œå¦åˆ™è¿”å›false
+			 */
+			bool IsExists(size_type idx) const
+			{
+				// è¶…å‡ºæœ€å¤§ä¸ªæ•°é™åˆ¶
+				if (idx >= MAX_SIZE)
+				{
+					return false;
+				}
+
+				// å°äº0
+				if (idx < 0)
+				{
+					return false;
+				}
+
+				// flag æ£€æŸ¥
+				return m_stData.get(idx)->bIsInited;
+			}
+
+			/**
+			 * è·å–ä¸‹ä¸€ä¸ªå…ƒç´ çš„ä¸‹æ ‡
+			 * @param [in] idx å½“å‰å…ƒç´ ä¸‹æ ‡
+			 * @return å­˜åœ¨è¿”å›ä¸‹ä¸€ä¸ªå…ƒç´ ä¸‹æ ‡ï¼Œä¸å­˜åœ¨è¿”å›nops
+			 */
+			size_type GetNextIdx(size_type idx) const
+			{
+				size_type iRet = npos;
+
+				if (IsExists(idx))
+				{
+					iRet = m_stData.get(idx)->iNextIdx;
+				}
+
+				iRet = IsExists(iRet)? iRet: npos;
+
+				return iRet;
+
+			}
+
+			/**
+			 * è·å–ä¸Šä¸€ä¸ªå…ƒç´ çš„ä¸‹æ ‡
+			 * @param [in] idx å½“å‰å…ƒç´ ä¸‹æ ‡
+			 * @return å­˜åœ¨è¿”å›ä¸Šä¸€ä¸ªå…ƒç´ ä¸‹æ ‡ï¼Œä¸å­˜åœ¨è¿”å›npos
+			 */
+			size_type GetPreIdx(size_type idx) const
+			{
+				size_type iRet = npos;
+
+				if (IsExists(idx))
+				{
+					iRet = m_stData.get(idx)->iPreIdx;
+				}
+
+				iRet = IsExists(iRet)? iRet: npos;
+
+				return iRet;
+
+			}
+
+			/**
+			 * æŒ‰Idxè·å–èŠ‚ç‚¹
+			 * @param [in] idx
+			 * @return å­˜åœ¨åˆ™è¿”å›æ•°æ®è¿­ä»£å™¨ï¼Œä¸å­˜åœ¨åˆ™è¿”å›endè¿­ä»£å™¨
+			 */
+			inline iterator Get(size_type idx)
+			{
+				return get(idx);
+			}
+
+			/**
+			 * æŒ‰Idxè·å–èŠ‚ç‚¹(const)
+			 * @param [in] idx
+			 * @return å­˜åœ¨åˆ™è¿”å›æ•°æ®è¿­ä»£å™¨ï¼Œä¸å­˜åœ¨åˆ™è¿”å›endè¿­ä»£å™¨
+			 */
+			inline const_iterator Get(size_type idx) const
+			{
+				return get(idx);
+			}
+
+			/**
+			 * æŒ‰Idxè·å–èŠ‚ç‚¹(const)
+			 * @param [in] idx
+			 * @return å­˜åœ¨åˆ™è¿”å›æ•°æ®å¼•ç”¨
+			 */
+			inline TObj& operator[](size_type idx) { return *get(idx); };
+
+			/**
+			 * æŒ‰Idxè·å–èŠ‚ç‚¹(const)
+			 * @param [in] idx
+			 * @return å­˜åœ¨åˆ™è¿”å›æ•°æ®å¸¸é‡å¼•ç”¨
+			 */
+			inline const TObj& operator[](size_type idx) const { return *get(idx); };
+
+			/**
+			 * åˆ›å»ºèŠ‚ç‚¹ï¼Œè¿”å›idx
+			 * @return æ–°èŠ‚ç‚¹çš„idxï¼Œå¤±è´¥è¿”å›npos
+			 */
+			size_type Create()
+			{
+				size_type ret = _create_node();
+				if (ret >= 0 && ret < MAX_SIZE)
+				{
+					node_type stNewNode = *m_stData.get(ret);
+					new ((void*)&stNewNode.stObjData)TObj();
+				}
+
+				return ret;
+			}
+
+			/**
+			 * åˆ›å»ºèŠ‚ç‚¹ï¼Œè¿”å›idx
+			 * @param [in] param1 æ„é€ å‡½æ•°å‚æ•°1
+			 * @return æ–°èŠ‚ç‚¹çš„idxï¼Œå¤±è´¥è¿”å›npos
+			 */
+			template<typename _TP1>
+			size_type Create(const _TP1& param1)
+			{
+				size_type ret = _create_node();
+				if (ret >= 0 && ret < MAX_SIZE)
+				{
+					node_type& stNewNode = *m_stData.get(ret);
+					new ((void*)&stNewNode.stObjData)TObj(param1);
+				}
+
+				return ret;
+			}
+
+			/**
+			 * åˆ›å»ºèŠ‚ç‚¹ï¼Œè¿”å›idx
+			 * @param [in] param1 æ„é€ å‡½æ•°å‚æ•°1
+			 * @param [in] param2 æ„é€ å‡½æ•°å‚æ•°2
+			 * @return æ–°èŠ‚ç‚¹çš„idxï¼Œå¤±è´¥è¿”å›npos
+			 */
+			template<typename _TP1, typename _TP2>
+			size_type Create(const _TP1& param1, const _TP2& param2)
+			{
+				size_type ret = _create_node();
+				if (ret >= 0 && ret < MAX_SIZE)
+				{
+					node_type& stNewNode = *m_stData.get(ret);
+					new ((void*)&stNewNode.stObjData)TObj(param1, param2);
+				}
+
+				return ret;
+			}
+
+			/**
+			 * åˆ›å»ºèŠ‚ç‚¹ï¼Œè¿”å›idx
+			 * @param [in] param1 æ„é€ å‡½æ•°å‚æ•°1
+			 * @param [in] param2 æ„é€ å‡½æ•°å‚æ•°2
+			 * @param [in] param3 æ„é€ å‡½æ•°å‚æ•°3
+			 * @return æ–°èŠ‚ç‚¹çš„idxï¼Œå¤±è´¥è¿”å›npos
+			 */
+			template<typename _TP1, typename _TP2, typename _TP3>
+			size_type Create(const _TP1& param1, const _TP2& param2, const _TP3& param3)
+			{
+				size_type ret = _create_node();
+				if (ret >= 0 && ret < MAX_SIZE)
+				{
+					node_type& stNewNode = *m_stData.get(ret);
+					new ((void*)&stNewNode.stObjData)TObj(param1, param2, param3);
+				}
+
+				return ret;
+			}
+
+			/**
+			 * ç§»é™¤ä¸€ä¸ªå…ƒç´ 
+			 * @param [in] idx ä¸‹æ ‡
+			 */
+			void Remove(size_type idx)
+			{
+				using std::swap;
+
+				// ä¸å­˜åœ¨ç›´æ¥è¿”å›
+				if(!IsExists(idx))
+				{
+					return;
+				}
+
+				node_ptr_type pCurNode = m_stData.get(idx);
+				size_type iPreIdx = pCurNode->iPreIdx;
+				size_type iNextIdx = pCurNode->iNextIdx;
+				size_type iFreeFirst = m_stData.get(m_stHeader.m_iLastUsedNode)->iNextIdx;
+
+				// åˆ é™¤èŠ‚ç‚¹ï¼Œäº¤æ¢é“¾æ¥
+				swap(m_stData.get(iPreIdx)->iNextIdx, pCurNode->iNextIdx);
+				swap(m_stData.get(iNextIdx)->iPreIdx, pCurNode->iPreIdx);
+
+				// é˜²æ­¢è‡ªå·±å’Œè‡ªå·±äº¤æ¢
+				if (idx == m_stHeader.m_iLastUsedNode)
+				{
+					m_stHeader.m_iLastUsedNode = iPreIdx;
+				}
+
+				// å¤„ç†è‡ªç”±èŠ‚ç‚¹ï¼Œäº¤æ¢é“¾æ¥
+				swap(m_stData.get(m_stHeader.m_iLastUsedNode)->iNextIdx, pCurNode->iNextIdx);
+				swap(m_stData.get(iFreeFirst)->iPreIdx, pCurNode->iPreIdx);
+
+				// èŠ‚ç‚¹è¡Œä¸º
+				pCurNode->bIsInited = false;
+				m_stHeader.m_iLastUsedNode = iPreIdx;
+
+				// æ‰§è¡Œææ„
+				TObj* pRemovedDataSect = &(pCurNode->stObjData);
+				pRemovedDataSect->~TObj();
+				// è®¡æ•°å‡ä¸€
+				-- m_stHeader.m_iSize;
+			}
+
+			/**
+			 * æ˜¯å¦ä¸ºç©º
+			 * @return ä¸ºç©ºè¿”å›true
+			 */
+			inline bool IsEmpty() const { return empty(); }
+
+			/**
+			 * æ˜¯å¦å·²æ»¡
+			 * @return å·²æ»¡è¿”å›true
+			 */
+			inline bool IsFull() const { return size() >= max_size(); }
+
+			// ===============================
+			// =====        è¿­ä»£å™¨ æ“ä½œ                  =====
+			// ===============================
+			iterator get(size_type idx)
+			{
+				if (!IsExists(idx))
+				{
+					return iterator(npos, this);
+				}
+
+				return iterator(idx, this);
+			}
+
+			const_iterator get(size_type idx) const
+			{
+				if (!IsExists(idx))
+				{
+					return const_iterator(npos, this);
+				}
+
+				return const_iterator(idx, this);
+			}
+
+			iterator begin()
+			{
+				return get(m_stData.get(MAX_SIZE)->iNextIdx);
+			}
+
+			const_iterator begin() const
+			{
+				return get(m_stData.get(MAX_SIZE)->iNextIdx);
+			}
+
+			iterator end()
+			{
+				return get(npos);
+			}
+
+			const_iterator end() const
+			{
+				return get(npos);
+			}
+
+			size_t size() const
+			{
+				return static_cast<size_t>(Count());
+			}
+
+			size_t max_size() const
+			{
+				return MAX_SIZE;
+			}
+
+			iterator erase(iterator iter)
+			{
+				size_type idx = iter.index();
+				++iter;
+
+				Remove(idx);
+
+				return iter;
+			}
+
+			inline bool empty() const
+			{
+				return size() == 0;
+			}
+
+			// é«˜çº§åŠŸèƒ½
+			// ===============================
+			// =====       Lambda æ“ä½œ             =====
+			// ===============================
+
+
+			/**
+			 * foreach æ“ä½œ
+			 * @param fn æ‰§è¡Œä»¿å‡½æ•°ï¼Œå‚æ•°å¿…é¡»ä¸º (size_type, TObj&)
+			 */
+			template<typename _F>
+			void Foreach(_F fn)
+			{
+				iterator iter = begin();
+				iterator itEnd = end();
+				while (iter != itEnd)
+				{
+					fn(iter.index(), *iter);
+					++ iter;
+				}
+			}
+
+			/**
+			 * const foreach æ“ä½œ
+			 * @param fn æ‰§è¡Œä»¿å‡½æ•°ï¼Œå‚æ•°å¿…é¡»ä¸º (size_type, TObj&)
+			 */
+			template<typename _F>
+			void Foreach(_F fn) const
+			{
+				const_iterator iter = begin();
+				const_iterator itEnd = end();
+				while (iter != itEnd)
+				{
+					fn(iter.index(), *iter);
+					++ iter;
+				}
+			}
+
+			/**
+			 * foreach æ“ä½œ
+			 * @param fn æ‰§è¡Œå‡½æ•°ï¼Œå‚æ•°å¿…é¡»ä¸º (size_type, TObj&)
+			 */
+			template<typename _R>
+			void Foreach(_R (*fn)(size_type, TObj&))
+			{
+				iterator iter = begin();
+				iterator itEnd = end();
+				while (iter != itEnd)
+				{
+					(*fn)(iter.index(), *iter);
+					++ iter;
+				}
+			};
+
+			/**
+			 * const foreach æ“ä½œ
+			 * @param fn æ‰§è¡Œå‡½æ•°ï¼Œå‚æ•°å¿…é¡»ä¸º (size_type, TObj&)
+			 */
+			template<typename _R>
+			void Foreach(_R (*fn)(size_type, const TObj&)) const
+			{
+				const_iterator iter = begin();
+				const_iterator itEnd = end();
+				while (iter != itEnd)
+				{
+					(*fn)(iter.index(), *iter);
+					++ iter;
+				}
+			};
+
+			/**
+			 * è·å–å…ƒç´ ä¸ªæ•°
+			 * @return å…ƒç´ ä¸ªæ•°
+			 */
+			size_type Count() const { return m_stHeader.m_iSize; };
+
+		public:
+			/**
+			 * è·å–ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 * @param [in] fn æ¡ä»¶å‡½æ•°
+			 * @return ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 */
+			size_type Count(bool (*fn)(size_type, const TObj&)) const
+			{
+				size_type iRet = 0;
+
+				Foreach(_count_cc_func<const TObj>(iRet, fn));
+
+				return iRet;
+			};
+
+			/**
+			 * è·å–ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 * @param [in] fn æ¡ä»¶å‡½æ•°
+			 * @return ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 */
+			size_type Count(bool (*fn)(size_type, TObj&))
+			{
+				size_type iRet = 0;
+
+				Foreach(_count_cc_func<TObj>(iRet, fn));
+
+				return iRet;
+			};
+
+		public:
+			/**
+			 * è·å–ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 * @param [in] fn æ¡ä»¶ä»¿å‡½æ•°
+			 * @return ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 */
+			template<typename _F>
+			size_type Count(_F fn) const
+			{
+				size_type iRet = 0;
+
+				Foreach(_count_obj_func<_F, const TObj>(iRet, fn));
+
+				return iRet;
+			};
+
+			/**
+			 * è·å–ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 * @param [in] fn æ¡ä»¶ä»¿å‡½æ•°
+			 * @return ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ä¸ªæ•°
+			 */
+			template<typename _F>
+			size_type Count(_F fn)
+			{
+				size_type iRet = 0;
+
+				Foreach(_count_obj_func<_F, TObj>(iRet, fn));
+
+				return iRet;
+			};
+
+		};
     }
 }
 
