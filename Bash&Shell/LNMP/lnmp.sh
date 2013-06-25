@@ -7,7 +7,7 @@ PHP_CONF_FILE_PATH=/etc/php.ini
 PHP_CONF_DIR_PATH=/etc/php.d
 PHP_FPM_CONF_FILE_PATH=/etc/php-fpm.d/www.conf
  
-# °²×°À©Õ¹Èí¼şÔ´
+# å®‰è£…æ‰©å±•è½¯ä»¶æº
 rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 if [ "$ARCH_FLAG" == "64" ]; then
     rpm -ivh http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
@@ -15,7 +15,7 @@ else
     rpm -ivh http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.i686.rpm
 fi
 rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
-rpm -K rpmforge-release-0.5.2-2.el6.rf.*.rpm  # ÕâÀï»á±¨Ò»¸ö´í£¬ÎŞÊÓÖ®
+rpm -K rpmforge-release-0.5.2-2.el6.rf.*.rpm  # è¿™é‡Œä¼šæŠ¥ä¸€ä¸ªé”™ï¼Œæ— è§†ä¹‹
  
 yum install -y nginx
 chkconfig nginx on
@@ -24,7 +24,7 @@ chkconfig httpd off
  
 cp $PHP_CONF_FILE_PATH $PHP_CONF_FILE_PATH.bak
  
-# Ìæ»»PHPÅäÖÃ
+# æ›¿æ¢PHPé…ç½®
 sed -i 's#output_buffering = Off#output_buffering = On#' $PHP_CONF_FILE_PATH
 sed -i 's/memory_limit = 128M/memory_limit = 300M/g' $PHP_CONF_FILE_PATH
 sed -i 's/post_max_size = 8M/post_max_size = 50M/g' $PHP_CONF_FILE_PATH
@@ -34,9 +34,9 @@ sed -i 's/short_open_tag = Off/short_open_tag = On/g' $PHP_CONF_FILE_PATH
 sed -i 's/; cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' $PHP_CONF_FILE_PATH
 sed -i 's/; cgi.fix_pathinfo=0/cgi.fix_pathinfo=0/g' $PHP_CONF_FILE_PATH
 sed -i 's/max_execution_time = 30/max_execution_time = 300/g' $PHP_CONF_FILE_PATH
-sed -i 's/disable_functions =.*/disable_functions = proc_open,proc_get_status,ini_alter,ini_alter,ini_restore,pfsockopen,popepassthru,stream_socket_server,fsocket,fsockopen/g' $PHP_CONF_FILE_PATH
+sed -i 's/disable_functions =.*/disable_functions = proc_open,proc_get_status,ini_alter,ini_alter,ini_restore,pfsockopen,popepassthru,stream_socket_server,fsocket/g' $PHP_CONF_FILE_PATH
  
-# Ìæ»»PHP-FPMÅäÖÃ
+# æ›¿æ¢PHP-FPMé…ç½®
 groupadd users
 useradd -s /sbin/nologin -g nginx users
 usermod -g users nginx
@@ -45,7 +45,7 @@ sed -i 's/group = apache/group = users/g' $PHP_FPM_CONF_FILE_PATH
 sed -i 's/;php_admin_value\[memory_limit\] = 128M/php_admin_value\[memory_limit\] = 300M/g' $PHP_FPM_CONF_FILE_PATH
  
  
-# °²×°¼ÓËÙÆ÷ eaccelerator
+# å®‰è£…åŠ é€Ÿå™¨ eaccelerator
 wget -c https://github.com/eaccelerator/eaccelerator/tarball/master -O eaccelerator.tar.gz
 tar -zxvf eaccelerator.tar.gz
 mv eaccelerator-eaccelerator-* eaccelerator
@@ -75,7 +75,7 @@ eaccelerator.compress_level=\"9\"
  
 cd "$WORKING_DIR"
  
-# °²×°¼ÓËÙÆ÷ Zend Guard Loader
+# å®‰è£…åŠ é€Ÿå™¨ Zend Guard Loader
 ZEND_GUARD_LOADER="http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-linux-glibc23-i386.tar.gz";
 if [ "$ARCH_FLAG" == "64" ]; then
     ZEND_GUARD_LOADER="http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz";
@@ -95,7 +95,7 @@ zend_loader.license_path=
 zend_extension=$(php-config --extension-dir)/ZendGuardLoader.so
 " > $PHP_CONF_DIR_PATH/zendloader.ini
  
-# ¸´ÖÆÍ¨ÓÃÅäÖÃÎÄ¼ş
+# å¤åˆ¶é€šç”¨é…ç½®æ–‡ä»¶
 NGINX_CONF_PATH="/etc/nginx"
 echo '
 location / {
@@ -141,29 +141,29 @@ if (!-e $request_filename) {
 }
 '  > "$NGINX_CONF_PATH/discuzx.conf"
  
-# iptables ¹ÜÀí
+# iptables ç®¡ç†
 /sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
 /sbin/iptables-save
  
-# ×ÔÆô¶¯
+# è‡ªå¯åŠ¨
 chkconfig --level 345 php-fpm on
 chkconfig --level 345 nginx on
 chkconfig --level 345 mysqld on
  
-# ÅäÖÃĞŞÕı£¨ĞŞ¸´¼¸¸öÄ¬ÈÏÅäÖÃ£©
+# é…ç½®ä¿®æ­£ï¼ˆä¿®å¤å‡ ä¸ªé»˜è®¤é…ç½®ï¼‰
 sed -i 's/extension=module.so/extension=mcrypt.so/g' $PHP_CONF_DIR_PATH/mcrypt.ini
  
-# ===========================  ÒÔÏÂÎªÊÖ¶¯´¦Àí  ===========================
-# ¼ÓËÙÆ÷XCache¡¢APCºÍeacceleratorÖ»ÄÜÆôÓÃÒ»¸ö
-# $PHP_CONF_DIR_PATH/xcache.ini ºÍ $PHP_CONF_DIR_PATH/apc.iniÄÚ×î¶àÖ»×¢ÊÍÒ»¸ö
+# ===========================  ä»¥ä¸‹ä¸ºæ‰‹åŠ¨å¤„ç†  ===========================
+# åŠ é€Ÿå™¨XCacheã€APCå’Œeacceleratoråªèƒ½å¯ç”¨ä¸€ä¸ª
+# $PHP_CONF_DIR_PATH/xcache.ini å’Œ $PHP_CONF_DIR_PATH/apc.iniå†…æœ€å¤šåªæ³¨é‡Šä¸€ä¸ª
 sed -i 's/extension = apc.so/;extension = apc.so/g' $PHP_CONF_DIR_PATH/apc.ini
 sed -i "s#extension=\"$(php-config --extension-dir)/eaccelerator.so\"#;extension=\"$(php-config --extension-dir)/eaccelerator.so\"#g" $PHP_CONF_DIR_PATH/eaccelerator.ini
 # sed -i "s#zend_extension = $(php-config --extension-dir)/xcache.so#;zend_extension = $(php-config --extension-dir)/xcache.so#g" $PHP_CONF_DIR_PATH/xcache.ini
  
-# ×¢ÒâxcacheµÄ¹ÜÀí¶Ë°²×°ÔÚ/var/www/html/xcacheÄÚ
-# Èç¹ûÒª¸øxcacheµÄ¹ÜÀí¶ËÉèÖÃÃÜÂë£¬ÇëĞŞ¸Ä $PHP_CONF_DIR_PATH/xcache.ini( ¼´ /etc/php.d/xcache.ini ) ÎÄ¼ş
+# æ³¨æ„xcacheçš„ç®¡ç†ç«¯å®‰è£…åœ¨/var/www/html/xcacheå†…
+# å¦‚æœè¦ç»™xcacheçš„ç®¡ç†ç«¯è®¾ç½®å¯†ç ï¼Œè¯·ä¿®æ”¹ $PHP_CONF_DIR_PATH/xcache.ini( å³ /etc/php.d/xcache.ini ) æ–‡ä»¶
  
-# ÖØÆô ·şÎñ
+# é‡å¯ æœåŠ¡
 service nginx restart
 service php-fpm restart
 service mysqld restart
