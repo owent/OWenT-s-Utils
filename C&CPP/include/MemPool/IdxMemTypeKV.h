@@ -42,12 +42,22 @@ namespace util
 			static std::map<key_type, inner_size_type> m_arrKeyValuePool[HASH_HVAL];
 
 			int m_iObjectID; //!对象ID，即在DynamicIdxList中的数组下标
+		        key_type m_tKey;
 
 		public:
 			virtual ~IdxMemTypeKV(){}
 
-			//!获取对象ID
-			inline int GetObjectID() const { return m_iObjectID; }
+		        /**
+		         * 获取对象ID
+		         * @return 对象ID
+		         */
+		        inline int GetObjectID() const { return m_iObjectID; }
+		
+		        /**
+		         * 获取对象Key
+		         * @return 对象Key
+		         */
+		        inline const key_type& GetObjectKey() const { return m_tKey; }
 
 		public:
 
@@ -110,7 +120,8 @@ namespace util
 				value_ptr_type ptr(pNewObj);
 				inner_size_type iIdx = m_astMemPool.Create(ptr);
 				ptr->m_iObjectID = iIdx;
-
+            			ptr->m_tKey = key;
+            
 				if (m_astMemPool.npos != iIdx)
 				{
 					m_arrKeyValuePool[iIndex][key] = iIdx;
