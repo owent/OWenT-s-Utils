@@ -85,7 +85,7 @@ namespace util
 				return std::numeric_limits<int>::max() - GetUsedObjNumber();
 			}
 
-			static int Create()
+			static value_type* Create()
 			{
 				value_type* pNewObj = new value_type();
 				if (NULL == pNewObj)
@@ -97,10 +97,10 @@ namespace util
 				inner_size_type iIdx = m_astMemPool.Create(ptr);
 
 				ptr->m_iObjectID = iIdx;
-				return static_cast<int>(iIdx);
+				return pNewObj;
 			}
 
-			static value_type* Get(const int iIdx)
+			static value_type* GetByIdx(const int iIdx)
 			{
 				inner_size_type uInnerIdx = static_cast<inner_size_type>(iIdx);
 				if (m_astMemPool.IsExists(uInnerIdx))
@@ -130,7 +130,7 @@ namespace util
 				return static_cast<int>(m_astMemPool.GetNextIdx(uInnerIdx));
 			}
 
-			static int Del(const int iIdx)
+			static int DeleteByIdx(const int iIdx)
 			{
 				inner_size_type uInnerIdx = static_cast<inner_size_type>(iIdx);
 				if (false == m_astMemPool.IsExists(uInnerIdx))
