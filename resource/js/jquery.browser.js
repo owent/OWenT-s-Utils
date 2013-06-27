@@ -10,7 +10,6 @@ window.Util = window.Util || {};
  * @example	var bro = Util.getEnvironment();
  * @example	jQuery.environment;
  */
- 
 Util._TEnvironment = function () {
 	// default names
 	this._browserName = "Unknown";
@@ -348,7 +347,7 @@ Util._TEnvironment = function () {
 			else
 				_this._kver = "Unknown";
 				
-			if (parseInt(_this._kver) == 7 && ua.match(/trident/))
+			if (parseInt(_this._kver) == 3)
 				_this._isCompatMode = true;
 		}
 
