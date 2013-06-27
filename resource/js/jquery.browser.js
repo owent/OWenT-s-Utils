@@ -10,6 +10,7 @@ window.Util = window.Util || {};
  * @example	var bro = Util.getEnvironment();
  * @example	jQuery.environment;
  */
+ 
 Util._TEnvironment = function () {
 	// default names
 	this._browserName = "Unknown";
