@@ -324,7 +324,7 @@ Util._TEnvironment = function () {
 			else {
 				_this._browserShort = "IE";
 				_this._browserName = "Microsoft Internet Explorer ";
-				var check_ver = ua.match(/msie ([\w.]+)/)[1];
+				var check_ver = ua.match(/msie ([\w.]+)/);
 				if (check_ver && check_ver.length > 1)
 					_this._browserVersion = check_ver[1];
 				else
