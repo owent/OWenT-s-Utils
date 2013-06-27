@@ -4,7 +4,7 @@ window.Util = window.Util || {};
  * Environment judge
  * Support browser: IE, Firefox, Chrome, Opera, Safari, Konqueror, Go
  * jQuery plugin
- * @version	1.6
+ * @version	1.6.1
  * @since	1.1
  * @example	var bro = new Util._TEnvironment();
  * @example	var bro = Util.getEnvironment();
@@ -324,7 +324,11 @@ Util._TEnvironment = function () {
 			else {
 				_this._browserShort = "IE";
 				_this._browserName = "Microsoft Internet Explorer ";
-				_this._browserVersion = ua.match(/msie ([\w.]+)/)[1];
+				var check_ver = ua.match(/msie ([\w.]+)/)[1];
+				if (check_ver && check_ver.length > 1)
+					_this._browserVersion = check_ver[1];
+				else
+					_this._browserVersion = ua.match(/trident\/([\w.]+)/)[1] + "(内核)[已知IE 11的内核版本为7]" ;
 				if (_this._platos == "64-Bit Edition") {
 					if (ua.match(/win64|x64|ia64/)) {
 						_this._platbr = "64-Bit Edition"
@@ -455,7 +459,7 @@ Util._TEnvironment = function () {
  * @package Util
  * @return The information of current environment.
  * @example	var bro = Util.getEnvironment();
- * @version	1.4
+ * @version	1.6.1
  * @since	1.1
  */
 Util.getEnvironment = function(){ return new Util._TEnvironment(); };
