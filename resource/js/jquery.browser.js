@@ -329,6 +329,7 @@ Util._TEnvironment = function () {
 					_this._browserVersion = check_ver[1];
 				else
 					_this._browserVersion = ua.match(/trident\/([\w.]+)/)[1] + "(内核)[已知IE 11的内核版本为7]" ;
+				
 				if (_this._platos == "64-Bit Edition") {
 					if (ua.match(/win64|x64|ia64/)) {
 						_this._platbr = "64-Bit Edition"
