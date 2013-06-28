@@ -427,7 +427,7 @@ Util._TEnvironment = function () {
                     //Chrome Plus
                     if (ua.match(/chromeplus/)) {
                         _this._browserShort = "Chrome Plus";
-                        _this._browserName = "Chrome Plus ";
+                        _this._browserName = "Tencent Chrome Plus ";
                         _this._browserVersion = _get_reg_ver(/chromeplus\/([\w.]+)/, 1);
                         _this._addtional = " with Google Chrome kernel";
                     } else {
