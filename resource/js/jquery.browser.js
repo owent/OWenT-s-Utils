@@ -211,6 +211,7 @@ Util._TEnvironment = function () {
                 } catch (e) {
                     _this._OSName = "Google Android";
                 }
+                _this._platos = "arm";
                 _this._ismobileos = true;
             } else if (ua.match(/ubuntu|fedora|redhat|debian|suse/)) {
                 var strs = ['Ubuntu', 'Fedora', 'RedHat', 'Debian', 'SUSE'];
@@ -227,7 +228,9 @@ Util._TEnvironment = function () {
             else
                 _this._OSName = "Linux";
             if (ua.match(/x86_64/))
-                _this._platos = "64-Bit Edition";
+                _this._platos = "x64";
+            if (ua.match(/arm/))
+                _this._platos = "x64";
             _this._kos = "OpenSource Linux";
         } else if (ua.match(/macintosh|iphone|ipad|ipod/)) {
             if (ua.match(/macintosh/)) {
@@ -370,7 +373,7 @@ Util._TEnvironment = function () {
                 }
             }
 
-            _this._kbrow = "Microsoft Trident by IE";
+            _this._kbrow = "Trident";
             _this._kver = _get_reg_ver(/trident\/([\w.]+)/, 1);
             if (parseInt(_this._browserVersion) == 7 && parseFloat(_this._kver) >= 4)
                 _this._isCompatMode = true;
@@ -448,18 +451,18 @@ Util._TEnvironment = function () {
                     _this._browserShort = "Safari";
                     _this._browserName = "Apple Safari ";
                     _this._browserVersion = _get_reg_ver(/version\/([\w.]+)/, 1);
-                    if (_this._platos == "64-Bit Edition") {
-                        _this._platbr = "64-Bit Edition"
+                    if (_this._platos == "x64") {
+                        _this._platbr = "x64";
                     }
                 }
-                _this._kbrow = "Apple WebKit(KHTML based)";
+                _this._kbrow = "WebKit";
                 _this._kver = _get_reg_ver(/applewebkit\/([\w.]+)/, 1);
             } else {
                 //Konqueror
                 _this._browserShort = "Konqueror";
                 _this._browserName = "KDE Konqueror ";
                 _this._browserVersion = _get_reg_ver(/konqueror\/([\w.]+)/, 1);
-                _this._kbrow = "OpenSource KHTML";
+                _this._kbrow = "KHTML";
                 _this._kver = _get_reg_ver(/khtml\/([\w.]+)/, 1);
             }
         }
@@ -469,7 +472,7 @@ Util._TEnvironment = function () {
             _this._browserShort = "FF";
             _this._browserName = "Mozilla FireFox ";
             _this._browserVersion = _get_reg_ver(/firefox\/([\w.]+)/, 1);
-            _this._kbrow = "OpenSource Gecko";
+            _this._kbrow = "Gecko";
             _this._kver = ua.match(/gecko\/([\w.]+)/)[1];
         }
 
