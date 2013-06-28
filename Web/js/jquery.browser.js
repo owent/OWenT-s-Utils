@@ -4,7 +4,7 @@ window.Util = window.Util || {};
  * Environment judge
  * Support browser: IE, Firefox, Chrome, Opera, Safari, Konqueror, Go
  * jQuery plugin
- * @version	1.6
+ * @version	1.6.1
  * @since	1.1
  * @example	var bro = new Util._TEnvironment();
  * @example	var bro = Util.getEnvironment();
@@ -466,7 +466,7 @@ Util._TEnvironment = function () {
  * @package Util
  * @return The information of current environment.
  * @example	var bro = Util.getEnvironment();
- * @version	1.4
+ * @version	1.6.1
  * @since	1.1
  */
 Util.getEnvironment = function(){ return new Util._TEnvironment(); };
