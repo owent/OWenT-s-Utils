@@ -162,7 +162,9 @@ Util._TEnvironment = function () {
 						is64 = true;
 						_this._platos = "64-Bit Edition";
 					}
-					if (t_ver == "6.2") {
+					if (t_ver == "6.3") {
+						_this._OSName = "Microsoft Windows 8.1";
+					} else if (t_ver == "6.2") {
 						_this._OSName = "Microsoft Windows 8";
 					} else if (t_ver == "6.1") {
 						_this._OSName = "Microsoft Windows 7/Windows Server 2008 R2";
@@ -180,12 +182,13 @@ Util._TEnvironment = function () {
 					} else {
 						_this._OSName = "Microsoft Windows NT";
 					}
+					_this._kos = "Microsoft Windows NT " + t_ver;
 				} catch (e) {
 					_this._OSName = "Microsoft Windows NT";
 				}
 			} else
 				_this._OSName = "Microsoft Windows";
-			_this._kos = "Microsoft Windows";
+			_this._kos = _this._kos || "Microsoft Windows";
 		} else if (ua.match(/linux/)) {
 			if (ua.match(/android/)) {
 				try {
