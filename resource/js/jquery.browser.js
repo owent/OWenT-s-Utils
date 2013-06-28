@@ -18,7 +18,7 @@ Util._TEnvironment = function () {
     this._addtional = "";
     this._OSName = "Unknown";
     this._kbrow = "Unknown";
-    this._kos = "0.0";
+    //this._kos = "0.0";
     this._kver = "Unknown";
     this._platos = "x86";
     this._platbr = "x86";
@@ -191,7 +191,7 @@ Util._TEnvironment = function () {
                     } else {
                         _this._OSName = "Microsoft Windows NT";
                     }
-                    _this._kos = "Microsoft Windows NT " + t_ver;
+                    //_this._kos = "Microsoft Windows NT " + t_ver;
                     
                     if (ua.match(/arm/)) {
                         _this._platos = "arm";
@@ -199,10 +199,14 @@ Util._TEnvironment = function () {
                     }
                 } catch (e) {
                     _this._OSName = "Microsoft Windows NT";
+                    //_this._kos = "Microsoft Windows";
                 }
             } else
                 _this._OSName = "Microsoft Windows";
-            _this._kos = _this._kos || "Microsoft Windows";
+            if (ua.match(/xbox/)) {
+                _this._OSName = "Microsoft XBox";
+            } 
+            //_this._kos = _this._kos || "Microsoft Windows";
         } else if (ua.match(/linux/)) {
             if (ua.match(/android/)) {
                 try {
@@ -231,7 +235,7 @@ Util._TEnvironment = function () {
                 _this._platos = "x64";
             if (ua.match(/arm/))
                 _this._platos = "x64";
-            _this._kos = "OpenSource Linux";
+            //_this._kos = "OpenSource Linux";
         } else if (ua.match(/macintosh|iphone|ipad|ipod/)) {
             if (ua.match(/macintosh/)) {
                 _this._OSName = "Apple Mac OS X";
@@ -252,24 +256,24 @@ Util._TEnvironment = function () {
                 }
             } catch (e) {
             }
-            _this._kos = "Apple Darwin";
+            //_this._kos = "Apple Darwin";
         } else if (ua.match(/blackberry/)) {
             _this._OSName = "BlackBerry OS";
-            _this._kos = "RIM";
+            //_this._kos = "RIM";
             _this._ismobileos = true;
         } else if (ua.match(/symbianos|symbos/)) {
             _this._OSName = "Nokia Symbian";
-            _this._kos = "Nokia Symbian";
+            //_this._kos = "Nokia Symbian";
             _this._ismobileos = true;
         } else if (ua.match(/solaris|sunos/)) {
             _this._OSName = "Sun Solaris";
-            _this._kos = "OpenSource Unix-Like";
+            //_this._kos = "OpenSource Unix-Like";
         } else if (ua.match(/bsd/)) {
             if (ua.match(/freebsd|openbsd/))
                 _this._OSName = _get_reg_ver(/freebsd|openbsd/i, 1) + " OS";
             else
                 _this._OSName = "BSD";
-            _this._kos = "OpenSource Unix-Like";
+            //_this._kos = "OpenSource Unix-Like";
         } else if (ua.match(/j2me/)) {
             _this._OSName = "J2ME OS- java based environment";
             _this._ismobileos = true;
