@@ -127,6 +127,13 @@ Util._TEnvironment = function () {
 		_this._cookieEnabled = navigator.cookieEnabled;
 		var ua = _this._userAgent.toLowerCase();
 
+		var _get_reg_ver = (function(reg, pos){
+			var ret = ua.match(reg);
+			if (ret && ret.length > pos)
+				return ret[pos];
+			return "Unknown"
+		});
+		
 		//OS
 		if (ua.match(/windows/)) {
 			if (ua.match(/windows ce/)) {
@@ -141,7 +148,7 @@ Util._TEnvironment = function () {
 					_this._OSName = "Microsoft Windows 98";
 			} else if (ua.match(/windows phone os/)) {
 				try {
-					var t_ver = ua.match(/windows phone os ([\d.]+)/)[1];
+					var t_ver = _get_reg_ver(/windows phone os ([\d.]+)/, 1);
 					_this._OSName = "Microsoft Windows Phone " + t_ver;
 				} catch (e) {
 					_this._OSName = "Microsoft Windows Phone";
@@ -149,7 +156,7 @@ Util._TEnvironment = function () {
 				_this._ismobileos = true;
 			} else if (ua.match(/windows nt/)) {
 				try {
-					var t_ver = ua.match(/windows nt ([\d.]+)/)[1];
+					var t_ver = _get_reg_ver(/windows nt ([\d.]+)/, 1);
 					var is64 = false;
 					if (ua.match(/win64|wow64|x64|ia64/)) {
 						is64 = true;
@@ -182,7 +189,7 @@ Util._TEnvironment = function () {
 		} else if (ua.match(/linux/)) {
 			if (ua.match(/android/)) {
 				try {
-					var t_ver = ua.match(/android ([\d.]+)/)[1];
+					var t_ver = _get_reg_ver(/android ([\d.]+)/, 1);
 					_this._OSName = "Google Android " + t_ver;
 				} catch (e) {
 					_this._OSName = "Google Android";
@@ -213,7 +220,7 @@ Util._TEnvironment = function () {
 				_this._ismobileos = true;
 			}
 			try {
-				var t_ver = ua.match(/(ppc mac os x|intel mac os x|cpu iphone os|cpu os) ([\d_]+)/)[2];
+				var t_ver = _get_reg_ver(/(ppc mac os x|intel mac os x|cpu iphone os|cpu os) ([\d_]+)/, 2);
 				t_ver = t_ver.replace(/_/g, ".");
 				_this._OSName += " " + t_ver;
 			} catch (e) {
@@ -235,7 +242,7 @@ Util._TEnvironment = function () {
 			_this._kos = "OpenSource Unix-Like";
 		} else if (ua.match(/bsd/)) {
 			if (ua.match(/freebsd|openbsd/))
-				_this._OSName = _this._userAgent.match(/freebsd|openbsd/i)[1] + " OS";
+				_this._OSName = _get_reg_ver(/freebsd|openbsd/i, 1) + " OS";
 			else
 				_this._OSName = "BSD";
 			_this._kos = "OpenSource Unix-Like";
@@ -263,11 +270,11 @@ Util._TEnvironment = function () {
 				_this._ismobilebr = true;
 			}
 			if (ua.match(/mozilla/)) {
-				_this._browserVersion = ua.match(/opera ([\w.]+)/)[1];
+				_this._browserVersion = _get_reg_ver(/opera ([\w.]+)/, 1);
 				_this._fakeopera = true;
 			} else {
-				_this._browserVersion = ua.match(/version\/([\w.]+)/)[1];
-				_this._kver = ua.match(/presto\/([\w.]+)/)[1];
+				_this._browserVersion = _get_reg_ver(/version\/([\w.]+)/, 1);
+				_this._kver = _get_reg_ver(/presto\/([\w.]+)/, 1);
 			}
 			_this._kbrow = "OpenSource Presto";
 		}
@@ -280,44 +287,44 @@ Util._TEnvironment = function () {
 				_this._browserShort = "TheWorld";
 				_this._browserName = "TheWorld Browser";
 				_this._browserVersion = "";
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 			//Tencent Traveler
 			else if (ua.match(/tencenttraveler/)) {
 				_this._browserShort = "Traveler";
 				_this._browserName = "Tencent Traveler ";
-				_this._browserVersion = ua.match(/tencenttraveler ([\w.]+)/)[1];
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._browserVersion = _get_reg_ver(/tencenttraveler ([\w.]+)/, 1);
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 			//Maxthon
 			else if (ua.match(/maxthon/)) {
 				_this._browserShort = "Maxthon";
 				_this._browserName = "Maxthon ";
 				if (ua.match(/maxthon(\/| )([\w.]+)/)) {
-					_this._browserVersion = ua.match(/maxthon(\/| )([\w.]+)/)[1];
+					_this._browserVersion = _get_reg_ver(/maxthon(\/| )([\w.]+)/, 1);
 				} else {
 					_this._browserVersion = "1.0";
 				}
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 			//Avant
 			else if (ua.match(/avant/)) {
 				_this._browserShort = "avant";
 				_this._browserName = "avant Browser ";
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 			//360SE
 			else if (ua.match(/360se/)) {
 				_this._browserShort = "360SE";
 				_this._browserName = "Qihoo 360 Safe Browser ";
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 			//Sogou
 			else if (ua.match(/se ([\d.]+)/)) {
 				_this._browserShort = "Sogou";
 				_this._browserName = "Sohu Sogou ";
-				_this._browserVersion = ua.match(/se ([\w.]+)/)[1];
-				_this._addtional = " with Microsoft Internet Explorer " + ua.match(/msie ([\w.]+)/)[1] + " kernel";
+				_this._browserVersion = _get_reg_ver(/se ([\w.]+)/, 1);
+				_this._addtional = " with Microsoft Internet Explorer " + _get_reg_ver(/msie ([\w.]+)/, 1) + " kernel";
 			}
 
 			//Microsoft Internet Explorer && Internet Explorer Mobile
@@ -328,8 +335,7 @@ Util._TEnvironment = function () {
 				if (check_ver && check_ver.length > 1)
 					_this._browserVersion = check_ver[1];
 				else
-					_this._browserVersion = ua.match(/trident\/([\w.]+)/)[1] + "(内核)[已知IE 11的内核版本为7]" ;
-				
+					_this._browserVersion = parseInt(_get_reg_ver(/trident\/([\w.]+)/, 1)) + 4 ;
 				if (_this._platos == "64-Bit Edition") {
 					if (ua.match(/win64|x64|ia64/)) {
 						_this._platbr = "64-Bit Edition"
@@ -341,13 +347,8 @@ Util._TEnvironment = function () {
 			}
 
 			_this._kbrow = "Microsoft Trident by IE";
-			var check_kernel_ver = ua.match(/trident\/([\w.]+)/);
-			if (check_kernel_ver)
-				_this._kver = check_kernel_ver[1];
-			else
-				_this._kver = "Unknown";
-				
-			if (parseInt(_this._kver) == 3)
+			_this._kver = _get_reg_ver(/trident\/([\w.]+)/, 1);
+			if (parseInt(_this._browserVersion) == 7 && ua.match(/trident/))
 				_this._isCompatMode = true;
 		}
 
@@ -359,7 +360,7 @@ Util._TEnvironment = function () {
 				if (ua.match(/tencenttraveler/)) {
 					_this._browserShort = "Traveler";
 					_this._browserName = "Tencent Traveler ";
-					_this._browserVersion = ua.match(/tencenttraveler ([\w.]+)/)[1];
+					_this._browserVersion = _get_reg_ver(/tencenttraveler ([\w.]+)/, 1);
 					_this._addtional = " with Apple Safari kernel";
 				}
 				//Maxthon
@@ -367,7 +368,7 @@ Util._TEnvironment = function () {
 					_this._browserShort = "Maxthon";
 					_this._browserName = "Maxthon ";
 					if (ua.match(/maxthon(\/| )([\w.]+)/)) {
-						_this._browserVersion = ua.match(/maxthon(\/| )([\w.]+)/)[1];
+						_this._browserVersion = _get_reg_ver(/maxthon(\/| )([\w.]+)/, 1);
 					} else {
 						_this._browserVersion = "1.0";
 					}
@@ -383,14 +384,14 @@ Util._TEnvironment = function () {
 				else if (ua.match(/se ([\d.]+)/)) {
 					_this._browserShort = "Sogou";
 					_this._browserName = "Sohu Sogou ";
-					_this._browserVersion = ua.match(/se ([\w.]+)/)[1];
+					_this._browserVersion = _get_reg_ver(/se ([\w.]+)/, 1);
 					_this._addtional = " with Apple Safari kernel";
 				}
 				//BrowserNG
 				else if (ua.match(/browserng/)) {
 					_this._browserShort = "BrowNG";
 					_this._browserName = "Nokia BrowserNG ";
-					_this._browserVersion = ua.match(/browserng\/([\w.]+)/)[1];
+					_this._browserVersion = _get_reg_ver(/browserng\/([\w.]+)/, 1);
 					_this._addtional = " with Apple Safari kernel";
 					_this._ismobilebr = true;
 				}
@@ -400,7 +401,7 @@ Util._TEnvironment = function () {
 					if (ua.match(/chromeplus/)) {
 						_this._browserShort = "Chrome Plus";
 						_this._browserName = "Chrome Plus ";
-						_this._browserVersion = ua.match(/chromeplus\/([\w.]+)/)[1];
+						_this._browserVersion = _get_reg_ver(/chromeplus\/([\w.]+)/, 1);
 						_this._addtional = " with Google Chrome kernel";
 					} else {
 						//Google Chrome && Chrome Lite
@@ -408,12 +409,12 @@ Util._TEnvironment = function () {
 						_this._browserName = "Google Chrome ";
 						if (ua.match(/android/) && ua.match(/version\/([\w.]+)/)) {
 							_this._browserName = "Google Chrome Lite ";
-							_this._browserVersion = ua.match(/version\/([\w.]+)/)[1];
+							_this._browserVersion = _get_reg_ver(/version\/([\w.]+)/, 1);
 							_this._ismobilebr = true;
 						} else if (ua.match(/chrome/)) {
-							_this._browserVersion = ua.match(/chrome\/([\w.]+)/)[1];
+							_this._browserVersion = _get_reg_ver(/chrome\/([\w.]+)/, 1);
 						} else {
-							_this._browserVersion = ua.match(/chromium\/([\w.]+)/)[1];
+							_this._browserVersion = _get_reg_ver(/chromium\/([\w.]+)/, 1);
 						}
 					}
 				}
@@ -422,20 +423,20 @@ Util._TEnvironment = function () {
 				else {
 					_this._browserShort = "Safari";
 					_this._browserName = "Apple Safari ";
-					_this._browserVersion = ua.match(/version\/([\w.]+)/)[1];
+					_this._browserVersion = _get_reg_ver(/version\/([\w.]+)/, 1);
 					if (_this._platos == "64-Bit Edition") {
 						_this._platbr = "64-Bit Edition"
 					}
 				}
 				_this._kbrow = "Apple WebKit(KHTML based)";
-				_this._kver = ua.match(/applewebkit\/([\w.]+)/)[1];
+				_this._kver = _get_reg_ver(/applewebkit\/([\w.]+)/, 1);
 			} else {
 				//Konqueror
 				_this._browserShort = "Konqueror";
 				_this._browserName = "KDE Konqueror ";
-				_this._browserVersion = ua.match(/konqueror\/([\w.]+)/)[1];
+				_this._browserVersion = _get_reg_ver(/konqueror\/([\w.]+)/, 1);
 				_this._kbrow = "OpenSource KHTML";
-				_this._kver = ua.match(/khtml\/([\w.]+)/)[1];
+				_this._kver = _get_reg_ver(/khtml\/([\w.]+)/, 1);
 			}
 		}
 
@@ -443,7 +444,7 @@ Util._TEnvironment = function () {
 		else if (ua.match(/firefox|gecko/)) {
 			_this._browserShort = "FF";
 			_this._browserName = "Mozilla FireFox ";
-			_this._browserVersion = ua.match(/firefox\/([\w.]+)/)[1];
+			_this._browserVersion = _get_reg_ver(/firefox\/([\w.]+)/, 1);
 			_this._kbrow = "OpenSource Gecko";
 			_this._kver = ua.match(/gecko\/([\w.]+)/)[1];
 		}
@@ -452,7 +453,7 @@ Util._TEnvironment = function () {
 		else if (ua.match(/gobrowser/)) {
 			_this._browserShort = "GoBrow";
 			_this._browserName = "Nokia Go Browser ";
-			_this._browserVersion = ua.match(/gobrowser\/([\w.]+)/)[1];
+			_this._browserVersion = _get_reg_ver(/gobrowser\/([\w.]+)/, 1);
 			_this._ismobilebr = true;
 		}
 
