@@ -347,8 +347,8 @@ Util._TEnvironment = function () {
 			}
 
 			_this._kbrow = "Microsoft Trident by IE";
-			_this._kver = _get_reg_ver(/msie ([\w.]+)/, 1);
-			if (parseInt(_this._kver) == 7 && ua.match(/trident/))
+			_this._kver = _get_reg_ver(/trident\/([\w.]+)/, 1);
+			if (parseInt(_this._browserVersion) == 7 && ua.match(/trident/))
 				_this._isCompatMode = true;
 		}
 
