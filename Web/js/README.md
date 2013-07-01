@@ -1,8 +1,8 @@
 OWenT’s Utils -- Web -- js
 =============
 
-### jquery.browser.js
-简单环境检测函数 -- 支持作为jQuery插件
+### jquery.browser.ts
+环境检测类 -- 支持作为jQuery插件(typescript)
 
 ### showJson.js
 显示JSON结构 -- web的js开发很方便啊，但是碰到iframe里的东西还是不方便看到变量的内容，所以就写了这么个看json内容的玩意，还可以当控制台输出用。
