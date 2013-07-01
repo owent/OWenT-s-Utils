@@ -104,6 +104,7 @@ module Util {
     // 系统信息基类
     class TEnvSystemInfoBase {
         private strPlatform: string;
+        private strArchitecture = "x86";
 
         public getOSName() {
             return "Unknown";
@@ -118,7 +119,7 @@ module Util {
         }
 
         public getArchitecture() {
-            return "x86";
+            return this.strArchitecture;
         }
 
         public isMobile() {
@@ -127,6 +128,12 @@ module Util {
 
         constructor(ori: TEnvOriData) {
             this.strPlatform = ori.nav.platform || "Unknown";
+
+            if (ori.userAgent.match(/ia64/i))
+                this.strArchitecture = "ia64";
+            else if (ori.userAgent.match(/win64|wow64|x64|x86_64/i))
+                this.strArchitecture = "x86_64";
+
         }
     };
 
@@ -144,7 +151,8 @@ module Util {
 
         private strOSName = "Windows";
         private strOSKernel = "Windows";
-        private strArchitecture = "x86";
+        private strArchitecture =
+            "x86";
         private bIsMobile = false;
 
         public getOSName() {
@@ -507,7 +515,6 @@ module Util {
 
         constructor(ori: TEnvOriData, sysInfo: IEnvSystemInfo) {
             this.strRenderMode = ori.doc.compatMode || this.strRenderMode;
-            this.strBrowserArchitecture = sysInfo.getArchitecture();
             this.bIsCookieEnabled = ori.nav.cookieEnabled || "Unknown";
             this.bIsMobile = sysInfo.isMobile();
         }
@@ -1186,7 +1193,7 @@ module Util {
                     }
                     if (silver_start_ver > 2) {
                         --silver_start_ver;
-                        this.PluginInfo["Silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver));
+                        this.PluginInfo["Silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver + ""));
                     }
                 } catch (e) {
                 }
