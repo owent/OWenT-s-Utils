@@ -95,7 +95,13 @@ var Util;
     ;
     var TEnvSystemInfoBase = (function () {
         function TEnvSystemInfoBase(ori) {
+            this.strArchitecture = "x86";
             this.strPlatform = ori.nav.platform || "Unknown";
+            if(ori.userAgent.match(/ia64/i)) {
+                this.strArchitecture = "ia64";
+            } else if(ori.userAgent.match(/win64|wow64|x64|x86_64/i)) {
+                this.strArchitecture = "x86_64";
+            }
         }
         TEnvSystemInfoBase.prototype.getOSName = function () {
             return "Unknown";
@@ -107,7 +113,7 @@ var Util;
             return this.strPlatform;
         };
         TEnvSystemInfoBase.prototype.getArchitecture = function () {
-            return "x86";
+            return this.strArchitecture;
         };
         TEnvSystemInfoBase.prototype.isMobile = function () {
             return false;
@@ -393,7 +399,6 @@ var Util;
             this.bIsCookieEnabled = false;
             this.bIsMobile = false;
             this.strRenderMode = ori.doc.compatMode || this.strRenderMode;
-            this.strBrowserArchitecture = sysInfo.getArchitecture();
             this.bIsCookieEnabled = ori.nav.cookieEnabled || "Unknown";
             this.bIsMobile = sysInfo.isMobile();
         }
@@ -957,7 +962,7 @@ var Util;
                     }
                     if(silver_start_ver > 2) {
                         --silver_start_ver;
-                        this.PluginInfo["Silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver));
+                        this.PluginInfo["Silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver + ""));
                     }
                 } catch (e) {
                 }
