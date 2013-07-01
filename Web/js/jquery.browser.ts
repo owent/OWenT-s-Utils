@@ -3,7 +3,7 @@
  * Support browser: IE, Firefox, Chrome, Opera, Safari, Konqueror, Go
  * Support system: Windows, Linux, Android, Windows Phone, Windows CE, Xbox, Mac OS, IOS, Symbian, Solaris, BSD, j2me
  * jQuery plugin
- * @version  2.0.0
+ * @version    2.0.0
  * @example	var bro = new Util._TEnvironment();
  * @example	var bro = Util.getEnvironment();
  * @example	jQuery.environment;
@@ -167,10 +167,6 @@ module Util {
             super(ori);
 
             this._init_branch(ori.userAgent);
-
-            // 覆盖架构信息
-            if (ori.nav.cpuClass)
-                this.strArchitecture = ori.nav.cpuClass;
         }
 
         private _init_branch(ua: string) {
@@ -182,7 +178,7 @@ module Util {
 
                     if (ua.match(/ia64/i))
                         this.strArchitecture = "ia64";
-                    else if (ua.match(/win64|wow64|x64/i))
+                    else if (ua.match(/win64|wow64|x64|x86_64/i))
                         this.strArchitecture = "x86_64";
 
                     if (this.strArchitecture == "ia64" && "5.2" == t_ver.toString())
@@ -461,7 +457,7 @@ module Util {
     // 浏览器检测基类
     class TEnvBrowserInfoBase {
         private strRenderMode = "Unknown";
-        private strBrowserArchitecture = "";
+        private strBrowserArchitecture = "x86";
         private bIsCookieEnabled = false;
         private bIsMobile = false;
 
@@ -586,7 +582,7 @@ module Util {
                     break;
                 }
 
-                this.stBrowserVersion = this.stBrowserKernelVersion = new TEnvVersionInfo("0");
+                this.stBrowserVersion = this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /version\/([\w.]+)/i, 1) || new TEnvVersionInfo("0");
             } while (false);
         }
     };
@@ -597,7 +593,7 @@ module Util {
         private strBrowserName = "Internet Explorer";
         private strBrowserShortName = "IE";
         private strBrowserKernelName = "Trident";
-        private strBrowserArchitecture = "";
+        private strBrowserArchitecture = "x86";
         private stBrowserVersion: TEnvVersionInfo;
         private stBrowserKernelVersion: TEnvVersionInfo;
         private bIsMobile = false;
@@ -645,6 +641,10 @@ module Util {
             this.bIsMobile = sysInfo.isMobile();
 
             this._init_branch(ori.userAgent, sysInfo);
+
+            // 覆盖浏览器架构信息
+            if (ori.nav.cpuClass)
+                this.strBrowserArchitecture = ori.nav.cpuClass;
         }
 
         private _init_branch(ua: string, sysInfo: IEnvSystemInfo) {
@@ -659,7 +659,7 @@ module Util {
             // 检测内核版本
             this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /trident\/([\w.]+)/i, 1);
             if (null == this.stBrowserKernelVersion)
-                this.stBrowserKernelVersion = _checked_ie_version;
+                this.stBrowserKernelVersion = new TEnvVersionInfo("Unkown");
 
             do {
                 //The World
@@ -728,7 +728,7 @@ module Util {
 
             if (ua.match(/ia64/i))
                 this.strBrowserArchitecture = "IA64";
-            else if (ua.match(/win64|x64/i))
+            else if (ua.match(/win64|x64|x86_64/i))
                 this.strBrowserArchitecture = "x86_64";
 
             if (ua.match(/iemobile/i))
@@ -927,30 +927,15 @@ module Util {
 
         private _init_branch(ua: string, sysInfo: IEnvSystemInfo) {
             // 检测浏览器版本
-            var _checked_other_version = new TEnvVersionInfo("0");
-            this.stBrowserVersion = this.stBrowserKernelVersion = _checked_other_version;
+            var _checked_ff_version =
+                TEnvVersionInfo.GetVersion(ua, /firefox\/([\w.]+)/i, 1) ||
+                TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
+            this.stBrowserVersion = _checked_ff_version || new TEnvVersionInfo("");
 
-            do {
-                //Konqueror
-                if (ua.match(/konqueror|khtml/i)) {
-                    this.strBrowserName = "KDE Konqueror";
-                    this.strBrowserShortName = "Konqueror";
-                    this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /konqueror\/([\w.]+)/i, 1) || _checked_other_version;
-                    this.strBrowserKernelName = "KHTML";
-                    this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /khtml\/([\w.]+)/i, 1) || _checked_other_version;
-                    break;
-                }
-
-                //Go Browser
-                if (ua.match(/gobrowser/i)) {
-                    this.strBrowserName = "Nokia Go Browser";
-                    this.strBrowserShortName = "GoBrow";
-                    this.stBrowserKernelVersion = this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /gobrowser\/([\w.]+)/i, 1) || new TEnvVersionInfo("0.0");
-                    break;
-                }
-
-                // 其他的是占不支持的浏览器
-            } while (false);
+            // 检测内核版本
+            this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /gecko\/([\w.]+)/i, 1);
+            if (null == this.stBrowserKernelVersion)
+                this.stBrowserKernelVersion = _checked_ff_version;
         }
     };
 
@@ -1001,15 +986,30 @@ module Util {
 
         private _init_branch(ua: string, sysInfo: IEnvSystemInfo) {
             // 检测浏览器版本
-            var _checked_ff_version =
-                TEnvVersionInfo.GetVersion(ua, /firefox\/([\w.]+)/i, 1) ||
-                TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
-            this.stBrowserVersion = _checked_ff_version || new TEnvVersionInfo("");
+            var _checked_other_version = new TEnvVersionInfo("0");
+            this.stBrowserVersion = this.stBrowserKernelVersion = _checked_other_version;
 
-            // 检测内核版本
-            this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /gecko\/([\w.]+)/i, 1);
-            if (null == this.stBrowserKernelVersion)
-                this.stBrowserKernelVersion = _checked_ff_version;
+            do {
+                //Konqueror
+                if (ua.match(/konqueror|khtml/i)) {
+                    this.strBrowserName = "KDE Konqueror";
+                    this.strBrowserShortName = "Konqueror";
+                    this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /konqueror\/([\w.]+)/i, 1) || _checked_other_version;
+                    this.strBrowserKernelName = "KHTML";
+                    this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /khtml\/([\w.]+)/i, 1) || _checked_other_version;
+                    break;
+                }
+
+                //Go Browser
+                if (ua.match(/gobrowser/i)) {
+                    this.strBrowserName = "Nokia Go Browser";
+                    this.strBrowserShortName = "GoBrow";
+                    this.stBrowserKernelVersion = this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /gobrowser\/([\w.]+)/i, 1) || new TEnvVersionInfo("0.0");
+                    break;
+                }
+
+                // 其他的是占不支持的浏览器
+            } while (false);
         }
     };
 
