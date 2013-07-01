@@ -124,9 +124,6 @@ var Util;
             this.strArchitecture = "x86";
             this.bIsMobile = false;
             this._init_branch(ori.userAgent);
-            if(ori.nav.cpuClass) {
-                this.strArchitecture = ori.nav.cpuClass;
-            }
         }
         TEnvSystemWindowsInfo.__nt_kernel_name_map = {
             "6.3": "Microsoft Windows 8.1/Microsoft Windows RT 8.1/Windows Server 2012 R2",
@@ -156,7 +153,7 @@ var Util;
                     this.strOSKernel = "Windows NT " + t_ver;
                     if(ua.match(/ia64/i)) {
                         this.strArchitecture = "ia64";
-                    } else if(ua.match(/win64|wow64|x64/i)) {
+                    } else if(ua.match(/win64|wow64|x64|x86_64/i)) {
                         this.strArchitecture = "x86_64";
                     }
                     if(this.strArchitecture == "ia64" && "5.2" == t_ver.toString()) {
@@ -392,7 +389,7 @@ var Util;
     var TEnvBrowserInfoBase = (function () {
         function TEnvBrowserInfoBase(ori, sysInfo) {
             this.strRenderMode = "Unknown";
-            this.strBrowserArchitecture = "";
+            this.strBrowserArchitecture = "x86";
             this.bIsCookieEnabled = false;
             this.bIsMobile = false;
             this.strRenderMode = ori.doc.compatMode || this.strRenderMode;
@@ -488,7 +485,7 @@ var Util;
                     this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /presto\/([\w.]+)/i, 1);
                     break;
                 }
-                this.stBrowserVersion = this.stBrowserKernelVersion = new TEnvVersionInfo("0");
+                this.stBrowserVersion = this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /version\/([\w.]+)/i, 1) || new TEnvVersionInfo("0");
             }while(false);
         };
         return TEnvBrowserOperaInfo;
@@ -501,12 +498,15 @@ var Util;
             this.strBrowserName = "Internet Explorer";
             this.strBrowserShortName = "IE";
             this.strBrowserKernelName = "Trident";
-            this.strBrowserArchitecture = "";
+            this.strBrowserArchitecture = "x86";
             this.bIsMobile = false;
             this.strAdditional = "";
             this.bIsCompatMode = false;
             this.bIsMobile = sysInfo.isMobile();
             this._init_branch(ori.userAgent, sysInfo);
+            if(ori.nav.cpuClass) {
+                this.strBrowserArchitecture = ori.nav.cpuClass;
+            }
         }
         TEnvBrowserIEInfo.prototype.getBrowserName = function () {
             return this.strBrowserName;
@@ -546,7 +546,7 @@ var Util;
             this.stBrowserVersion = _checked_ie_version;
             this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /trident\/([\w.]+)/i, 1);
             if(null == this.stBrowserKernelVersion) {
-                this.stBrowserKernelVersion = _checked_ie_version;
+                this.stBrowserKernelVersion = new TEnvVersionInfo("Unkown");
             }
             do {
                 if(ua.match(/theworld/i)) {
@@ -598,7 +598,7 @@ var Util;
             }while(false);
             if(ua.match(/ia64/i)) {
                 this.strBrowserArchitecture = "IA64";
-            } else if(ua.match(/win64|x64/i)) {
+            } else if(ua.match(/win64|x64|x86_64/i)) {
                 this.strBrowserArchitecture = "x86_64";
             }
             if(ua.match(/iemobile/i)) {
@@ -746,24 +746,12 @@ var Util;
             return this.bIsMobile;
         };
         TEnvBrowserFirefoxInfo.prototype._init_branch = function (ua, sysInfo) {
-            var _checked_other_version = new TEnvVersionInfo("0");
-            this.stBrowserVersion = this.stBrowserKernelVersion = _checked_other_version;
-            do {
-                if(ua.match(/konqueror|khtml/i)) {
-                    this.strBrowserName = "KDE Konqueror";
-                    this.strBrowserShortName = "Konqueror";
-                    this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /konqueror\/([\w.]+)/i, 1) || _checked_other_version;
-                    this.strBrowserKernelName = "KHTML";
-                    this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /khtml\/([\w.]+)/i, 1) || _checked_other_version;
-                    break;
-                }
-                if(ua.match(/gobrowser/i)) {
-                    this.strBrowserName = "Nokia Go Browser";
-                    this.strBrowserShortName = "GoBrow";
-                    this.stBrowserKernelVersion = this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /gobrowser\/([\w.]+)/i, 1) || new TEnvVersionInfo("0.0");
-                    break;
-                }
-            }while(false);
+            var _checked_ff_version = TEnvVersionInfo.GetVersion(ua, /firefox\/([\w.]+)/i, 1) || TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
+            this.stBrowserVersion = _checked_ff_version || new TEnvVersionInfo("");
+            this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /gecko\/([\w.]+)/i, 1);
+            if(null == this.stBrowserKernelVersion) {
+                this.stBrowserKernelVersion = _checked_ff_version;
+            }
         };
         return TEnvBrowserFirefoxInfo;
     })(TEnvBrowserInfoBase);    
@@ -802,12 +790,24 @@ var Util;
             return this.bIsMobile;
         };
         TEnvBrowserOtherInfo.prototype._init_branch = function (ua, sysInfo) {
-            var _checked_ff_version = TEnvVersionInfo.GetVersion(ua, /firefox\/([\w.]+)/i, 1) || TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
-            this.stBrowserVersion = _checked_ff_version || new TEnvVersionInfo("");
-            this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /gecko\/([\w.]+)/i, 1);
-            if(null == this.stBrowserKernelVersion) {
-                this.stBrowserKernelVersion = _checked_ff_version;
-            }
+            var _checked_other_version = new TEnvVersionInfo("0");
+            this.stBrowserVersion = this.stBrowserKernelVersion = _checked_other_version;
+            do {
+                if(ua.match(/konqueror|khtml/i)) {
+                    this.strBrowserName = "KDE Konqueror";
+                    this.strBrowserShortName = "Konqueror";
+                    this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /konqueror\/([\w.]+)/i, 1) || _checked_other_version;
+                    this.strBrowserKernelName = "KHTML";
+                    this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /khtml\/([\w.]+)/i, 1) || _checked_other_version;
+                    break;
+                }
+                if(ua.match(/gobrowser/i)) {
+                    this.strBrowserName = "Nokia Go Browser";
+                    this.strBrowserShortName = "GoBrow";
+                    this.stBrowserKernelVersion = this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /gobrowser\/([\w.]+)/i, 1) || new TEnvVersionInfo("0.0");
+                    break;
+                }
+            }while(false);
         };
         return TEnvBrowserOtherInfo;
     })(TEnvBrowserInfoBase);    
