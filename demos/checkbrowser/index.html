@@ -15,32 +15,39 @@
             text-align: center;
         }
     </style>
-    <script language="javascript" type="text/javascript" src="../../resource/js/jquery.browser.js"></script>
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript" src="../../resource/js/jquery.browser.js"></script>
+    <script type="text/javascript">
         var res = "";
         (function () {
 
             var bro = Util.getEnvironment();
-            res += "<tr><td style='width: 200px;'>UserAgent</td><td>" + bro._userAgent + "</td></tr>";
+            res += "<tr><td style='width: 200px;'>UserAgent</td><td>" + bro.getOriInfo().userAgent + "</td></tr>";
             res += "<tr><td>Environment</td><td>" + bro.toString() + "</td></tr>";
-            res += "<tr><td>Cookie</td><td>" + bro._cookieEnabled + "</td></tr>";
-            res += "<tr><td>Browser Name</td><td>" + bro._browserName + "</td></tr>";
-            res += "<tr><td>Short Name</td><td>" + bro._browserShort + "</td></tr>";
-            res += "<tr><td>Browser Version</td><td>" + bro._browserVersion + "</td></tr>";
-            res += "<tr><td>Operating System Name</td><td>" + bro._OSName + "</td></tr>";
-            res += "<tr><td>Browser Kernal</td><td>" + bro._kbrow + "</td></tr>";
-            res += "<tr><td>Browser Kernal Version</td><td>" + bro._kver + "</td></tr>";
-            res += "<tr><td>Browser Platfrom</td><td>" + bro._platbr + "</td></tr>";
-            res += "<tr><td>Operating System Platfrom</td><td>" + bro._platos + "</td></tr>";
-            res += bro._platform? ("<tr><td>Environment Platform</td><td>" + bro._platform + "</td></tr>"): "";
-            res += "<tr><td>Rendering Mode</td><td>" + (bro._compatMode == "CSS1Compat" ? "Standard Mode" : (bro._compatMode == "BackCompat") ? "BackCompat Mode" : bro._compatMode) + "</td></tr>";
-            res += bro._isCompatMode ? ("<tr><td>Compatibility view</td><td>" + "You are in Compatibility View" + "</td></tr>") : "";
+            res += "<tr><td>Cookie</td><td>" + (bro.getBrowserInfo().isCookieEnabled()? "Yes": "No") + "</td></tr>";
+            res += "<tr><td>Browser Name</td><td>" + bro.getBrowserInfo().getBrowserName() + "</td></tr>";
+            res += "<tr><td>Short Name</td><td>" + bro.getBrowserInfo().getBrowserShortName() + "</td></tr>";
+            res += "<tr><td>Browser Version</td><td>" + bro.getBrowserInfo().getBrowserVersion() + "</td></tr>";
+            res += "<tr><td>Operating System Name</td><td>" + bro.getSysInfo().getOSName() + "</td></tr>";
+            res += "<tr><td>Browser Kernal</td><td>" + bro.getBrowserInfo().getBrowserKernelName() + "</td></tr>";
+            res += "<tr><td>Browser Kernal Version</td><td>" + bro.getBrowserInfo().getBrowserKernelVersion() + "</td></tr>";
+            res += "<tr><td>Browser Architecture</td><td>" + bro.getBrowserInfo().getBrowserArchitecture() + "</td></tr>";
+            if ("Unknown" != bro.getSysInfo().getPlatform())
+                res += "<tr><td>Operating System Platfrom</td><td>" + bro.getSysInfo().getPlatform() + "</td></tr>";
+            res += "<tr><td>Operating System Architecture</td><td>" + bro.getSysInfo().getArchitecture() + "</td></tr>";
+            res += "<tr><td>Rendering Mode</td><td>" + (bro.getBrowserInfo().getBrowserRenderMode() == "CSS1Compat" ? "Standard Mode" : (bro.getBrowserInfo().getBrowserRenderMode() == "BackCompat") ? "BackCompat Mode" : bro.getBrowserInfo().getBrowserRenderMode()) + "</td></tr>";
+            res += bro.getBrowserInfo().isCompatMode() ? ("<tr><td>Compatibility view</td><td>" + "You are in Compatibility View" + "</td></tr>") : "";
+
+            res += "<tr><td><hr /><strong>Plugins:</strong></td></tr>"
+            var plugins = bro.getPluginsInfo();
+            for (var key in plugins) {
+                res += "<tr><td>" + plugins[key].getPluginName() + "</td><td>" + plugins[key].getPluginVersion() + "</td></tr>";
+            }
         })();
     </script>
 </head>
 <body>
-    <script language="javascript" type="text/javascript">
-        document.body.innerHTML = "<table>" + res + "</table>";
+    <script type="text/javascript">
+        document.write("<table>" + res + "</table>");
     </script>
     
 <!-- 腾讯分析服务 -->
