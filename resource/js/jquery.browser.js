@@ -401,6 +401,7 @@ var Util;
             this.strRenderMode = ori.doc.compatMode || this.strRenderMode;
             this.bIsCookieEnabled = ori.nav.cookieEnabled || "Unknown";
             this.bIsMobile = sysInfo.isMobile();
+            this.strBrowserArchitecture = sysInfo.getArchitecture() + "(System Arch)";
         }
         TEnvBrowserInfoBase.prototype.getBrowserName = function () {
             return "Unknown";
@@ -508,6 +509,7 @@ var Util;
             this.strAdditional = "";
             this.bIsCompatMode = false;
             this.bIsMobile = sysInfo.isMobile();
+            this.strBrowserArchitecture = _super.prototype.getBrowserArchitecture.call(this);
             this._init_branch(ori.userAgent, sysInfo);
             if(ori.nav.cpuClass) {
                 this.strBrowserArchitecture = ori.nav.cpuClass;
