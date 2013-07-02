@@ -517,6 +517,7 @@ module Util {
             this.strRenderMode = ori.doc.compatMode || this.strRenderMode;
             this.bIsCookieEnabled = ori.nav.cookieEnabled || "Unknown";
             this.bIsMobile = sysInfo.isMobile();
+            this.strBrowserArchitecture = sysInfo.getArchitecture() + "(System Arch)";
         }
     };
 
@@ -646,6 +647,7 @@ module Util {
         constructor(ori: TEnvOriData, sysInfo: IEnvSystemInfo) {
             super(ori, sysInfo);
             this.bIsMobile = sysInfo.isMobile();
+            this.strBrowserArchitecture = super.getBrowserArchitecture();
 
             this._init_branch(ori.userAgent, sysInfo);
 
