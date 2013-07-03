@@ -37,11 +37,14 @@
             res += "<tr><td>Rendering Mode</td><td>" + (bro.getBrowserInfo().getBrowserRenderMode() == "CSS1Compat" ? "Standard Mode" : (bro.getBrowserInfo().getBrowserRenderMode() == "BackCompat") ? "BackCompat Mode" : bro.getBrowserInfo().getBrowserRenderMode()) + "</td></tr>";
             res += bro.getBrowserInfo().isCompatMode() ? ("<tr><td>Compatibility view</td><td>" + "You are in Compatibility View" + "</td></tr>") : "";
 
-            res += "<tr><td><hr /><strong>Plugins:</strong></td></tr>"
             var plugins = bro.getPluginsInfo();
+            var plugins_number = 0;
+            var res_cache = "";
             for (var key in plugins) {
-                res += "<tr><td>" + plugins[key].getPluginName() + "</td><td>" + plugins[key].getPluginVersion() + "</td></tr>";
+                res_cache += "<tr><td>" + plugins[key].getPluginName() + "</td><td>" + plugins[key].getPluginVersion() + "</td></tr>";
+                ++plugins_number;
             }
+            res += "<tr><td><hr /><strong>Plugins: (" + plugins_number + " detected)</strong></td></tr>" + res_cache;
         })();
     </script>
 </head>
@@ -50,6 +53,7 @@
         document.write("<table>" + res + "</table>");
     </script>
     
+    <a href="https://github.com/owt5008137/OWenT-s-Utils/blob/master/Web/js/jquery.browser.ts" target="_blank">Check Browser Script Source</a>
 <!-- 腾讯分析服务 -->
 <script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
 
