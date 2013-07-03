@@ -877,8 +877,8 @@ module Util {
 
                 //Chrome Lite
                 if (ua.match(/android/i) && ua.match(/version\/([\w.]+)/i)) {
-                    this.strBrowserName = "Google Chrome Lite";
-                    this.strBrowserShortName = "Chrome Lite";
+                    this.strBrowserName = "Google Android Browser";
+                    this.strBrowserShortName = "Android Browser";
                     this.bIsMobile = true;
                     break;
                 }
@@ -1039,12 +1039,13 @@ module Util {
             if (obj.version) {
                 this.stVersion = new TEnvVersionInfo(obj.version);
             } else {
-                var des = obj.description || this.stPluginName;
-                var t_ver = des.match(/[\d.]+/i);
+                var reg_exp = /\d([\d. ]|(u[\d]+))+$/i;
+                var t_ver = ((obj.description) ? obj.description.match(reg_exp) : false)
+                    || this.stPluginName.match(reg_exp);
                 if (t_ver)
                     this.stVersion = new TEnvVersionInfo(t_ver[0]);
                 else
-                    this.stVersion = new TEnvVersionInfo("Unknown");
+                    this.stVersion = new TEnvVersionInfo("");
             }
         }
 
@@ -1154,9 +1155,9 @@ module Util {
                         var t_plugin = new TEnvPluginInfo(this.OriData.nav.plugins[i]);
                         if (t_plugin.getPluginName() == "")
                             continue;
-                        var pname = t_plugin.getPluginName();
+                        var pname = t_plugin.getPluginName().toLowerCase();
                         if (this.PluginInfo[pname]) {
-                            if ("Unknown" != t_plugin.getPluginVersion().toString())
+                            if (t_plugin.getPluginVersion().toString())
                                 this.PluginInfo[pname] = t_plugin;
                             continue;
                         }
@@ -1182,7 +1183,7 @@ module Util {
                         var tdn_plugin = new TEnvPluginIEDotNetInfo(this.OriData.userAgent, dot_net_arr[i].reg, dot_net_arr[i].pname);
                         if ("" == tdn_plugin.getPluginName())
                             continue;
-                        this.PluginInfo[dot_net_arr[i].pname] = tdn_plugin;
+                        this.PluginInfo[dot_net_arr[i].pname.toLowerCase()] = tdn_plugin;
                     }
 
                     // Sillverlight
@@ -1195,7 +1196,11 @@ module Util {
                     }
                     if (silver_start_ver > 2) {
                         --silver_start_ver;
-                        this.PluginInfo["Silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver + ""));
+                        var silver_start_ver_s = 0;
+                        while (silverlight_activex.IsVersionSupported(silver_start_ver + "." + silver_start_ver_s))
+                            ++silver_start_ver_s;
+                        --silver_start_ver_s;
+                        this.PluginInfo["silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver + "." + silver_start_ver_s));
                     }
                 } catch (e) {
                 }
@@ -1252,4 +1257,5 @@ module Util {
         } catch (e) { }
     })();
 }
+
 
