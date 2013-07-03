@@ -1039,7 +1039,7 @@ module Util {
             if (obj.version) {
                 this.stVersion = new TEnvVersionInfo(obj.version);
             } else {
-                var reg_exp = /\d([\d. ]|(u[\d]+))+/gi;
+                var reg_exp = /\d([\d. ]|(\w[\d]+))+/gi;
                 var t_ver = ((obj.description) ? obj.description.match(reg_exp) : false)
                     || this.stPluginName.match(reg_exp);
                 if (t_ver)
