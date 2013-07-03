@@ -1019,3 +1019,4 @@ var Util;
         }
     })();
 })(Util || (Util = {}));
+//@ sourceMappingURL=jquery.browser.js.map
