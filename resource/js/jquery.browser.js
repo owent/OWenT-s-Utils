@@ -826,10 +826,10 @@ var Util;
             if(obj.version) {
                 this.stVersion = new TEnvVersionInfo(obj.version);
             } else {
-                var reg_exp = /\d([\d. ]|(u[\d]+))+$/i;
+                var reg_exp = /\d([\d. ]|(u[\d]+))+/gi;
                 var t_ver = ((obj.description) ? obj.description.match(reg_exp) : false) || this.stPluginName.match(reg_exp);
                 if(t_ver) {
-                    this.stVersion = new TEnvVersionInfo(t_ver[0]);
+                    this.stVersion = new TEnvVersionInfo(t_ver[t_ver.length - 1]);
                 } else {
                     this.stVersion = new TEnvVersionInfo("");
                 }
