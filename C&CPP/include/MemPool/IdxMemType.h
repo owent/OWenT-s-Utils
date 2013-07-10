@@ -97,8 +97,13 @@ namespace util
 				value_ptr_type ptr(pNewObj);
 				inner_size_type iIdx = m_astMemPool.Create(ptr);
 
-				ptr->m_iObjectID = iIdx;
-				return pNewObj;
+				if (m_astMemPool.npos != iIdx)
+				{
+					ptr->m_iObjectID = iIdx;
+					return pNewObj;
+				}
+				
+				return NULL;
 			}
 
 			static value_type* GetByIdx(const int iIdx)
