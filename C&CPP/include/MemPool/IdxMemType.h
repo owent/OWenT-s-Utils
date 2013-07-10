@@ -29,10 +29,11 @@ namespace util
 		public:
 			typedef Ty value_type;
 			typedef std::shared_ptr<value_type> value_ptr_type;
+			typedef DynamicIdxList<value_ptr_type> container_type;
 
 		private:
-			typedef typename DynamicIdxList<std::shared_ptr<Ty> >::size_type inner_size_type;
-			static DynamicIdxList<value_ptr_type> m_astMemPool;
+			typedef typename container_type::size_type inner_size_type;
+			static container_type m_astMemPool;
 
 			int m_iObjectID; //!对象ID，即在DynamicIdxList中的数组下标
 
@@ -50,7 +51,7 @@ namespace util
 			 * @note 用来进行高级操作，比如迭代器枚举,count和foreach
 			 * @return 原始内存池
 			 */
-			static const DynamicIdxList<value_ptr_type>& GetMemoryPool()
+			static const container_type& GetMemoryPool()
 			{
 				return m_astMemPool;
 			}
@@ -144,7 +145,7 @@ namespace util
 		};
 
 		template<typename Ty>
-		DynamicIdxList<typename IdxMemType<Ty>::value_ptr_type> IdxMemType<Ty>::m_astMemPool;
+		typename IdxMemType<Ty>::container_type IdxMemType<Ty>::m_astMemPool;
 	}
 }
 
