@@ -127,12 +127,12 @@ namespace util
 
 				ITObj* get()
 				{
-					return &(m_pListPtr->m_stData.get(iIndex)->stObjData);
+					return (ITObj*)(m_pListPtr->m_stData.get(iIndex)->stObjData);
 				}
 
 				const ITObj* get() const
 				{
-					return &(m_pListPtr->m_stData.get(iIndex)->stObjData);
+					return (const ITObj*)(m_pListPtr->m_stData.get(iIndex)->stObjData);
 				}
 
 				friend bool operator==(const Iterator& l, const Iterator& r)
@@ -423,7 +423,7 @@ namespace util
 				if (ret >= 0 && ret < MAX_SIZE)
 				{
 					node_type stNewNode = *m_stData.get(ret);
-					new ((void*)&stNewNode.stObjData)TObj();
+					new ((void*)stNewNode.stObjData)TObj();
 				}
 
 				return ret;
@@ -441,7 +441,7 @@ namespace util
 				if (ret >= 0 && ret < MAX_SIZE)
 				{
 					node_type& stNewNode = *m_stData.get(ret);
-					new ((void*)&stNewNode.stObjData)TObj(param1);
+					new ((void*)stNewNode.stObjData)TObj(param1);
 				}
 
 				return ret;
@@ -460,7 +460,7 @@ namespace util
 				if (ret >= 0 && ret < MAX_SIZE)
 				{
 					node_type& stNewNode = *m_stData.get(ret);
-					new ((void*)&stNewNode.stObjData)TObj(param1, param2);
+					new ((void*)stNewNode.stObjData)TObj(param1, param2);
 				}
 
 				return ret;
@@ -480,7 +480,7 @@ namespace util
 				if (ret >= 0 && ret < MAX_SIZE)
 				{
 					node_type& stNewNode = *m_stData.get(ret);
-					new ((void*)&stNewNode.stObjData)TObj(param1, param2, param3);
+					new ((void*)stNewNode.stObjData)TObj(param1, param2, param3);
 				}
 
 				return ret;
@@ -524,7 +524,7 @@ namespace util
 				m_stHeader.m_iLastUsedNode = iPreIdx;
 
 				// 执行析构
-				TObj* pRemovedDataSect = &(pCurNode->stObjData);
+				TObj* pRemovedDataSect = (TObj*)(pCurNode->stObjData);
 				pRemovedDataSect->~TObj();
 				// 计数减一
 				-- m_stHeader.m_iSize;
