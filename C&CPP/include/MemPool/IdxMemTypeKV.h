@@ -49,6 +49,18 @@ namespace util
 			virtual ~IdxMemTypeKV(){}
 
 		        /**
+		         * 清空数据
+		         */
+		        static void ClearAll()
+		        {
+		            m_astMemPool.destruct();
+		            for(int i = 0; i < HASH_HVAL; ++ i)
+		            {
+		                m_arrKeyValuePool[i].clear();
+		            }
+		        }
+        
+		        /**
 		         * 获取对象ID
 		         * @return 对象ID
 		         */
