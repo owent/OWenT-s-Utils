@@ -40,6 +40,14 @@ namespace util
 		public:
 			virtual ~IdxMemType(){}
 
+		        /**
+		         * 清空数据
+		         */
+		        static void ClearAll()
+		        {
+		            m_astMemPool.destruct();
+		        }
+		        
 			//!获取对象ID
 			inline int GetObjectID() const { return m_iObjectID; }
 
