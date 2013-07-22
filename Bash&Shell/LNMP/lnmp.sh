@@ -10,9 +10,9 @@ PHP_FPM_CONF_FILE_PATH=/etc/php-fpm.d/www.conf
 # 安装扩展软件源
 rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 if [ "$ARCH_FLAG" == "64" ]; then
-    rpm -ivh http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
+    rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
 else
-    rpm -ivh http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.i686.rpm
+    rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.i686.rpm
 fi
 rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt
 rpm -K rpmforge-release-0.5.2-2.el6.rf.*.rpm  # 这里会报一个错，无视之
@@ -143,6 +143,7 @@ if (!-e $request_filename) {
  
 # iptables 管理
 /sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+/sbin/iptables -I INPUT -p tcp --dport 443 -j ACCEPT
 /sbin/iptables-save
  
 # 自启动
