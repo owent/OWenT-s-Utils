@@ -9,11 +9,11 @@ $obj_config = array(
 
 function gen_binary_operator($opr, $cls, $left, $right){?>
 
-            template<typename _TAttrMgr>
-            std::shared_ptr<AttrOprBase<_TAttrMgr> > operator<?php echo $opr ?>(<?php echo $left['type']; ?> l, <?php echo $right['type']; ?> r)
-            {
-                return <?php echo $cls; ?><_TAttrMgr>::Create(<?php echo str_replace('%v', 'l', $left['create']); ?>, <?php echo str_replace('%v', 'r', $right['create']); ?>);
-            }
+        template<typename _TAttrMgr>
+        std::shared_ptr<AttrOprBase<_TAttrMgr> > operator<?php echo $opr ?>(<?php echo $left['type']; ?> l, <?php echo $right['type']; ?> r)
+        {
+            return <?php echo $cls; ?><_TAttrMgr>::Create(<?php echo str_replace('%v', 'l', $left['create']); ?>, <?php echo str_replace('%v', 'r', $right['create']); ?>);
+        }
 <?php
 }
 
@@ -47,12 +47,15 @@ function gen_all_operator($left_name, $right_name){
 }
 
 ?>/**
+ * Copyright (c) 2013, Tencent
+ * All rights reserved.
+ *
  * @file AttributeManager.h
- * @brief Í¨ÓÃÊôĞÔÏµÍ³<br />
- *        Ö§³Ö×Ô¶¯´¦ÀíÒÀÀµ¹ØÏµ¹«Ê½
+ * @brief é€šç”¨å±æ€§ç³»ç»Ÿ<br />
+ *        æ”¯æŒè‡ªåŠ¨å¤„ç†ä¾èµ–å…³ç³»å…¬å¼
  *
  * @version 1.0
- * @author OWenT
+ * @author owentou, owentou@tencent.com
  * @date 2013-04-19
  *
  * @history
@@ -70,833 +73,1033 @@ function gen_all_operator($left_name, $right_name){
 #include <set>
 #include <list>
 #include <vector>
+#include <istream>
+#include <ostream>
 #include <algorithm>
 #include "std/smart_ptr.h"
 #include "std/ref.h"
 
-namespace util
+namespace BaseLib
 {
-    namespace logic
+    namespace Operator
     {
-        namespace Operator
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--åŸºç±»
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprBase: public std::enable_shared_from_this< AttrOprBase<_TAttrMgr> >
         {
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--»ùÀà
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprBase: public std::enable_shared_from_this< AttrOprBase<_TAttrMgr> >
+            typedef typename _TAttrMgr::attr_value_type attr_value_type;
+            typedef typename _TAttrMgr::attr_class_type attr_class_type;
+            typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
+
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+
+            virtual ~AttrOprBase(){}
+            virtual attr_value_type operator()(_TAttrMgr&) = 0;
+
+            virtual void BuildFormularParam(attr_attach_set_type&) {}
+            
+            virtual void Serialize(std::ostream& stOut) const = 0;
+
+            virtual void Unserialize(std::istream& stIn) = 0;
+
+            friend std::ostream& operator<<(std::ostream& stOut, const AttrOprBase<_TAttrMgr>& stThis)
             {
-                typedef typename _TAttrMgr::attr_value_type attr_value_type;
-                typedef typename _TAttrMgr::attr_class_type attr_class_type;
-                typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
-
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-
-                virtual ~AttrOprBase(){}
-                virtual attr_value_type operator()(_TAttrMgr&) = 0;
-
-                virtual void BuildFormularParam(attr_attach_set_type&) {}
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½Êı--ÖµÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprVal : public AttrOprBase<_TAttrMgr>
-            {
-                typedef AttrOprVal<_TAttrMgr> self_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-                typedef typename base_type::attr_class_type attr_class_type;
-
-                attr_value_type tVal;
-                AttrOprVal(attr_value_type val): tVal(val){}
-
-                virtual attr_value_type operator()(_TAttrMgr&)
-                {
-                    return tVal;
-                }
-
-                static base_ptr_type Create(attr_value_type v)
-                {
-                    return std::shared_ptr<base_type>(new self_type(v));
-                }
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--ÊôĞÔÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprAttr : public AttrOprBase<_TAttrMgr>
-            {
-                typedef AttrOprAttr<_TAttrMgr> self_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-                typedef typename base_type::attr_class_type attr_class_type;
-                typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
-
-                attr_class_type tAttrType;
-                AttrOprAttr(attr_class_type val): tAttrType(val){}
-
-                virtual attr_value_type operator()(_TAttrMgr& stMgr)
-                {
-                    return stMgr[tAttrType];
-                }
-
-                static base_ptr_type Create(attr_class_type v)
-                {
-                    return std::shared_ptr<base_type>(new self_type(v));
-                }
-
-                virtual void BuildFormularParam(attr_attach_set_type& stAttachSet) 
-                {
-                    stAttachSet.insert(tAttrType);
-                }
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--Ë«Ä¿ÔËËã·û»ùÀà
-             */
-            template<typename _TAttrMgr, typename _TReal>
-            struct AttrOprBinaryOperation: public AttrOprBase<_TAttrMgr>
-            {
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef _TReal self_type;
-                typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
-
-                base_ptr_type left, right;
-
-                AttrOprBinaryOperation(base_ptr_type l, base_ptr_type r): left(l), right(r){}
-
-                static base_ptr_type Create(base_ptr_type left, base_ptr_type right)
-                {
-                    return std::shared_ptr<base_type>(new self_type(left, right));
-                }
-
-                virtual void BuildFormularParam(attr_attach_set_type& stAttachSet) 
-                {
-                    left->BuildFormularParam(stAttachSet);
-                    right->BuildFormularParam(stAttachSet);
-                }
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--¼Ó·¨ÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprPlus : public AttrOprBinaryOperation<_TAttrMgr, AttrOprPlus<_TAttrMgr> >
-            {
-                typedef AttrOprPlus<_TAttrMgr> self_type;
-                typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-
-                using opr_base_type::left;
-                using opr_base_type::right;
-
-                AttrOprPlus(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
-
-                virtual attr_value_type operator()(_TAttrMgr& stMgr)
-                {
-                    return (*left)(stMgr) + (*right)(stMgr);
-                }
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--¼õ·¨ÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprMinu : public AttrOprBinaryOperation<_TAttrMgr, AttrOprMinu<_TAttrMgr> >
-            {
-                typedef AttrOprMinu<_TAttrMgr> self_type;
-                typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-
-                using opr_base_type::left;
-                using opr_base_type::right;
-
-                AttrOprMinu(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
-
-                virtual attr_value_type operator()(_TAttrMgr& stMgr)
-                {
-                    return (*left)(stMgr) - (*right)(stMgr);
-                }
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--³Ë·¨ÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprMult : public AttrOprBinaryOperation<_TAttrMgr, AttrOprMult<_TAttrMgr> >
-            {
-                typedef AttrOprMult<_TAttrMgr> self_type;
-                typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-
-                using opr_base_type::left;
-                using opr_base_type::right;
-
-                AttrOprMult(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
-
-                virtual attr_value_type operator()(_TAttrMgr& stMgr)
-                {
-                    return (*left)(stMgr) * (*right)(stMgr);
-                }
-
-            };
-
-            /**
-             * ÊôĞÔ¹ØÏµ±í´ïÊ½--³ı·¨ÀàĞÍ
-             */
-            template<typename _TAttrMgr>
-            struct AttrOprDevi : public AttrOprBinaryOperation<_TAttrMgr, AttrOprDevi<_TAttrMgr> >
-            {
-                typedef AttrOprDevi<_TAttrMgr> self_type;
-                typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
-                typedef AttrOprBase<_TAttrMgr> base_type;
-                typedef std::shared_ptr<base_type> base_ptr_type;
-                typedef typename base_type::attr_value_type attr_value_type;
-
-                using opr_base_type::left;
-                using opr_base_type::right;
-
-                AttrOprDevi(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
-
-                virtual attr_value_type operator()(_TAttrMgr& stMgr)
-                {
-                    return (*left)(stMgr) / (*right)(stMgr);
-                }
-            };
-
-            template<typename _AttrMgr>
-            typename AttrOprAttr<_AttrMgr>::base_ptr_type _(typename AttrOprAttr<_AttrMgr>::attr_class_type type)
-            {
-                return AttrOprAttr<_AttrMgr>::Create(type);
+                stThis.Serialize(stOut);
+                return stOut;
             }
-        }
 
-        namespace Wrapper
-        {
-            template<typename _TAttrMgr>
-            class AttributeFormulaBuilderAttrWrapper
+            friend std::istream& operator>>(std::istream& stIn, AttrOprBase<_TAttrMgr>& stThis)
             {
-            public:
-                typedef typename _TAttrMgr::attr_class_type attr_class_type;
-                typedef typename _TAttrMgr::formula_map_type formula_map_type;
-                typedef typename _TAttrMgr::attr_formula_ptr_type attr_formula_ptr_type;
-                typedef AttributeFormulaBuilderAttrWrapper<_TAttrMgr> self_type;
-
-            private:
-                attr_class_type m_tClass;
-
-            public:
-                AttributeFormulaBuilderAttrWrapper(attr_class_type tClass): m_tClass(tClass){}
-
-                attr_formula_ptr_type operator()() const
-                {
-                    return Operator::_<_TAttrMgr>(m_tClass);
-                }
-
-                /**
-                 * Ìá¹©×Ô¶¯×ªÎªÊôĞÔ²ÎÊıµÄ¹¦ÄÜ
-                 */
-                operator attr_formula_ptr_type() const
-                {
-                    return (*this)(m_tClass);
-                }
-
-                /**
-                 * ¹«Ê½¸³Öµ¿ØÖÆ
-                 */
-                self_type& operator=(attr_formula_ptr_type pFormula)
-                {
-                    formula_map_type& stFormulaMap = _TAttrMgr::GetFormulaMapObj();
-                    stFormulaMap[m_tClass] = pFormula;
-                    return *this;
-                }
-
-                /**
-                 * ¸´ÖÆ¸³Öµ¿ØÖÆ(Ö§³ÖÁ¬µÈºÅ)
-                 */
-                self_type& operator=(const self_type& stFormulaWrapper)
-                {
-                    formula_map_type& stFormulaMap = _TAttrMgr::GetFormulaMapObj();
-                    typename formula_map_type::iterator iter = stFormulaMap.find(stFormulaWrapper.m_tClass);
-
-                    // [ÓÅ»¯] Èç¹ûÄ¿±êÊôĞÔÓÉ¹«Ê½Éú³É£¬Ôò¼õÉÙÒ»²ã½Úµã
-                    if (iter == stFormulaMap.end())
-                    {
-                        stFormulaMap[m_tClass] = Operator::_<_TAttrMgr>(stFormulaWrapper.m_tClass);
-                    }
-                    else
-                    {
-                        stFormulaMap[m_tClass] = iter->second;
-                    }
-
-                    return *this;
-                }
-            };
-
-
-            template<typename _TAttrMgr>
-            class AttributeFormulaBuilderWrapper
-            {
-            public:
-                typedef typename _TAttrMgr::attr_class_type attr_class_type;
-                typedef typename _TAttrMgr::attr_value_type attr_value_type;
-                typedef AttributeFormulaBuilderAttrWrapper<_TAttrMgr> builder_attr_type;
-
-            public:
-
-                builder_attr_type operator[](attr_class_type tClass)
-                {
-                    return builder_attr_type(tClass);
-                }
-
-                builder_attr_type operator()(attr_class_type tClass)
-                {
-                    return builder_attr_type(tClass);
-                }
-            };
-
-            /**
-             * ÊôĞÔÖµ°ü×°Æ÷
-             */
-            template<typename _TAttrMgr>
-            class AttributeWrapper
-            {
-            public:
-                typedef typename _TAttrMgr::attr_class_type attr_class_type;
-                typedef typename _TAttrMgr::attr_value_type attr_value_type;
-                typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
-                typedef typename _TAttrMgr::attr_attach_list_type attr_attach_list_type;
-                typedef typename _TAttrMgr::formula_map_type formula_map_type;
-                typedef typename _TAttrMgr::attr_attach_type attr_attach_type;
-
-                typedef AttributeWrapper<_TAttrMgr> self_type;
-
-            private:
-                std::reference_wrapper<_TAttrMgr> m_stMgrRef;
-                attr_class_type m_tIndex;
-
-            public:
-                AttributeWrapper(_TAttrMgr& stMgr, attr_class_type tIndex): m_stMgrRef(stMgr), m_tIndex(tIndex){}
-
-                operator attr_value_type() const
-                {
-                    return m_stMgrRef.get().get(m_tIndex);
-                }
-
-                /**
-                 * Öµ·¢Éú±ä»¯
-                 * @note Í¬²½¸Ä±ä¹ØÁªÏî
-                 * @param [in] tVal ¸Ä±äµÄÊôĞÔÏî
-                 * @return ÒÀ¾İµÈºÅ¹æ·¶, ·µ»Ø*this
-                 */
-                self_type& operator=(attr_value_type tVal)
-                {
-                    m_stMgrRef.get().get(m_tIndex) = tVal;
-
-                    attr_attach_list_type stAttachedList;
-                    GetAttachedAttributes(stAttachedList, false);
-
-                    formula_map_type& stFormulaMap = m_stMgrRef.get().GetFormulaMap();
-                    
-                    typename attr_attach_list_type::iterator iter = stAttachedList.begin();
-                    for(; iter != stAttachedList.end(); ++ iter)
-                    {
-                        typename formula_map_type::iterator itAttached = stFormulaMap.find(*iter);
-                        if (itAttached == stFormulaMap.end() || *iter == m_tIndex)
-                        {
-                            // ÕâÀïÓĞÎÊÌâ£¬ÄÇ¾ÍÊÇ³ÌĞòÓĞBUG
-                            // »òÕßÒÀÀµ¹ØÏµ³É»·
-                            // »òÕß³öÏÖ×ÔÒÀÀµ
-                            continue;
-                        }
-
-                        // Ñ­»·¸³Öµ
-                        m_stMgrRef.get()[*iter] = (*itAttached->second)(m_stMgrRef);
-                    }
-
-                    return (*this);
-                }
-
-                self_type& operator=(const self_type& tVal)
-                {
-                    m_stMgrRef = std::ref(tVal.m_stMgrRef);
-                    m_tIndex = tVal.m_tIndex;
-
-                    return (*this);
-                }
-
-                /**
-                 * »ñÈ¡ËùÓĞ±»µ±Ç°ÊôĞÔÒÀÀµµÄÊôĞÔ<br />
-                 * ¼´£¬µ±Ç°ÊôĞÔÊÇ»ñµÃµÄÊôĞÔµÄ²ÎÊı
-                 * @param [in, out] stAttrList ½á¹ûÊôĞÔ¼¯
-                 * @param [in] bRecursion ÊÇ·ñµİ¹é²éÕÒÒÀÀµÏî
-                 */
-                void GetAttachedAttributes(attr_attach_list_type& stAttrList, bool bRecursion = false)
-                {
-                    _TAttrMgr& stMgr = m_stMgrRef;
-                    attr_attach_type& stAttachMap = stMgr.GetAttachAttrMap();
-                    typename attr_attach_type::iterator iter = stAttachMap.find(m_tIndex);
-
-                    // Ã»ÕÒµ½¹ØÏµÊ½
-                    if (iter == stAttachMap.end())
-                    {
-                        return;
-                    }
-
-                    // Ìî³äÊı¾İ
-                    stAttrList.insert(stAttrList.end(), iter->second.begin(), iter->second.end());
-                    if ( false == bRecursion || false == _TAttrMgr::CheckValid())
-                    {
-                        return;
-                    }
-
-                    // ĞèÒªµİ¹é²éÕÒ
-                    typedef typename attr_attach_type::mapped_type attach_mapped;
-                    typename attach_mapped::iterator itm = iter->second.begin();
-                    for (; itm != iter->second.end(); ++ itm)
-                    {
-                        self_type stTmpObj(stMgr, *itm);
-                        stTmpObj.GetAttachedAttributes(stAttrList, bRecursion);
-                    }
-                }
-
-                /**
-                 * »ñÈ¡ËùÓĞµ±Ç°ÊôĞÔµÄ¼ÆËã²ÎÊıÊôĞÔ<br />
-                 * ¼´£¬»ñµÃµÄÊôĞÔÊÇµÄµ±Ç°ÊôĞÔ²ÎÊı
-                 * @param [in, out] stAttrSet ½á¹ûÊôĞÔ¼¯
-                 * @param [in] bRecursion ÊÇ·ñµİ¹é²éÕÒ²ÎÊı
-                 */
-                void GetAttachAttributes(attr_attach_set_type& stAttrSet, bool bRecursion = false)
-                {
-                    _TAttrMgr& stMgr = m_stMgrRef;
-                    formula_map_type& stFormulaMap = stMgr.GetFormulaMap();
-                    typename formula_map_type::iterator iter = stFormulaMap.find(m_tIndex);
-
-                    // Ã»ÕÒµ½¹«Ê½
-                    if (iter == stFormulaMap.end())
-                    {
-                        return;
-                    }
-
-                    // Ìî³äÊı¾İ
-                    attr_attach_set_type stCurrentSet;
-                    iter->second->BuildFormularParam(stCurrentSet);
-                    stAttrSet.insert(stCurrentSet.begin(), stCurrentSet.end());
-
-                    if ( false == bRecursion || false == _TAttrMgr::CheckValid())
-                    {
-                        return;
-                    }
-
-                    // ĞèÒªµİ¹é²éÕÒ
-                    typename attr_attach_set_type::iterator itm = stCurrentSet.begin();
-                    for (; itm != stCurrentSet.end(); ++ itm)
-                    {
-                        self_type stTmpObj(stMgr, *itm);
-                        stTmpObj.GetAttachAttributes(stAttrSet, bRecursion);
-                    }
-                }
-            };
-        }
+                stThis.Unserialize(stIn);
+                return stIn;
+            }
+        };
 
         /**
-         * ÊôĞÔ¹ÜÀíÆ÷
-         * @note Ó¦¸Ã°üº¬ÖÁÉÙÒ»ÌõÊôĞÔ¹«Ê½
-         * @note ¸½ÊôÀà_TOwner±ØĞë°üº¬GenAttrFormulaMap(formula_builder_type&)º¯ÊıÒÔ³õÊ¼»¯ÊôĞÔ¹«Ê½±í
-         * @note ÎªÁËÌá¸ß²éÑ¯Ğ§ÂÊ, ÊôĞÔ±àºÅÊÇÁ¬ĞøµÄ, ¹Ê¶ø_MAXCOUNT ²»ÒË¹ı´ó
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼æ•°--å€¼ç±»å‹
          */
-        template<typename _TAttrType, int _MAXCOUNT, typename _TOwner, typename _TAttr = int>
-        class AttributeManager
+        template<typename _TAttrMgr>
+        struct AttrOprVal : public AttrOprBase<_TAttrMgr>
+        {
+            typedef AttrOprVal<_TAttrMgr> self_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+            typedef typename base_type::attr_class_type attr_class_type;
+
+            attr_value_type tVal;
+            AttrOprVal(attr_value_type val): tVal(val){}
+
+            virtual attr_value_type operator()(_TAttrMgr&)
+            {
+                return tVal;
+            }
+
+            static base_ptr_type Create(attr_value_type v)
+            {
+                return std::shared_ptr<base_type>(new self_type(v));
+            }
+            
+            virtual void Serialize(std::ostream& stOut) const
+            {
+                stOut<< tVal;
+            }
+
+            virtual void Unserialize(std::istream& stIn)
+            {
+                stIn>> tVal;
+            }
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--å±æ€§ç±»å‹
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprAttr : public AttrOprBase<_TAttrMgr>
+        {
+            typedef AttrOprAttr<_TAttrMgr> self_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+            typedef typename base_type::attr_class_type attr_class_type;
+            typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
+
+            attr_class_type tAttrType;
+            AttrOprAttr(attr_class_type val): tAttrType(val){}
+
+            virtual attr_value_type operator()(_TAttrMgr& stMgr)
+            {
+                return stMgr[tAttrType];
+            }
+
+            static base_ptr_type Create(attr_class_type v)
+            {
+                return std::shared_ptr<base_type>(new self_type(v));
+            }
+
+            virtual void BuildFormularParam(attr_attach_set_type& stAttachSet) 
+            {
+                stAttachSet.insert(tAttrType);
+            }
+            
+            virtual void Serialize(std::ostream& stOut) const
+            {
+                int iType = static_cast<int>(tAttrType);
+                stOut<< '['<< iType<< ']';
+            }
+
+            virtual void Unserialize(std::istream& stIn)
+            {
+                char cWrapper;
+                int iType;
+                stIn>> cWrapper>> iType>> cWrapper;
+                tAttrType = static_cast<attr_class_type>(iType);
+            }
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--åŒç›®è¿ç®—ç¬¦åŸºç±»
+         */
+        template<typename _TAttrMgr, typename _TReal>
+        struct AttrOprBinaryOperation: public AttrOprBase<_TAttrMgr>
+        {
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef _TReal self_type;
+            typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
+
+            base_ptr_type left, right;
+
+            AttrOprBinaryOperation(base_ptr_type l, base_ptr_type r): left(l), right(r){}
+
+            static base_ptr_type Create(base_ptr_type left, base_ptr_type right)
+            {
+                return std::shared_ptr<base_type>(new self_type(left, right));
+            }
+
+            virtual void BuildFormularParam(attr_attach_set_type& stAttachSet) 
+            {
+                left->BuildFormularParam(stAttachSet);
+                right->BuildFormularParam(stAttachSet);
+            }
+            
+            virtual const char* GetSymbolName() const = 0;
+
+            virtual void Serialize(std::ostream& stOut) const
+            {
+                stOut<< GetSymbolName()<< ' '<< (*left)<< ' '<< (*right);
+            }
+
+            virtual void Unserialize(std::istream& stIn)
+            {
+                char cOpr;
+                stIn>> cOpr>> (*left)>> (*right);
+            }
+            
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--åŠ æ³•ç±»å‹
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprPlus : public AttrOprBinaryOperation<_TAttrMgr, AttrOprPlus<_TAttrMgr> >
+        {
+            typedef AttrOprPlus<_TAttrMgr> self_type;
+            typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+
+            using opr_base_type::left;
+            using opr_base_type::right;
+
+            AttrOprPlus(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
+
+            virtual attr_value_type operator()(_TAttrMgr& stMgr)
+            {
+                return (*left)(stMgr) + (*right)(stMgr);
+            }
+            
+            virtual const char* GetSymbolName() const
+            {
+                return "+";
+            }
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--å‡æ³•ç±»å‹
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprMinu : public AttrOprBinaryOperation<_TAttrMgr, AttrOprMinu<_TAttrMgr> >
+        {
+            typedef AttrOprMinu<_TAttrMgr> self_type;
+            typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+
+            using opr_base_type::left;
+            using opr_base_type::right;
+
+            AttrOprMinu(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
+
+            virtual attr_value_type operator()(_TAttrMgr& stMgr)
+            {
+                return (*left)(stMgr) - (*right)(stMgr);
+            }
+            
+            virtual const char* GetSymbolName() const
+            {
+                return "-";
+            }
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--ä¹˜æ³•ç±»å‹
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprMult : public AttrOprBinaryOperation<_TAttrMgr, AttrOprMult<_TAttrMgr> >
+        {
+            typedef AttrOprMult<_TAttrMgr> self_type;
+            typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+
+            using opr_base_type::left;
+            using opr_base_type::right;
+
+            AttrOprMult(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
+
+            virtual attr_value_type operator()(_TAttrMgr& stMgr)
+            {
+                return (*left)(stMgr) * (*right)(stMgr);
+            }
+
+    		virtual const char* GetSymbolName() const
+            {
+                return "*";
+            }
+        };
+
+        /**
+         * å±æ€§å…³ç³»è¡¨è¾¾å¼--é™¤æ³•ç±»å‹
+         */
+        template<typename _TAttrMgr>
+        struct AttrOprDevi : public AttrOprBinaryOperation<_TAttrMgr, AttrOprDevi<_TAttrMgr> >
+        {
+            typedef AttrOprDevi<_TAttrMgr> self_type;
+            typedef AttrOprBinaryOperation<_TAttrMgr, self_type > opr_base_type;
+            typedef AttrOprBase<_TAttrMgr> base_type;
+            typedef std::shared_ptr<base_type> base_ptr_type;
+            typedef typename base_type::attr_value_type attr_value_type;
+
+            using opr_base_type::left;
+            using opr_base_type::right;
+
+            AttrOprDevi(base_ptr_type l, base_ptr_type r): opr_base_type(l, r){}
+
+            virtual attr_value_type operator()(_TAttrMgr& stMgr)
+            {
+                return (*left)(stMgr) / (*right)(stMgr);
+            }
+            
+            virtual const char* GetSymbolName() const
+            {
+                return "/";
+            }
+        };
+
+        template<typename _AttrMgr>
+        typename AttrOprAttr<_AttrMgr>::base_ptr_type _(typename AttrOprAttr<_AttrMgr>::attr_class_type type)
+        {
+            return AttrOprAttr<_AttrMgr>::Create(type);
+        }
+        
+        template<typename _AttrMgr>
+        typename AttrOprAttr<_AttrMgr>::base_ptr_type _(std::istream& ss)
+        {
+            typename AttrOprAttr<_AttrMgr>::base_ptr_type stPtr, ptrLeft, ptrRight;
+
+            char cNextChar = ss.peek();
+            while (!ss.eof() && (cNextChar == ' ' || cNextChar == '\t' || cNextChar == '\r' || cNextChar == '\n'))
+            {
+                ss.get();
+                cNextChar = ss.peek();
+            }
+
+            if (ss.eof())
+            {
+                return stPtr;
+            }
+
+            switch(cNextChar)
+            {
+            case '[': // å±æ€§
+                stPtr = AttrOprAttr<_AttrMgr>::Create(static_cast<typename AttrOprBase<_AttrMgr>::attr_class_type>(0));
+                stPtr->Unserialize(ss);
+                break;
+
+            case '+': // æ“ä½œç¬¦ +
+                ss.get();
+                ptrLeft = _<_AttrMgr>(ss);
+                ptrRight = _<_AttrMgr>(ss);
+                stPtr = AttrOprPlus<_AttrMgr>::Create(ptrLeft, ptrRight);
+                break;
+
+            case '-': // æ“ä½œç¬¦ -
+                ss.get();
+                ptrLeft = _<_AttrMgr>(ss);
+                ptrRight = _<_AttrMgr>(ss);
+                stPtr = AttrOprMinu<_AttrMgr>::Create(ptrLeft, ptrRight);
+                break;
+
+            case '*': // æ“ä½œç¬¦ *
+                ss.get();
+                ptrLeft = _<_AttrMgr>(ss);
+                ptrRight = _<_AttrMgr>(ss);
+                stPtr = AttrOprMult<_AttrMgr>::Create(ptrLeft, ptrRight);
+                break;
+
+            case '/': // æ“ä½œç¬¦ /
+                ss.get();
+                ptrLeft = _<_AttrMgr>(ss);
+                ptrRight = _<_AttrMgr>(ss);
+                stPtr = AttrOprDevi<_AttrMgr>::Create(ptrLeft, ptrRight);
+                break;
+
+            default: // å¸¸é‡
+                stPtr = AttrOprVal<_AttrMgr>::Create(0);
+                stPtr->Unserialize(ss);
+            }
+
+            return stPtr;
+        }
+    }
+
+    namespace Wrapper
+    {
+        template<typename _TAttrMgr>
+        class AttributeFormulaBuilderAttrWrapper
         {
         public:
-            typedef _TAttrType attr_class_type;
-            typedef _TAttr attr_value_type;
-            typedef AttributeManager<_TAttrType, _MAXCOUNT, _TOwner, _TAttr> self_type;
-
-            typedef std::set<_TAttrType> attr_attach_set_type;
-            typedef std::list<_TAttrType> attr_attach_list_type;
-            typedef std::map<_TAttrType, attr_attach_list_type > attr_attach_type;
-
-            typedef Operator::AttrOprBase<self_type> attr_formula_type;
-            typedef typename attr_formula_type::base_ptr_type attr_formula_ptr_type;
-            typedef std::map<_TAttrType, attr_formula_ptr_type > formula_map_type;
-            typedef Wrapper::AttributeFormulaBuilderWrapper<self_type> formula_builder_type;
-
-            typedef Wrapper::AttributeWrapper<self_type> attr_wrapper_type;
-
-            typedef std::list< std::list<int> > formula_loops_type;
-
-            friend class Wrapper::AttributeWrapper<self_type>;
-            friend class Wrapper::AttributeFormulaBuilderWrapper<self_type>;
-            friend class Wrapper::AttributeFormulaBuilderAttrWrapper<self_type>;
+            typedef typename _TAttrMgr::attr_class_type attr_class_type;
+            typedef typename _TAttrMgr::formula_map_type formula_map_type;
+            typedef typename _TAttrMgr::attr_formula_ptr_type attr_formula_ptr_type;
+            typedef AttributeFormulaBuilderAttrWrapper<_TAttrMgr> self_type;
 
         private:
-            _TAttr m_arrAttrs[_MAXCOUNT];
-
-            static attr_attach_type& GetAttachAttrMapObj()
-            {
-                static attr_attach_type functor;
-                return functor;
-            }
-
-            static formula_map_type& GetFormulaMapObj()
-            {
-                static formula_map_type functor;
-                return functor;
-            }
-
-            static attr_attach_type& GetAttachAttrMap()
-            {
-                // ±£Ö¤ÒÑ³õÊ¼»¯
-                GetFormulaMap();
-
-                return GetAttachAttrMapObj();
-            }
-
-            static formula_map_type& GetFormulaMap()
-            {
-                formula_map_type& stFormula = GetFormulaMapObj();
-                if (stFormula.begin() == stFormula.end())
-                {
-                    // Éú³ÉÊôĞÔ¹«Ê½
-                    formula_builder_type stBuilder;
-                    _TOwner::GenAttrFormulaMap(stBuilder);
-
-                    // ½¨Á¢ÊôĞÔ¹ØÏµÁÚ½Ó±í
-                    attr_attach_type& stAttrAttach = GetAttachAttrMapObj();
-                    stAttrAttach.clear();
-                    for(typename formula_map_type::iterator iter = stFormula.begin();
-                        iter != stFormula.end();
-                        ++ iter)
-                    {
-                        attr_attach_set_type stAttachAttrs;
-
-                        iter->second->BuildFormularParam(stAttachAttrs);
-                        for (typename attr_attach_set_type::iterator itAttr = stAttachAttrs.begin();
-                            itAttr != stAttachAttrs.end();
-                            ++ itAttr
-                            )
-                        {
-                            typename attr_attach_type::mapped_type& stList = stAttrAttach[*itAttr];
-
-                            stList.push_back(iter->first);
-                        }
-                    }
-                }
-
-                return stFormula;
-            }
+            attr_class_type m_tClass;
 
         public:
+            AttributeFormulaBuilderAttrWrapper(attr_class_type tClass): m_tClass(tClass){}
 
-            void Construct()
+            attr_formula_ptr_type operator()() const
             {
-                memset(m_arrAttrs, 0, sizeof(m_arrAttrs));
+                return Operator::_<_TAttrMgr>(m_tClass);
             }
 
             /**
-             * »ñÈ¡ÊôĞÔÔ­Ê¼ÒıÓÃ¶ÔÏó
-             * @param [in] uIndex ¶ÔÏóË÷Òı
-             * @return Ô­Ê¼ÊôĞÔÒıÓÃ
+             * æä¾›è‡ªåŠ¨è½¬ä¸ºå±æ€§å‚æ•°çš„åŠŸèƒ½
              */
-            _TAttr& get(_TAttrType uIndex)
+            operator attr_formula_ptr_type() const
             {
-                return m_arrAttrs[uIndex];
+                return (*this)(m_tClass);
             }
 
             /**
-             * »ñÈ¡ÊôĞÔÔ­Ê¼ÒıÓÃ¶ÔÏó
-             * @param [in] uIndex ¶ÔÏóË÷Òı
-             * @return Ô­Ê¼ÊôĞÔÒıÓÃ
+             * å…¬å¼èµ‹å€¼æ§åˆ¶
              */
-            const _TAttr& get(_TAttrType uIndex) const
+            self_type& operator=(attr_formula_ptr_type pFormula)
             {
-                return m_arrAttrs[uIndex];
+                formula_map_type& stFormulaMap = _TAttrMgr::GetFormulaMapObj();
+                stFormulaMap[m_tClass] = pFormula;
+                return *this;
             }
 
             /**
-             * »ñÈ¡ÊôĞÔ
-             * @param [in] uIndex ¶ÔÏóË÷Òı
-             * @return ÊôĞÔ¶ÔÏó
+             * å¤åˆ¶èµ‹å€¼æ§åˆ¶(æ”¯æŒè¿ç­‰å·)
              */
-            attr_wrapper_type operator[](_TAttrType uIndex)
+            self_type& operator=(const self_type& stFormulaWrapper)
             {
-                return attr_wrapper_type(*this, uIndex);
+                formula_map_type& stFormulaMap = _TAttrMgr::GetFormulaMapObj();
+                typename formula_map_type::iterator iter = stFormulaMap.find(stFormulaWrapper.m_tClass);
+
+                // [ä¼˜åŒ–] å¦‚æœç›®æ ‡å±æ€§ç”±å…¬å¼ç”Ÿæˆï¼Œåˆ™å‡å°‘ä¸€å±‚èŠ‚ç‚¹
+                if (iter == stFormulaMap.end())
+                {
+                    stFormulaMap[m_tClass] = Operator::_<_TAttrMgr>(stFormulaWrapper.m_tClass);
+                }
+                else
+                {
+                    stFormulaMap[m_tClass] = iter->second;
+                }
+
+                return *this;
             }
-
-
-        private:
-            struct CheckValidNode
-            {
-                int iLeftDstEdge; /** Ê£Óàµ½´ïµ±Ç°½ÚµãµÄ±ßÊı **/
-                std::list<int> stSrcList; /** ÒÔµ±Ç°½ÚµãÎªÆğµãµÄ±ßÁĞ±í(ÁÚ½Ó±í) **/
-                CheckValidNode(): iLeftDstEdge(0){}
-            };
-
-            /**
-             * ¼ì²é¹«Ê½ÊÇ·ñ³É»·
-             * @note ¼ì²âÓĞÏòÍ¼ÖĞÊÇ·ñ´æÔÚ»·
-             * @note Ö÷ÒªËã·¨£ºÍØÆËÅÅĞò, ÍêÕûÊ±¼ä¸´ÔÓ¶È[O(n+2m)], ÍêÕû¿Õ¼ä¸´ÔÓ¶È[O(2n+m)]
-             * @note { nÎªËùÓĞ¹«Ê½ÖĞÉæ¼°µÄÊôĞÔID×Ü¸öÊı, mÎªÊôĞÔµÄ»áÖ±½ÓÓ°ÏìµÄÄ¿±êÊôĞÔ×Ü¸öÊı }
-             * @param [in, out] stRelationMap ¹ØÏµ½Úµã»º³åÇø(Èç¹û´æÔÚ»·, Êä³ö½á¹ûÖĞµÄ±ßÁĞ±í°üº¬ËùÓĞÓĞÁ¬½ÓµÄ±ßºÍ½Úµã)
-             * @return ²»´æÔÚ»··µ»Øtrue
-             */
-            static bool CheckFormulaNoLoop(CheckValidNode stRelationMap[_MAXCOUNT])
-            {
-                std::list<int> stWaitForReach;
-
-                // Step 1. ½¨Í¼, Ê±¼ä¸´ÔÓ¶È[O(m)], ¿Õ¼ä¸´ÔÓ¶È[O(n + m)]
-                attr_attach_type& stAttachedMap = GetAttachAttrMap();
-                for(typename attr_attach_type::iterator iter = stAttachedMap.begin();
-                    iter != stAttachedMap.end();
-                    ++ iter)
-                {
-                        attr_attach_list_type& stAttachList = iter->second;
-                        int iSrcIndex = static_cast<int>(iter->first);
-
-                        for (typename attr_attach_list_type::iterator itAttr = stAttachList.begin();
-                            itAttr != stAttachList.end();
-                            ++ itAttr
-                            )
-                        {
-                            int iDstIndex = static_cast<int>(*itAttr);
-                            ++ stRelationMap[iDstIndex].iLeftDstEdge;
-                            stRelationMap[iSrcIndex].stSrcList.push_back(iDstIndex);
-                        }
-                }
-
-                // Step 2. ³õÊ¼»¯ÍØÆËÅÅĞò½Úµã, ¿Éµ½´ï½ÚµãÍÆÈë¾ÍĞ÷Á´±í, Ê±¼ä¸´ÔÓ¶È[O(n)], ¿Õ¼ä¸´ÔÓ¶È[O(n)]
-                int iLeftUnreached = _MAXCOUNT;
-                for (int i = 0; i < _MAXCOUNT; ++ i)
-                {
-                    if (stRelationMap[i].iLeftDstEdge <= 0)
-                    {
-                        stWaitForReach.push_back(i);
-                    }
-                }
-
-                // Step 3. ÍØÆËÅÅĞò, Ê±¼ä¸´ÔÓ¶È[O(m)], ¿Õ¼ä¸´ÔÓ¶È[O(n)][ÓëÉÏÃæ¹²ÓÃ¾ÍĞ÷Á´±í]
-                while(false == stWaitForReach.empty())
-                {
-                    -- iLeftUnreached;
-                    int iSrcIndex = stWaitForReach.front();
-                    stWaitForReach.pop_front();
-
-                    std::list<int>& stEdgeList =  stRelationMap[iSrcIndex].stSrcList;
-                    while(!stEdgeList.empty())
-                    {
-                        int iDstIndex = stEdgeList.front();
-                        stEdgeList.pop_front();
-
-                        -- stRelationMap[iDstIndex].iLeftDstEdge;
-                        if (stRelationMap[iDstIndex].iLeftDstEdge == 0)
-                        {
-                            stWaitForReach.push_back(iDstIndex);
-                        }
-                    }
-                }
-
-                // Step 4. Èç¹ûËùÓĞ½Úµã¾ùÒÑµ½´ï£¬ÔòÎŞ»·
-                return iLeftUnreached <= 0;
-            }
-
-            // »ñÈ¡Ñ­»·¹ØÏµÁ´--Éî¶ÈÓÅÏÈËÑË÷º¯Êı
-            static void GetInvalidLoopsDFS(CheckValidNode stRelationMap[_MAXCOUNT], int iPos, std::vector<bool>& stReachedFlags, std::vector<bool>& stIsInRoute, std::vector<int>& stRoute, formula_loops_type& stResult)
-            {
-                // Èç¹ûÒÑ¾­Ëã¹ı¾­¹ıµ±Ç°½ÚµãµÄ»·£¬ÎŞĞèÖØËã
-                if(stReachedFlags[iPos])
-                {
-                    return;
-                }
-
-                // ³öÏÖÑ­»·½Ú
-                if (stIsInRoute[iPos])
-                {
-                    // ĞÂÔö»·¼ÇÂ¼
-                    stResult.push_back(std::list<int>());
-                    stResult.back().assign(
-                        std::find(stRoute.begin(), stRoute.end(), iPos),
-                        stRoute.end()
-                    );
-
-                    return;
-                }
-
-                stRoute.push_back(iPos); // ÈëÕ»
-                stIsInRoute[iPos] = true;
-                for (std::list<int>::iterator iter = stRelationMap[iPos].stSrcList.begin();
-                    iter != stRelationMap[iPos].stSrcList.end();
-                    ++ iter)
-                {
-                    GetInvalidLoopsDFS(stRelationMap, *iter, stReachedFlags, stIsInRoute, stRoute, stResult);
-                }
-                stIsInRoute[iPos] = false;
-                stRoute.pop_back(); // ³öÕ»
-
-                // ±ê¼ÇÎªÒÑ¾­¾­¹ıµ±Ç°½Úµã
-                stReachedFlags[iPos] = true;
-            }
-
-        public:
-            /**
-             * ¼ì²é¹ØÏµÁ´ÊÇ·ñºÏ·¨(²»ÄÜ³öÏÖ »·»òÍ¼ ¹ØÏµ)
-             * @return ¹ØÏµÁ´ºÏ·¨·µ»Øtrue
-             */
-            static bool CheckValid()
-            {
-                // ¼ì²é¹«Ê½ÕıÈ·µÄ»º´æ
-                static bool bCheckRes = false;
-                if (bCheckRes)
-                {
-                    return bCheckRes;
-                }
-
-                // ¼ì²âÓĞÏòÍ¼ÖĞÊÇ·ñ´æÔÚ»·
-                CheckValidNode stRelationMap[_MAXCOUNT];
-                return bCheckRes = CheckFormulaNoLoop(stRelationMap);
-            }
-
-            /**
-             * »ñÈ¡²»ºÏ·¨µÄ¹ØÏµÁ´
-             * @note Ö÷ÒªËã·¨£ºDFS { Ê±¼ä¸´ÔÓ¶ÈO(mn), ¿Õ¼ä¸´ÔÓ¶ÈO(3n) }
-             * @param [in, out] stRelationMap ¹ØÏµ½Úµã»º³åÇø
-             * @param [out] stLoops ËùÓĞµÄ»·ÁĞ±í
-             */
-            static void GetInvalidLoops(CheckValidNode stRelationMap[_MAXCOUNT], formula_loops_type& stLoops)
-            {
-                stLoops.clear();
-                bool bCheckRes = CheckFormulaNoLoop(stRelationMap);
-                if (bCheckRes)
-                {
-                    return;
-                }
-
-                int iStartIndex = 0;
-                std::vector<bool> stReachedFlags, stIsInRoute;
-                stReachedFlags.assign(_MAXCOUNT, false);
-                stIsInRoute.assign(_MAXCOUNT, false);
-                std::vector<int> stRoute;
-
-                // Ã¶¾ÙÆğµã
-                for (; iStartIndex < _MAXCOUNT; ++ iStartIndex )
-                {
-                    // ÒÑ±»µ½´ï¹ı£¬Ìø¹ı
-                    if (stReachedFlags[iStartIndex])
-                    {
-                        continue;
-                    }
-
-                    // ÎŞºóĞø½Úµã£¬Ìø¹ı
-                    if (stRelationMap[iStartIndex].stSrcList.size() <= 0)
-                    {
-                        continue;
-                    }
-
-                    // Éî¶ÈÓÅÏÈËÑË÷£¬²éÕÒËùÓĞµÄ»·
-                    stRoute.clear();
-                    GetInvalidLoopsDFS(stRelationMap, iStartIndex, stReachedFlags, stIsInRoute, stRoute, stLoops);
-                }
-
-                
-            }
-
-            /**
-             * Êä³ö²»ºÏ·¨µÄ¹ØÏµÁ´ºÍ¹«Ê½Ñ­»·µ½Êä³öÁ÷
-             * @param [in, out] ostream Êä³öÄ¿±ê
-             */
-            template<typename _TOStream>
-            static void PrintInvalidLoops(_TOStream& ostream)
-            {
-                formula_loops_type stLoops;
-                CheckValidNode stRelationMap[_MAXCOUNT];
-                GetInvalidLoops(stRelationMap, stLoops);
-                ostream<< "All node links:\n";
-
-                // ´òÓ¡¹ØÏµÍ¼Æ×
-                for (int i = 0; i < _MAXCOUNT; ++ i)
-                {
-                    if (stRelationMap[i].iLeftDstEdge <= 0)
-                    {
-                        continue;
-                    }
-
-                    ostream<< "\t"<< i<< " -> ";
-                    for (std::list<int>::iterator iter = stRelationMap[i].stSrcList.begin();
-                        iter != stRelationMap[i].stSrcList.end();
-                        ++ iter)
-                    {
-                        ostream<< " "<< *iter;
-                    }
-                    ostream<< "\n";
-                }
-
-                // ´òÓ¡ËùÓĞµÄ¹«Ê½ÒÀÀµÑ­»·
-                ostream<< "All formula loops:\n";
-                for (typename formula_loops_type::iterator iter = stLoops.begin();
-                    iter != stLoops.end();
-                    ++ iter)
-                {
-                    // ÂÔ¹ı¿ÕÁĞ±í
-                    if (iter->empty())
-                    {
-                        continue;
-                    }
-
-                    ostream<< "\t"<< *(iter->begin());
-                    for (std::list<int>::reverse_iterator riter = iter->rbegin();
-                        riter != iter->rend();
-                        ++ riter)
-                    {
-                        ostream<<" -> "<< *riter;
-                    }
-                    ostream<< "\n";
-                }
-            }
-
         };
 
 
-        // ==================== ²Ù×÷·ûÖØÔØ ====================
-        namespace Operator
+        template<typename _TAttrMgr>
+        class AttributeFormulaBuilderWrapper
         {
-            // ==================== ²Ù×÷·ûÖØÔØ: ±í´ïÊ½ -- ±í´ïÊ½ ====================
-            <?php gen_all_operator('base', 'base'); ?>
+        public:
+            typedef typename _TAttrMgr::attr_class_type attr_class_type;
+            typedef typename _TAttrMgr::attr_value_type attr_value_type;
+            typedef AttributeFormulaBuilderAttrWrapper<_TAttrMgr> builder_attr_type;
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ±í´ïÊ½ -- ³£Á¿ ====================
-            <?php gen_all_operator('base', 'value'); ?>
+        public:
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ³£Á¿ -- ±í´ïÊ½ ====================
-            <?php gen_all_operator('value', 'base'); ?>
+            builder_attr_type operator[](attr_class_type tClass)
+            {
+                return builder_attr_type(tClass);
+            }
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ÊôĞÔ -- ÊôĞÔ ====================
-            <?php gen_all_operator('attr_wrapper', 'attr_wrapper'); ?>
+            builder_attr_type operator()(attr_class_type tClass)
+            {
+                return builder_attr_type(tClass);
+            }
+        };
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ÊôĞÔ -- ³£Á¿ ====================
-            <?php gen_all_operator('attr_wrapper', 'value'); ?>
+        /**
+         * å±æ€§å€¼åŒ…è£…å™¨
+         */
+        template<typename _TAttrMgr>
+        class AttributeWrapper
+        {
+        public:
+            typedef typename _TAttrMgr::attr_class_type attr_class_type;
+            typedef typename _TAttrMgr::attr_value_type attr_value_type;
+            typedef typename _TAttrMgr::attr_attach_set_type attr_attach_set_type;
+            typedef typename _TAttrMgr::attr_attach_list_type attr_attach_list_type;
+            typedef typename _TAttrMgr::formula_map_type formula_map_type;
+            typedef typename _TAttrMgr::attr_attach_type attr_attach_type;
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ³£Á¿ -- ÊôĞÔ ====================
-            <?php gen_all_operator('value', 'attr_wrapper'); ?>
+            typedef AttributeWrapper<_TAttrMgr> self_type;
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ÊôĞÔ -- ±í´ïÊ½ ====================
-            <?php gen_all_operator('attr_wrapper', 'base'); ?>
+        private:
+            std::reference_wrapper<_TAttrMgr> m_stMgrRef;
+            attr_class_type m_tIndex;
 
-            // ==================== ²Ù×÷·ûÖØÔØ: ±í´ïÊ½ -- ÊôĞÔ ====================
-            <?php gen_all_operator('base', 'attr_wrapper'); ?>
-        }
+        public:
+            AttributeWrapper(_TAttrMgr& stMgr, attr_class_type tIndex): m_stMgrRef(stMgr), m_tIndex(tIndex){}
+
+            operator attr_value_type() const
+            {
+                return m_stMgrRef.get().get(m_tIndex);
+            }
+
+            /**
+             * å€¼å‘ç”Ÿå˜åŒ–
+             * @note åŒæ­¥æ”¹å˜å…³è”é¡¹
+             * @param [in] tVal æ”¹å˜çš„å±æ€§é¡¹
+             * @return ä¾æ®ç­‰å·è§„èŒƒ, è¿”å›*this
+             */
+            self_type& operator=(attr_value_type tVal)
+            {
+                m_stMgrRef.get().get(m_tIndex) = tVal;
+
+                attr_attach_list_type stAttachedList;
+                GetAttachedAttributes(stAttachedList, false);
+
+                formula_map_type& stFormulaMap = m_stMgrRef.get().GetFormulaMap();
+                
+                typename attr_attach_list_type::iterator iter = stAttachedList.begin();
+                for(; iter != stAttachedList.end(); ++ iter)
+                {
+                    typename formula_map_type::iterator itAttached = stFormulaMap.find(*iter);
+                    if (itAttached == stFormulaMap.end() || *iter == m_tIndex)
+                    {
+                        // è¿™é‡Œæœ‰é—®é¢˜ï¼Œé‚£å°±æ˜¯ç¨‹åºæœ‰BUG
+                        // æˆ–è€…ä¾èµ–å…³ç³»æˆç¯
+                        // æˆ–è€…å‡ºç°è‡ªä¾èµ–
+                        continue;
+                    }
+
+                    // å¾ªç¯èµ‹å€¼
+                    m_stMgrRef.get()[*iter] = (*itAttached->second)(m_stMgrRef);
+                }
+
+                return (*this);
+            }
+
+            self_type& operator=(const self_type& tVal)
+            {
+                m_stMgrRef = std::ref(tVal.m_stMgrRef);
+                m_tIndex = tVal.m_tIndex;
+
+                return (*this);
+            }
+
+            /**
+             * è·å–æ‰€æœ‰è¢«å½“å‰å±æ€§ä¾èµ–çš„å±æ€§<br />
+             * å³ï¼Œå½“å‰å±æ€§æ˜¯è·å¾—çš„å±æ€§çš„å‚æ•°
+             * @param [in, out] stAttrList ç»“æœå±æ€§é›†
+             * @param [in] bRecursion æ˜¯å¦é€’å½’æŸ¥æ‰¾ä¾èµ–é¡¹
+             */
+            void GetAttachedAttributes(attr_attach_list_type& stAttrList, bool bRecursion = false)
+            {
+                _TAttrMgr& stMgr = m_stMgrRef;
+                attr_attach_type& stAttachMap = stMgr.GetAttachAttrMap();
+                typename attr_attach_type::iterator iter = stAttachMap.find(m_tIndex);
+
+                // æ²¡æ‰¾åˆ°å…³ç³»å¼
+                if (iter == stAttachMap.end())
+                {
+                    return;
+                }
+
+                // å¡«å……æ•°æ®
+                stAttrList.insert(stAttrList.end(), iter->second.begin(), iter->second.end());
+                if ( false == bRecursion || false == _TAttrMgr::CheckValid())
+                {
+                    return;
+                }
+
+                // éœ€è¦é€’å½’æŸ¥æ‰¾
+                typedef typename attr_attach_type::mapped_type attach_mapped;
+                typename attach_mapped::iterator itm = iter->second.begin();
+                for (; itm != iter->second.end(); ++ itm)
+                {
+                    self_type stTmpObj(stMgr, *itm);
+                    stTmpObj.GetAttachedAttributes(stAttrList, bRecursion);
+                }
+            }
+
+            /**
+             * è·å–æ‰€æœ‰å½“å‰å±æ€§çš„è®¡ç®—å‚æ•°å±æ€§<br />
+             * å³ï¼Œè·å¾—çš„å±æ€§æ˜¯çš„å½“å‰å±æ€§å‚æ•°
+             * @param [in, out] stAttrSet ç»“æœå±æ€§é›†
+             * @param [in] bRecursion æ˜¯å¦é€’å½’æŸ¥æ‰¾å‚æ•°
+             */
+            void GetAttachAttributes(attr_attach_set_type& stAttrSet, bool bRecursion = false)
+            {
+                _TAttrMgr& stMgr = m_stMgrRef;
+                formula_map_type& stFormulaMap = stMgr.GetFormulaMap();
+                typename formula_map_type::iterator iter = stFormulaMap.find(m_tIndex);
+
+                // æ²¡æ‰¾åˆ°å…¬å¼
+                if (iter == stFormulaMap.end())
+                {
+                    return;
+                }
+
+                // å¡«å……æ•°æ®
+                attr_attach_set_type stCurrentSet;
+                iter->second->BuildFormularParam(stCurrentSet);
+                stAttrSet.insert(stCurrentSet.begin(), stCurrentSet.end());
+
+                if ( false == bRecursion || false == _TAttrMgr::CheckValid())
+                {
+                    return;
+                }
+
+                // éœ€è¦é€’å½’æŸ¥æ‰¾
+                typename attr_attach_set_type::iterator itm = stCurrentSet.begin();
+                for (; itm != stCurrentSet.end(); ++ itm)
+                {
+                    self_type stTmpObj(stMgr, *itm);
+                    stTmpObj.GetAttachAttributes(stAttrSet, bRecursion);
+                }
+            }
+        };
     }
+
+    /**
+     * å±æ€§ç®¡ç†å™¨
+     * @note åº”è¯¥åŒ…å«è‡³å°‘ä¸€æ¡å±æ€§å…¬å¼
+     * @note é™„å±ç±»_TOwnerå¿…é¡»åŒ…å«GenAttrFormulaMap(formula_builder_type&)å‡½æ•°ä»¥åˆå§‹åŒ–å±æ€§å…¬å¼è¡¨
+     * @note ä¸ºäº†æé«˜æŸ¥è¯¢æ•ˆç‡, å±æ€§ç¼–å·æ˜¯è¿ç»­çš„, æ•…è€Œ_MAXCOUNT ä¸å®œè¿‡å¤§
+     */
+    template<typename _TAttrType, int _MAXCOUNT, typename _TOwner, typename _TAttr = int>
+    class AttributeManager
+    {
+    public:
+        typedef _TAttrType attr_class_type;
+        typedef _TAttr attr_value_type;
+        typedef AttributeManager<_TAttrType, _MAXCOUNT, _TOwner, _TAttr> self_type;
+
+        typedef std::set<_TAttrType> attr_attach_set_type;
+        typedef std::list<_TAttrType> attr_attach_list_type;
+        typedef std::map<_TAttrType, attr_attach_list_type > attr_attach_type;
+
+        typedef Operator::AttrOprBase<self_type> attr_formula_type;
+        typedef typename attr_formula_type::base_ptr_type attr_formula_ptr_type;
+        typedef std::map<_TAttrType, attr_formula_ptr_type > formula_map_type;
+        typedef Wrapper::AttributeFormulaBuilderWrapper<self_type> formula_builder_type;
+
+        typedef Wrapper::AttributeWrapper<self_type> attr_wrapper_type;
+
+        typedef std::list< std::list<int> > formula_loops_type;
+
+        friend class Wrapper::AttributeWrapper<self_type>;
+        friend class Wrapper::AttributeFormulaBuilderWrapper<self_type>;
+        friend class Wrapper::AttributeFormulaBuilderAttrWrapper<self_type>;
+
+    private:
+        _TAttr m_arrAttrs[_MAXCOUNT];
+
+        static attr_attach_type& GetAttachAttrMapObj()
+        {
+            static attr_attach_type functor;
+            return functor;
+        }
+
+        static formula_map_type& GetFormulaMapObj()
+        {
+            static formula_map_type functor;
+            return functor;
+        }
+		
+        static attr_attach_type& GetAttachAttrMap()
+        {
+            // ä¿è¯å·²åˆå§‹åŒ–
+            GetFormulaMap();
+
+            return GetAttachAttrMapObj();
+        }
+
+        static formula_map_type& GetFormulaMap()
+        {
+            formula_map_type& stFormula = GetFormulaMapObj();
+            if (stFormula.begin() == stFormula.end())
+            {
+            	ReloadFormula();
+            }
+
+            return stFormula;
+        }
+
+    public:
+
+        void Construct()
+        {
+            memset(m_arrAttrs, 0, sizeof(m_arrAttrs));
+        }
+
+        /**
+         * è·å–å±æ€§åŸå§‹å¼•ç”¨å¯¹è±¡
+         * @param [in] uIndex å¯¹è±¡ç´¢å¼•
+         * @return åŸå§‹å±æ€§å¼•ç”¨
+         */
+        _TAttr& get(_TAttrType uIndex)
+        {
+            return m_arrAttrs[uIndex];
+        }
+
+        /**
+         * è·å–å±æ€§åŸå§‹å¼•ç”¨å¯¹è±¡
+         * @param [in] uIndex å¯¹è±¡ç´¢å¼•
+         * @return åŸå§‹å±æ€§å¼•ç”¨
+         */
+        const _TAttr& get(_TAttrType uIndex) const
+        {
+            return m_arrAttrs[uIndex];
+        }
+
+        /**
+         * è·å–å±æ€§
+         * @param [in] uIndex å¯¹è±¡ç´¢å¼•
+         * @return å±æ€§å¯¹è±¡
+         */
+        attr_wrapper_type operator[](_TAttrType uIndex)
+        {
+            return attr_wrapper_type(*this, uIndex);
+        }
+
+
+    private:
+        struct CheckValidNode
+        {
+            int iLeftDstEdge; /** å‰©ä½™åˆ°è¾¾å½“å‰èŠ‚ç‚¹çš„è¾¹æ•° **/
+            std::list<int> stSrcList; /** ä»¥å½“å‰èŠ‚ç‚¹ä¸ºèµ·ç‚¹çš„è¾¹åˆ—è¡¨(é‚»æ¥è¡¨) **/
+            CheckValidNode(): iLeftDstEdge(0){}
+        };
+
+        /**
+         * æ£€æŸ¥å…¬å¼æ˜¯å¦æˆç¯
+         * @note æ£€æµ‹æœ‰å‘å›¾ä¸­æ˜¯å¦å­˜åœ¨ç¯
+         * @note ä¸»è¦ç®—æ³•ï¼šæ‹“æ‰‘æ’åº, å®Œæ•´æ—¶é—´å¤æ‚åº¦[O(n+2m)], å®Œæ•´ç©ºé—´å¤æ‚åº¦[O(2n+m)]
+         * @note { nä¸ºæ‰€æœ‰å…¬å¼ä¸­æ¶‰åŠçš„å±æ€§IDæ€»ä¸ªæ•°, mä¸ºå±æ€§çš„ä¼šç›´æ¥å½±å“çš„ç›®æ ‡å±æ€§æ€»ä¸ªæ•° }
+         * @param [in, out] stRelationMap å…³ç³»èŠ‚ç‚¹ç¼“å†²åŒº(å¦‚æœå­˜åœ¨ç¯, è¾“å‡ºç»“æœä¸­çš„è¾¹åˆ—è¡¨åŒ…å«æ‰€æœ‰æœ‰è¿æ¥çš„è¾¹å’ŒèŠ‚ç‚¹)
+         * @return ä¸å­˜åœ¨ç¯è¿”å›true
+         */
+        static bool CheckFormulaNoLoop(CheckValidNode stRelationMap[_MAXCOUNT])
+        {
+            std::list<int> stWaitForReach;
+
+            // Step 1. å»ºå›¾, æ—¶é—´å¤æ‚åº¦[O(m)], ç©ºé—´å¤æ‚åº¦[O(n + m)]
+            attr_attach_type& stAttachedMap = GetAttachAttrMap();
+            for(typename attr_attach_type::iterator iter = stAttachedMap.begin();
+                iter != stAttachedMap.end();
+                ++ iter)
+            {
+                    attr_attach_list_type& stAttachList = iter->second;
+                    int iSrcIndex = static_cast<int>(iter->first);
+
+                    for (typename attr_attach_list_type::iterator itAttr = stAttachList.begin();
+                        itAttr != stAttachList.end();
+                        ++ itAttr
+                        )
+                    {
+                        int iDstIndex = static_cast<int>(*itAttr);
+                        ++ stRelationMap[iDstIndex].iLeftDstEdge;
+                        stRelationMap[iSrcIndex].stSrcList.push_back(iDstIndex);
+                    }
+            }
+
+            // Step 2. åˆå§‹åŒ–æ‹“æ‰‘æ’åºèŠ‚ç‚¹, å¯åˆ°è¾¾èŠ‚ç‚¹æ¨å…¥å°±ç»ªé“¾è¡¨, æ—¶é—´å¤æ‚åº¦[O(n)], ç©ºé—´å¤æ‚åº¦[O(n)]
+            int iLeftUnreached = _MAXCOUNT;
+            for (int i = 0; i < _MAXCOUNT; ++ i)
+            {
+                if (stRelationMap[i].iLeftDstEdge <= 0)
+                {
+                    stWaitForReach.push_back(i);
+                }
+            }
+
+            // Step 3. æ‹“æ‰‘æ’åº, æ—¶é—´å¤æ‚åº¦[O(m)], ç©ºé—´å¤æ‚åº¦[O(n)][ä¸ä¸Šé¢å…±ç”¨å°±ç»ªé“¾è¡¨]
+            while(false == stWaitForReach.empty())
+            {
+                -- iLeftUnreached;
+                int iSrcIndex = stWaitForReach.front();
+                stWaitForReach.pop_front();
+
+                std::list<int>& stEdgeList =  stRelationMap[iSrcIndex].stSrcList;
+                while(!stEdgeList.empty())
+                {
+                    int iDstIndex = stEdgeList.front();
+                    stEdgeList.pop_front();
+
+                    -- stRelationMap[iDstIndex].iLeftDstEdge;
+                    if (stRelationMap[iDstIndex].iLeftDstEdge == 0)
+                    {
+                        stWaitForReach.push_back(iDstIndex);
+                    }
+                }
+            }
+
+            // Step 4. å¦‚æœæ‰€æœ‰èŠ‚ç‚¹å‡å·²åˆ°è¾¾ï¼Œåˆ™æ— ç¯
+            return iLeftUnreached <= 0;
+        }
+
+        // è·å–å¾ªç¯å…³ç³»é“¾--æ·±åº¦ä¼˜å…ˆæœç´¢å‡½æ•°
+        static void GetInvalidLoopsDFS(CheckValidNode stRelationMap[_MAXCOUNT], int iPos, std::vector<bool>& stReachedFlags, std::vector<bool>& stIsInRoute, std::vector<int>& stRoute, formula_loops_type& stResult)
+        {
+            // å¦‚æœå·²ç»ç®—è¿‡ç»è¿‡å½“å‰èŠ‚ç‚¹çš„ç¯ï¼Œæ— éœ€é‡ç®—
+            if(stReachedFlags[iPos])
+            {
+                return;
+            }
+
+            // å‡ºç°å¾ªç¯èŠ‚
+            if (stIsInRoute[iPos])
+            {
+                // æ–°å¢ç¯è®°å½•
+                stResult.push_back(std::list<int>());
+                stResult.back().assign(
+                    std::find(stRoute.begin(), stRoute.end(), iPos),
+                    stRoute.end()
+                );
+
+                return;
+            }
+
+            stRoute.push_back(iPos); // å…¥æ ˆ
+            stIsInRoute[iPos] = true;
+            for (std::list<int>::iterator iter = stRelationMap[iPos].stSrcList.begin();
+                iter != stRelationMap[iPos].stSrcList.end();
+                ++ iter)
+            {
+                GetInvalidLoopsDFS(stRelationMap, *iter, stReachedFlags, stIsInRoute, stRoute, stResult);
+            }
+            stIsInRoute[iPos] = false;
+            stRoute.pop_back(); // å‡ºæ ˆ
+
+            // æ ‡è®°ä¸ºå·²ç»ç»è¿‡å½“å‰èŠ‚ç‚¹
+            stReachedFlags[iPos] = true;
+        }
+
+        static void RebuildAttachList()
+        {
+            formula_map_type& stFormula = GetFormulaMapObj();
+            attr_attach_type& stAttrAttach = GetAttachAttrMapObj();
+            stAttrAttach.clear();
+            for(typename formula_map_type::iterator iter = stFormula.begin();
+                iter != stFormula.end();
+                ++ iter)
+            {
+                attr_attach_set_type stAttachAttrs;
+
+                iter->second->BuildFormularParam(stAttachAttrs);
+                for (typename attr_attach_set_type::iterator itAttr = stAttachAttrs.begin();
+                    itAttr != stAttachAttrs.end();
+                    ++ itAttr
+                    )
+                {
+                    typename attr_attach_type::mapped_type& stList = stAttrAttach[*itAttr];
+
+                    stList.push_back(iter->first);
+                }
+            }
+        }
+        
+    public:
+    
+        /**
+         * æ¸…ç©ºæ‰€æœ‰å…¬å¼
+         */
+    	static void ClearAllFormula()
+		{
+			attr_attach_type& stAttrMap = GetAttachAttrMapObj();
+			formula_map_type& stFormulaMap = GetFormulaMapObj();
+			
+			stAttrMap.clear();
+			stFormulaMap.clear();
+		}
+		
+		/**
+         * é‡æ–°ç”Ÿæˆå…¬å¼, è§¦å‘ç”Ÿæˆå…¬å¼å‡½æ•°
+         */
+        static void ReloadFormula()
+        {
+        	ClearAllFormula();
+        
+            // ç”Ÿæˆå±æ€§å…¬å¼
+            formula_builder_type stBuilder;
+            _TOwner::GenAttrFormulaMap(stBuilder);
+
+            // å»ºç«‹å±æ€§å…³ç³»é‚»æ¥è¡¨
+            RebuildAttachList();
+        }
+		
+		/**
+         * åºåˆ—åŒ–
+         * @param [out] åºåˆ—åŒ–è¾“å‡ºç»“æœ
+         */
+        static void Serialize(std::ostream& stOut)
+        {
+            // attr_class_type, attr_formula_ptr_type
+            formula_map_type& stFormulas = GetFormulaMap();
+            for(typename formula_map_type::iterator iter = stFormulas.begin();
+                iter != stFormulas.end();
+                ++ iter)
+            {
+                stOut<< iter->first<< " = ";
+                iter->second->Serialize(stOut);
+                stOut<<std::endl;
+            }
+        }
+
+        /**
+         * ååºåˆ—åŒ–
+         * @param [in] ååºåˆ—åŒ–æ¥æº
+         */
+        static void Unserialize(std::istream& stIn)
+        {
+        	ClearAllFormula();
+            int id;
+            char cEqual;
+            formula_map_type& stFormulas = GetFormulaMapObj();
+            while(stIn>> id>> cEqual)
+            {
+                attr_class_type eid = static_cast<attr_class_type>(id);
+                stFormulas[eid] = Operator::_<self_type>(stIn);
+            }
+            
+            // å»ºç«‹å±æ€§å…³ç³»é‚»æ¥è¡¨
+            RebuildAttachList();
+        }
+        
+        /**
+         * æ£€æŸ¥å…³ç³»é“¾æ˜¯å¦åˆæ³•(ä¸èƒ½å‡ºç° ç¯æˆ–å›¾ å…³ç³»)
+         * @return å…³ç³»é“¾åˆæ³•è¿”å›true
+         */
+        static bool CheckValid()
+        {
+            // æ£€æŸ¥å…¬å¼æ­£ç¡®çš„ç¼“å­˜
+            static bool bCheckRes = false;
+            if (bCheckRes)
+            {
+                return bCheckRes;
+            }
+
+            // æ£€æµ‹æœ‰å‘å›¾ä¸­æ˜¯å¦å­˜åœ¨ç¯
+            CheckValidNode stRelationMap[_MAXCOUNT];
+            return bCheckRes = CheckFormulaNoLoop(stRelationMap);
+        }
+
+        /**
+         * è·å–ä¸åˆæ³•çš„å…³ç³»é“¾
+         * @note ä¸»è¦ç®—æ³•ï¼šDFS { æ—¶é—´å¤æ‚åº¦O(mn), ç©ºé—´å¤æ‚åº¦O(3n) }
+         * @param [in, out] stRelationMap å…³ç³»èŠ‚ç‚¹ç¼“å†²åŒº
+         * @param [out] stLoops æ‰€æœ‰çš„ç¯åˆ—è¡¨
+         */
+        static void GetInvalidLoops(CheckValidNode stRelationMap[_MAXCOUNT], formula_loops_type& stLoops)
+        {
+            stLoops.clear();
+            bool bCheckRes = CheckFormulaNoLoop(stRelationMap);
+            if (bCheckRes)
+            {
+                return;
+            }
+
+            int iStartIndex = 0;
+            std::vector<bool> stReachedFlags, stIsInRoute;
+            stReachedFlags.assign(_MAXCOUNT, false);
+            stIsInRoute.assign(_MAXCOUNT, false);
+            std::vector<int> stRoute;
+
+            // æšä¸¾èµ·ç‚¹
+            for (; iStartIndex < _MAXCOUNT; ++ iStartIndex )
+            {
+                // å·²è¢«åˆ°è¾¾è¿‡ï¼Œè·³è¿‡
+                if (stReachedFlags[iStartIndex])
+                {
+                    continue;
+                }
+
+                // æ— åç»­èŠ‚ç‚¹ï¼Œè·³è¿‡
+                if (stRelationMap[iStartIndex].stSrcList.size() <= 0)
+                {
+                    continue;
+                }
+
+                // æ·±åº¦ä¼˜å…ˆæœç´¢ï¼ŒæŸ¥æ‰¾æ‰€æœ‰çš„ç¯
+                stRoute.clear();
+                GetInvalidLoopsDFS(stRelationMap, iStartIndex, stReachedFlags, stIsInRoute, stRoute, stLoops);
+            }
+
+            
+        }
+
+        /**
+         * è¾“å‡ºä¸åˆæ³•çš„å…³ç³»é“¾å’Œå…¬å¼å¾ªç¯åˆ°è¾“å‡ºæµ
+         * @param [in, out] ostream è¾“å‡ºç›®æ ‡
+         */
+        template<typename _TOStream>
+        static void PrintInvalidLoops(_TOStream& ostream)
+        {
+            formula_loops_type stLoops;
+            CheckValidNode stRelationMap[_MAXCOUNT];
+            GetInvalidLoops(stRelationMap, stLoops);
+            ostream<< "All node links:\n";
+
+            // æ‰“å°å…³ç³»å›¾è°±
+            for (int i = 0; i < _MAXCOUNT; ++ i)
+            {
+                if (stRelationMap[i].iLeftDstEdge <= 0)
+                {
+                    continue;
+                }
+
+                ostream<< "\t"<< i<< " -> ";
+                for (std::list<int>::iterator iter = stRelationMap[i].stSrcList.begin();
+                    iter != stRelationMap[i].stSrcList.end();
+                    ++ iter)
+                {
+                    ostream<< " "<< *iter;
+                }
+                ostream<< "\n";
+            }
+
+            // æ‰“å°æ‰€æœ‰çš„å…¬å¼ä¾èµ–å¾ªç¯
+            ostream<< "All formula loops:\n";
+            for (typename formula_loops_type::iterator iter = stLoops.begin();
+                iter != stLoops.end();
+                ++ iter)
+            {
+                // ç•¥è¿‡ç©ºåˆ—è¡¨
+                if (iter->empty())
+                {
+                    continue;
+                }
+
+                ostream<< "\t"<< *(iter->begin());
+                for (std::list<int>::reverse_iterator riter = iter->rbegin();
+                    riter != iter->rend();
+                    ++ riter)
+                {
+                    ostream<<" -> "<< *riter;
+                }
+                ostream<< "\n";
+            }
+        }
+
+    };
+
+
+    // ==================== æ“ä½œç¬¦é‡è½½ ====================
+    namespace Operator
+    {
+        // ==================== æ“ä½œç¬¦é‡è½½: è¡¨è¾¾å¼ -- è¡¨è¾¾å¼ ====================
+        <?php gen_all_operator('base', 'base'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: è¡¨è¾¾å¼ -- å¸¸é‡ ====================
+        <?php gen_all_operator('base', 'value'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: å¸¸é‡ -- è¡¨è¾¾å¼ ====================
+        <?php gen_all_operator('value', 'base'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: å±æ€§ -- å±æ€§ ====================
+        <?php gen_all_operator('attr_wrapper', 'attr_wrapper'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: å±æ€§ -- å¸¸é‡ ====================
+        <?php gen_all_operator('attr_wrapper', 'value'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: å¸¸é‡ -- å±æ€§ ====================
+        <?php gen_all_operator('value', 'attr_wrapper'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: å±æ€§ -- è¡¨è¾¾å¼ ====================
+        <?php gen_all_operator('attr_wrapper', 'base'); ?>
+
+        // ==================== æ“ä½œç¬¦é‡è½½: è¡¨è¾¾å¼ -- å±æ€§ ====================
+        <?php gen_all_operator('base', 'attr_wrapper'); ?>
+    }
+
 }
 
 #endif
