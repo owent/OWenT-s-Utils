@@ -65,7 +65,7 @@ endmacro(include_project_recurse)
 
 
 # cmake VC 源文件分组  
-# source_group_by_dir [Source List Var]
+# source_group_by_dir [Source List Var1 [Source List Var2 [...]]]
 macro(source_group_by_dir)
     if(MSVC)
         foreach(source_files ${ARGV})
