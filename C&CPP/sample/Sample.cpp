@@ -7,7 +7,27 @@
 
 #include "String/TQueryString.h"
 #include "Logic/AttributeManager.h"
+#include "Random/RandomGenerator.h"
 #include "Algorithm/Hash.h"
+
+//=======================================================================================================
+void RandomSample()
+{
+    printf("\n");
+    printf("===============begin random sample==============\n");
+    util::random::MT19937 stGen1;
+    stGen1.InitSeed(123);
+
+    printf("Random - mt19937: %u\n", stGen1.Radom());
+    printf("Random - mt19937: %u\n", stGen1());
+    printf("Random - mt19937 - between [100, 10000): %d\n", stGen1.RadomBetween(100, 10000));
+
+    printf("===============end random sample==============\n");
+}
+
+//=======================================================================================================
+
+
 
 //=======================================================================================================
 void TQueryStringSample()
@@ -65,11 +85,11 @@ struct AttributeManagerSampleValid
     {
         using namespace util::logic::Operator;
 
-        /* ¹«Ê½£º×î´óÉúÃü = Á¦Á¿ * 2 + BLABLABLA */
+        /* å…¬å¼ï¼šæœ€å¤§ç”Ÿå‘½ = åŠ›é‡ * 2 + BLABLABLA */
         stFormulas[ESA_MAX_HP] = stFormulas[ESA_STRENTH] * 2 + _<mt>(ESA_BLABLAB);
-        /* ¹«Ê½£º¹¥»÷Á¦ = 100 * »ù´¡¹¥»÷ - Á¦Á¿ */
+        /* å…¬å¼ï¼šæ”»å‡»åŠ› = 100 * åŸºç¡€æ”»å‡» - åŠ›é‡ */
         stFormulas[ESA_UNKNOWN] = stFormulas[ESA_ATTACK] = 100 * _<mt>(ESA_BASIC_ATTACK) - _<mt>(ESA_STRENTH) + _<mt>(ESA_STRENTH) * _<mt>(ESA_BASIC_ATTACK);
-        /* ¹«Ê½£º»ù´¡¹¥»÷ = BLABLABLA / 5 */
+        /* å…¬å¼ï¼šåŸºç¡€æ”»å‡» = BLABLABLA / 5 */
         stFormulas[ESA_BASIC_ATTACK] = _<mt>(ESA_BLABLAB) / 5;
 
     }
@@ -84,20 +104,20 @@ struct AttributeManagerSampleInvalid
     {
         using namespace util::logic::Operator;
 
-        /* ¹«Ê½£º×î´óÉúÃü = 2 * Á¦Á¿ + BLABLABLA / »ù´¡¹¥»÷ */
+        /* å…¬å¼ï¼šæœ€å¤§ç”Ÿå‘½ = 2 * åŠ›é‡ + BLABLABLA / åŸºç¡€æ”»å‡» */
         stFormulas[ESA_MAX_HP] = 2 * stFormulas[ESA_STRENTH] + _<mt>(ESA_BLABLAB) / stFormulas[ESA_BASIC_ATTACK];
-        /* ¹«Ê½£ºESA_UNKNOWN = ¹¥»÷Á¦ = 100 * »ù´¡¹¥»÷ - Á¦Á¿ + Á¦Á¿ * »ù´¡¹¥»÷ */
+        /* å…¬å¼ï¼šESA_UNKNOWN = æ”»å‡»åŠ› = 100 * åŸºç¡€æ”»å‡» - åŠ›é‡ + åŠ›é‡ * åŸºç¡€æ”»å‡» */
         stFormulas[ESA_UNKNOWN] = stFormulas[ESA_ATTACK] = 100 * _<mt>(ESA_BASIC_ATTACK) - stFormulas[ESA_STRENTH] + stFormulas[ESA_STRENTH] * stFormulas[ESA_BASIC_ATTACK];
-        /* ¹«Ê½£º»ù´¡¹¥»÷ = BLABLABLA / 5 + ×î´óÉúÃü */
+        /* å…¬å¼ï¼šåŸºç¡€æ”»å‡» = BLABLABLA / 5 + æœ€å¤§ç”Ÿå‘½ */
         stFormulas[ESA_BASIC_ATTACK] = _<mt>(ESA_BLABLAB) / 5 + stFormulas[ESA_MAX_HP];
 
-        /* ¹«Ê½Ñ­»·£ºESA_BLABLAB = ESA_BLABLAB + ×î´óÉúÃü / 100 */
+        /* å…¬å¼å¾ªç¯ï¼šESA_BLABLAB = ESA_BLABLAB + æœ€å¤§ç”Ÿå‘½ / 100 */
         stFormulas[ESA_BLABLAB] = stFormulas[ESA_BLABLAB]() + stFormulas[ESA_MAX_HP] / 100;
 
-        /* ¹«Ê½Ñ­»·£ºÁ¦Á¿ = ×î´óÉúÃü / 10 - »ù´¡¹¥»÷ * ESA_BLABLAB */
+        /* å…¬å¼å¾ªç¯ï¼šåŠ›é‡ = æœ€å¤§ç”Ÿå‘½ / 10 - åŸºç¡€æ”»å‡» * ESA_BLABLAB */
         stFormulas[ESA_STRENTH] = _<mt>(ESA_MAX_HP) / 10 - stFormulas[ESA_BASIC_ATTACK] * stFormulas[ESA_BLABLAB];
 
-        /* ±¾À´ÊÇ²â´òÓ¡ËùÓĞ»·µÄ£¬µ«ÊÇÕâ¸ö¹ØÏµÊ½£¬ÎÒÔÎÁË¡£Ä¿²âÃ²ËÆËùÓĞµÄ»·¶¼ÕıÈ·Êä³öÁË */
+        /* æœ¬æ¥æ˜¯æµ‹æ‰“å°æ‰€æœ‰ç¯çš„ï¼Œä½†æ˜¯è¿™ä¸ªå…³ç³»å¼ï¼Œæˆ‘æ™•äº†ã€‚ç›®æµ‹è²Œä¼¼æ‰€æœ‰çš„ç¯éƒ½æ­£ç¡®è¾“å‡ºäº† */
     }
 };
 
@@ -134,68 +154,68 @@ void AttributeManagerSample()
         return;
     }
 
-    // ³õÊ¼ÖÃ¿Õ
+    // åˆå§‹ç½®ç©º
     foo.Construct();
     foo[ESA_STRENTH] = 1000;
     foo[ESA_BLABLAB] = 512;
 
-    // ¼ì²é±»ÒÀÀµ¹ØÏµ
+    // æ£€æŸ¥è¢«ä¾èµ–å…³ç³»
     AttributeManagerSampleValid::mt::attr_attach_list_type stList;
 
-    // ÒÀÀµ ESA_STRENTH µÄÊôĞÔ
+    // ä¾èµ– ESA_STRENTH çš„å±æ€§
     foo[ESA_STRENTH].GetAttachedAttributes(stList, false);
     std::cout<< "Attached: ESA_STRENTH => should be 3, real is "<< stList.size()<< std::endl;
     print_stl(stList);
 
 
-    // ÒÀÀµ ESA_BLABLAB µÄÊôĞÔ
+    // ä¾èµ– ESA_BLABLAB çš„å±æ€§
     stList.clear();
     foo[ESA_BLABLAB].GetAttachedAttributes(stList, false);
     std::cout<< "Attached: ESA_BLABLAB => should be 2, real is "<< stList.size()<< std::endl;
     print_stl(stList);
 
-    // ÒÀÀµ ESA_BLABLAB µÄÊôĞÔ - Recursion
+    // ä¾èµ– ESA_BLABLAB çš„å±æ€§ - Recursion
     stList.clear();
     foo[ESA_BLABLAB].GetAttachedAttributes(stList, true);
     std::cout<< "Attached: ESA_BLABLAB - Recursion => should be 4, real is "<< stList.size()<< std::endl;
     print_stl(stList);
 
-    // ÒÀÀµ ESA_ATTACK µÄÊôĞÔ
+    // ä¾èµ– ESA_ATTACK çš„å±æ€§
     stList.clear();
     foo[ESA_ATTACK].GetAttachedAttributes(stList, true);
     std::cout<< "Attached: ESA_ATTACK => should be 0, real is "<< stList.size()<< std::endl;
 
-    // ÒÀÀµ ESA_UNKNOWN µÄÊôĞÔ
+    // ä¾èµ– ESA_UNKNOWN çš„å±æ€§
     stList.clear();
     foo[ESA_UNKNOWN].GetAttachedAttributes(stList, true);
     std::cout<< "Attached: ESA_UNKNOWN => should be 0, real is "<< stList.size()<< std::endl;
 
-    // ¼ì²é²ÎÊı±í
+    // æ£€æŸ¥å‚æ•°è¡¨
     AttributeManagerSampleValid::mt::attr_attach_set_type stSet;
 
-    // ESA_STRENTH µÄ¹ØÁª²ÎÊı
+    // ESA_STRENTH çš„å…³è”å‚æ•°
     foo[ESA_STRENTH].GetAttachAttributes(stSet, true);
     std::cout<< "Attach: ESA_STRENTH => should be 0, real is "<< stSet.size()<< std::endl;
 
-    // ESA_MAX_HP µÄ¹ØÁª²ÎÊı
+    // ESA_MAX_HP çš„å…³è”å‚æ•°
     stSet.clear();
     foo[ESA_MAX_HP].GetAttachAttributes(stSet, true);
     std::cout<< "Attach: ESA_MAX_HP => should be 2, real is "<< stSet.size()<< std::endl;
     print_stl(stSet);
 
-    // ESA_ATTACK µÄ¹ØÁª²ÎÊı
+    // ESA_ATTACK çš„å…³è”å‚æ•°
     stSet.clear();
     foo[ESA_ATTACK].GetAttachAttributes(stSet, false);
     std::cout<< "Attach: ESA_ATTACK => should be 2, real is "<< stSet.size()<< std::endl;
     print_stl(stSet);
 
-    // ESA_ATTACK µÄ¹ØÁª²ÎÊı - Recursion
+    // ESA_ATTACK çš„å…³è”å‚æ•° - Recursion
     stSet.clear();
     foo[ESA_ATTACK].GetAttachAttributes(stSet, true);
     std::cout<< "Attach: ESA_ATTACK - Recursion => should be 3, real is "<< stSet.size()<< std::endl;
     print_stl(stSet);
 
-    // ¼ì²éÖµ¼°¹«Ê½¼ÆËã½á¹û
+    // æ£€æŸ¥å€¼åŠå…¬å¼è®¡ç®—ç»“æœ
     std::cout<< "ESA_UNKNOWN => "<< foo[ESA_UNKNOWN]<< "(ESA_UNKNOWN = ESA_ATTACK)"<< std::endl;
     std::cout<< "ESA_STRENTH => "<< foo[ESA_STRENTH]<< std::endl;
     std::cout<< "ESA_BLABLAB => "<< foo[ESA_BLABLAB]<< std::endl;
@@ -240,6 +260,6 @@ int main(int argc, char** argv)
 {
     TQueryStringSample();
     AttributeManagerSample();
-	HashSample();
+    HashSample();
     return 0;
 }

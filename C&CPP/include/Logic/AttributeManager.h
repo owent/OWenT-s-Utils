@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _BASELIB_HASH_H_
-#define _BASELIB_HASH_H_
+#ifndef _UTIL_LOGIC_HASH_H_
+#define _UTIL_LOGIC_HASH_H_
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
