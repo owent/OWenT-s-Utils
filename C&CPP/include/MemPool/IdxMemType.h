@@ -23,11 +23,22 @@ namespace util
 {
 	namespace mempool
 	{
+	    namespace wrapper
+	    {
+	    	template<typename Ty>
+	        class SeedMemTypeWrapper: public Ty
+	        {
+	        	public:
+				SeedMemTypeWrapper(){}
+				~SeedMemTypeWrapper(){}	
+			};
+		}
+
 		template<typename Ty>
 		class IdxMemType
 		{
 		public:
-			typedef Ty value_type;
+			typedef wrapper::SeedMemTypeWrapper<Ty> value_type;
 			typedef std::shared_ptr<value_type> value_ptr_type;
 			typedef DynamicIdxList<value_ptr_type> container_type;
 
@@ -55,7 +66,7 @@ namespace util
 
 			/**
 			 * 获取原始内存池(只读)
-			 * @note 注意内存池中保存的数据并不是传入类型Ty，而是其智能指针 std::shared_ptr<Ty> (value_ptr_type)
+			 * @note 注意内存池中保存的数据并不是传入类型value_type，而是其智能指针 std::shared_ptr<value_type> (value_ptr_type)
 			 * @note 用来进行高级操作，比如迭代器枚举,count和foreach
 			 * @return 原始内存池
 			 */
