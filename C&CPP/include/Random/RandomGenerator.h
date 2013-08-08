@@ -37,10 +37,11 @@ namespace util
         class RandomManagerWrapper
         {
         public:
-            typedef typename CoreType::result_type result_type;
+            typedef CoreType core_type;
+            typedef typename core_type::result_type result_type;
 
         private:
-            CoreType m_stCore;
+            core_type m_stCore;
 
         public:
             RandomManagerWrapper(){}
@@ -135,7 +136,13 @@ namespace util
             6364136223846793005ULL
         > > MT19937_64;
 
-        // ============== 随机数生成器 - lagged fibonacci 算法(比梅森旋转算法消耗更多的内存，但是性能更好) ==============
+        // ============== 随机数生成器 - taus 算法(比梅森旋转算法消耗更少的内存，但是循环节更小) ==============
+        typedef RandomManagerWrapper<core::XorCombineEngine<
+            core::XorCombineEngine<
+                core::LinearFeedbackShiftEngine<uint32_t, 32, 31, 13, 12>, 0,
+                core::LinearFeedbackShiftEngine<uint32_t, 32, 29, 2, 4>, 0>, 0,
+            core::LinearFeedbackShiftEngine<uint32_t, 32, 28, 3, 17>, 0>
+        > TAUS88;
     }
 }
 
