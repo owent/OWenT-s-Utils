@@ -25,6 +25,16 @@ namespace util
 {
 	namespace mempool
 	{
+		namespace wrapper
+		{
+			template<typename Ty>
+			class SeedMemTypeKVWrapper: public Ty
+			{
+			public:
+				SeedMemTypeKVWrapper(){}
+				~SeedMemTypeKVWrapper(){}
+			};
+		}
 		/**
 		 * 键值型内存随机访问链表，建议HASH_HVAL为素数，以减少碰撞可能性
 		 */
@@ -32,7 +42,7 @@ namespace util
 		class IdxMemTypeKV
 		{
 		public:
-			typedef TObj value_type;
+			typedef wrapper::SeedMemTypeKVWrapper<TObj> value_type;
 			typedef TKey key_type;
 			typedef std::shared_ptr<value_type> value_ptr_type;
 			typedef DynamicIdxList<value_ptr_type> container_type;
