@@ -82,7 +82,7 @@ namespace util
 			public:
 				typedef Iterator<ITObj> self_type;
 				typedef const self_type const_self_type;
-				typedef typename StaticIdxList<TObj, MAX_SIZE>::self_type list_type;
+				typedef typename StaticIdxList<TObj, MAX_SIZE, TAlloc>::self_type list_type;
 
 			private:
 				mutable size_type iIndex;
