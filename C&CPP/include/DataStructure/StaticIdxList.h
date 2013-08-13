@@ -422,7 +422,7 @@ namespace util
 				size_type ret = _create_node();
 				if (ret >= 0 && ret < MAX_SIZE)
 				{
-					node_type stNewNode = *m_stData.get(ret);
+					node_type& stNewNode = *m_stData.get(ret);
 					new ((void*)stNewNode.stObjData)TObj();
 				}
 
