@@ -51,9 +51,9 @@ function remove_more_than()
 # 远程指令
 function auto_scp()
 {
-    src=$1
-    dst=$2
-    pass=$3
+    src="$1";
+    dst="$2";
+    pass="$3";
 
     expect -c "set timeout -1;
             spawn scp -p -o StrictHostKeyChecking=no -r $src $dst;
@@ -64,11 +64,13 @@ function auto_scp()
 
 function auto_ssh_exec()
 {
-    host_ip=$1
-    host_port=$2
-    host_user=$3
-    host_pwd=$4
-    cmd=$5
+    host_ip="$1";
+    host_port="$2";
+    host_user="$3";
+    host_pwd="$4";
+    cmd="$5";
+    cmd="${cmd//\\/\\\\}";
+    cmd="${cmd//\"/\\\"}";
     expect -c "set timeout -1;
             spawn ssh -o StrictHostKeyChecking=no ${host_user}@${host_ip} -p ${host_port} \"${cmd}\";
             expect "*assword:*" { send $host_pwd\r\n; };
