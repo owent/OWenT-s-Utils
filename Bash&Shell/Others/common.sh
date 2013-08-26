@@ -71,6 +71,7 @@ function auto_ssh_exec()
     cmd="$5";
     cmd="${cmd//\\/\\\\}";
     cmd="${cmd//\"/\\\"}";
+    cmd="${cmd//\$/\\\$}";
     expect -c "set timeout -1;
             spawn ssh -o StrictHostKeyChecking=no ${host_user}@${host_ip} -p ${host_port} \"${cmd}\";
             expect "*assword:*" { send $host_pwd\r\n; };
