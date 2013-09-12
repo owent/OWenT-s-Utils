@@ -44,3 +44,17 @@ TEST(RandomTest, RandomGen64MT11213B)
     ASSERT_EQ(static_cast<uint32_t>(740436508), a2);
     ASSERT_EQ(static_cast<uint32_t>(649207690), a3);
 }
+
+TEST(RandomTest, RandomGenTAUS88)
+{
+    util::random::TAUS88 stGen1;
+    stGen1.InitSeed(321);
+
+    uint32_t a1 = stGen1.Radom();
+    uint32_t a2 = stGen1.Radom();
+    uint32_t a3 = stGen1();
+
+    ASSERT_EQ(static_cast<uint32_t>(43258884), a1);
+    ASSERT_EQ(static_cast<uint32_t>(1073987586), a2);
+    ASSERT_EQ(static_cast<uint32_t>(2769562570), a3);
+}
