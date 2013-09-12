@@ -25,6 +25,7 @@
 #include <numeric>
 
 #include "RandomMTCore.h"
+#include "RandomXorCombineCore.h"
 
 namespace util
 {
@@ -48,7 +49,9 @@ namespace util
             RandomManagerWrapper(result_type tSeed): m_stCore(tSeed)
             {
             }
-
+            
+            inline core_type& GetCore() { return m_stCore; }
+            inline const core_type& GetCore() const { return m_stCore; }
 
             /**
              * 初始化随机数种子
@@ -99,8 +102,8 @@ namespace util
             template<typename ResaultType>
             ResaultType RadomBetween(ResaultType lowest, ResaultType highest)
             {
-                ResaultType res = static_cast<ResaultType>((*this)());
-                return res % (highest - lowest) + lowest;
+                result_type res = (*this)();
+                return static_cast<ResaultType>(res % static_cast<result_type>(highest - lowest)) + lowest;
             }
         };
 
@@ -146,4 +149,4 @@ namespace util
     }
 }
 
-#endif /* MTRANDOM_H_ */
+#endif /* _UTIL_RANDOM_GENERATOR_H_ */
