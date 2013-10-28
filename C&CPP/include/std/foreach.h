@@ -76,10 +76,10 @@
         // 采用 VC 的 for each (object var in collection_to_loop)
         #define owent_foreach(VAR, COL) for each (VAR in COL)
     #endif
-#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__GXX_EXPERIMENTAL_CXX0X__)
+#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && (__cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__))
     // 采用G++ 的range-based-for循环
     #define owent_foreach(VAR, COL) for(VAR : COL)
-#elif defined(FOREACH_WITH_BOOST_HPP) || defined(BOOST_FOREACH)
+#elif defined(SEED_WITH_BOOST_HPP) && defined(SEED_ENABLE_BOOST_FOREACH)
     #include <boost/foreach.hpp>
     #define owent_foreach(VAR, COL) BOOST_FOREACH(VAR, COL)
 #else
