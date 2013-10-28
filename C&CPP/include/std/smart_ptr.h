@@ -35,14 +35,16 @@
 *
 * 否则启用boost中的smart_ptr库（如果是这种情况需要加入boost库）
 */
-  
+ 
 // VC9.0 SP1以上分支判断
-#if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1) || _MSC_VER > 1500)
+#if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1)) || (_MSC_VER > 1500 && defined(_HAS_CPP0X) && _HAS_CPP0X)
     // 采用VC std::tr1库
     #include <memory>
 #elif defined(__GNUC__) && __GNUC__ >= 4
     // 采用G++ std::tr1库
-    #if !defined(__GXX_EXPERIMENTAL_CXX0X__) && !defined(__clang__)
+    #if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
+        #include <memory>
+    #else
         #include <tr1/memory>
         namespace std {
             using tr1::bad_weak_ptr;
@@ -55,8 +57,6 @@
             using tr1::swap;
             using tr1::weak_ptr;
         }
-    #else
-        #include <memory>
     #endif
 #else
     // 采用boost tr1库
@@ -73,5 +73,5 @@
         using tr1::weak_ptr;
     }
 #endif
- 
+
 #endif
