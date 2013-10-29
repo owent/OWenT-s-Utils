@@ -40,7 +40,7 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 + gcc 4.4.7 or gcc 4.1.2 or gcc 4.4.5
 
 <h4><span style="color:#4B0082;">编译的依赖库：</span></h4>
-+ gmp 5.1.2
++ gmp 5.1.3
 + mpfr 3.1.2
 + mpc 1.0.1
 + isl 0.11.1
@@ -49,7 +49,7 @@ CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
 <h4><span style="color:#4B0082;">编译目标：</span></h4>
 + gcc 4.8.X
 + binutils 2.32.2 (如果存在ppl库)
-+ gdb 7.6 (如果存在ncurses-devel包)
++ gdb 7.6.1 (如果存在ncurses-devel包)
 
 <h4><span style="color:#4B0082;">注：</span></h4>
 + (所有的库都会被安装在**$PREFEX_DIR**里)
@@ -79,3 +79,4 @@ end
 + 2013-04-11     改进脚本，增加统一编译选项，增加对binutils和gdb可选包的编译，增加自动把PREFIX_DIR变为绝对路径的问题，统一目录组织，修复环境变量的一些小问题
 + 2013-05-24     增加安装pretty-printer的方法
 + 2013-06-03     更新gcc到4.8.1，更新基础库，更新gdb到7.6，添加clean功能，gdb添加python支持(用于pretty-printer)
++ 2013-10-29     更新gcc到4.8.2，更新gdb到7.6.1，更新GMP到5.1.3
