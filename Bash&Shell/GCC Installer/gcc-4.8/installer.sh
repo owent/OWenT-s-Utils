@@ -1,7 +1,7 @@
 #!/bin/sh
  
 # ======================================= 配置 ======================================= 
-PREFIX_DIR=/usr/local/gcc-4.8.1
+PREFIX_DIR=/usr/local/gcc-4.8.2
  
 # ======================= 非交叉编译 ======================= 
 BUILD_TARGET_CONF_OPTION=""
@@ -18,7 +18,7 @@ CHECK_INFO_SLEEP=3
  
 # ======================= 安装目录初始化/工作目录清理 ======================= 
 if [ $# -gt 0 ]; then
- if [ "$1" == "clean" ]; then
+	if [ "$1" == "clean" ]; then
 		rm -rf $(ls -A -d -p * | grep -E "(.*)/$" | grep -v "addition/");
 		echo -e "\\033[32;1mnotice: clear work dir(s) done.\\033[39;49;0m"
 		exit;
@@ -45,7 +45,7 @@ if [ $SYS_LONG_BIT == "64" ]; then
     fi
     for FILE_PATH in ${GCC_OPT_DISABLE_MULTILIB_DEV_LIBS[@]}; do
         if [ ${FILE_PATH:0:9} == "/usr/lib/" ]; then
-            echo -e "\\033[32;1mnotice: librt x86 found in x86_64 system, multilib enabled.\\033[39;49;0m"
+            echo -e "\\033[32;1mnotice: librt x86_64 found multilib enabled.\\033[39;49;0m"
             GCC_OPT_DISABLE_MULTILIB=""
         fi
     done
@@ -76,7 +76,7 @@ if [ $BUILD_THREAD_OPT -gt 8 ]; then
     BUILD_THREAD_OPT=8;
 fi
 BUILD_THREAD_OPT="-j$BUILD_THREAD_OPT";
-echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile.\\033[39;49;0m"
+echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile."
  
 # ======================= 统一的包检查和下载函数 ======================= 
 function check_and_download(){
@@ -133,7 +133,7 @@ sleep $CHECK_INFO_SLEEP
 swapoff -a
  
 # install gmp
-GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-5.1.2.tar.bz2" );
+GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-5.1.3.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GMP_PKG"
     exit -1;
@@ -204,7 +204,7 @@ make install
 cd "$WORKING_DIR"
  
 # ======================= gcc包 ======================= 
-GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.1/gcc-4.8.1.tar.bz2" );
+GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.2/gcc-4.8.2.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GCC_PKG"
     exit -1;
@@ -231,7 +231,7 @@ ln -s $PREFIX_DIR/bin/gcc $PREFIX_DIR/bin/cc
 
 # ##### [binutils组件依赖PPL库， 由于新版GCC和GDB已经去除对PPL的依赖，并且下面的都不是必须项，所以如果没有就跳过] #####
 if [ -z "$(whereis libppl.so.* | awk '{print $2;}')" ]; then
-    echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils].\\033[39;49;0m"
+    echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils] and [gdb].\\033[39;49;0m"
 else
     # ======================= install binutils(链接器,汇编器 等) ======================= 
     BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.23.2.tar.bz2" );
@@ -268,11 +268,10 @@ else
 		cd $PYTHON_DIR
 		./configure --prefix=$PREFIX_DIR
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
-		cd "$WORKING_DIR"
 	fi
 	
 	# ======================= 正式安装GDB =======================
-	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.tar.bz2" );
+	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.1.tar.bz2" );
 	if [ $? -ne 0 ]; then
 		echo -e "$GDB_PKG"
 		exit -1;
