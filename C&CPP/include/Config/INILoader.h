@@ -240,7 +240,9 @@ namespace util
           INILoader();
           ~INILoader();
   
-          int LoadFile(const std::string strFilePath, bool bIsAppend = false);
+          int LoadFile(const char* strFilePath, bool bIsAppend = false);
+          
+          int LoadFile(const std::string& strFilePath, bool bIsAppend = false);
   
           void Clear();
   
