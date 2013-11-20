@@ -565,11 +565,16 @@ namespace util
       INILoader::~INILoader()
       {
       }
-  
-      int INILoader::LoadFile(const std::string strFilePath, bool bIsAppend)
+
+      int INILoader::LoadFile(const std::string& strFilePath, bool bIsAppend)
+      {
+          return LoadFile(strFilePath.c_str(), bIsAppend);
+      }
+      
+      int INILoader::LoadFile(const char* strFilePath, bool bIsAppend)
       {
           std::fstream stFile;
-          stFile.open(strFilePath.c_str(), std::ios::in);
+          stFile.open(strFilePath, std::ios::in);
           if (false == stFile.is_open())
           {
               return EIEC_OPENFILE;
