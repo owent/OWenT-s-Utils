@@ -214,7 +214,7 @@ GCC_DIR=$(ls -d gcc-* | grep -v \.tar\.bz2)
 mkdir objdir
 cd objdir
 # ======================= 这一行的最后一个参数请注意，如果要支持其他语言要安装依赖库并打开对该语言的支持 ======================= 
-GCC_CONF_OPTION_ALL="--prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-bootstrap --enable-build-with-cxx --enable-cloog-backend=isl --disable-libjava-multilib --enable-checking=release $GCC_OPT_DISABLE_MULTILIB $BUILD_TARGET_CONF_OPTION";
+GCC_CONF_OPTION_ALL="--prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-bootstrap --enable-build-with-cxx --enable-cloog-backend=isl --disable-libjava-multilib --enable-checking=release --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $GCC_OPT_DISABLE_MULTILIB $BUILD_TARGET_CONF_OPTION";
 ../$GCC_DIR/configure $GCC_CONF_OPTION_ALL
 make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
@@ -239,7 +239,10 @@ tar -jxvf $BINUTILS_PKG
 BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
 cd $BINUTILS_DIR
 ./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $BUILD_TARGET_CONF_OPTION
-make $BUILD_THREAD_OPT && make check && make install
+make -j2 && make install
+# ---- 某个版本编译线程数过高会导致编译不过 
+# ---- 另外某个版本的make check有failed用例就被发布了,应该gnu的自动化测试有遗漏 ----
+make check
 cd "$WORKING_DIR"
 
 ls $PREFIX_DIR/bin/ld
