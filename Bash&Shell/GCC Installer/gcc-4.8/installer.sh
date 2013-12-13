@@ -229,22 +229,22 @@ fi
 ln -s $PREFIX_DIR/bin/gcc $PREFIX_DIR/bin/cc
 
 
-# ##### [binutils组件依赖PPL库， 由于新版GCC和GDB已经去除对PPL的依赖，并且下面的都不是必须项，所以如果没有就跳过] #####
-if [ -z "$(whereis libppl.so.* | awk '{print $2;}')" ]; then
-    echo -e "\\033[32;1mwarning: ppl not found, skip build [binutils] and [gdb].\\033[39;49;0m"
-else
-    # ======================= install binutils(链接器,汇编器 等) ======================= 
-    BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.23.2.tar.bz2" );
-    if [ $? -ne 0 ]; then
-        echo -e "$BINUTILS_PKG"
-        exit -1;
-    fi
-    tar -jxvf $BINUTILS_PKG
-    BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
-    cd $BINUTILS_DIR
-    ./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --enable-build-with-cxx $BUILD_TARGET_CONF_OPTION
-    make $BUILD_THREAD_OPT && make check && make install
-    cd "$WORKING_DIR"
+# ======================= install binutils(链接器,汇编器 等) ======================= 
+BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.bz2" );
+if [ $? -ne 0 ]; then
+echo -e "$BINUTILS_PKG"
+exit -1;
+fi
+tar -jxvf $BINUTILS_PKG
+BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
+cd $BINUTILS_DIR
+./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $BUILD_TARGET_CONF_OPTION
+make $BUILD_THREAD_OPT && make check && make install
+cd "$WORKING_DIR"
+
+ls $PREFIX_DIR/bin/ld
+if [ $? -ne 0 ]; then
+    echo -e "\\033[31;1mError: build binutils failed.\\033[39;49;0m"
 fi
 
 # ======================= install gdb(调试器) [依赖 ncurses-devel 包] ======================= 
@@ -258,20 +258,20 @@ else
 		GDB_PYTHON_OPT="--with-python=$PREFIX_DIR"
 	else
 		# =======================  尝试编译安装python  =======================
-		PYTHON_PKG=$(check_and_download "python" "Python-2.*.tar.bz2" "http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2" );
+		PYTHON_PKG=$(check_and_download "python" "Python-2.*.tar.bz2" "http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz" );
 		if [ $? -ne 0 ]; then
 			return;
 		fi
 
-		tar -jxvf $PYTHON_PKG
-		PYTHON_DIR=$(ls -d Python-2.* | grep -v \.tar\.bz2)
+		tar -axvf $PYTHON_PKG
+		PYTHON_DIR=$(ls -d Python-2.* | grep -v \.tar\.xz)
 		cd $PYTHON_DIR
 		./configure --prefix=$PREFIX_DIR
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
 	fi
 	
 	# ======================= 正式安装GDB =======================
-	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.1.tar.bz2" );
+	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.2.tar.bz2" );
 	if [ $? -ne 0 ]; then
 		echo -e "$GDB_PKG"
 		exit -1;
@@ -279,9 +279,14 @@ else
 	tar -jxvf $GDB_PKG
 	GDB_DIR=$(ls -d gdb-* | grep -v \.tar\.bz2)
 	cd $GDB_DIR
-	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
+	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-objc-gc $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
 	make $BUILD_THREAD_OPT && make install
 	cd "$WORKING_DIR"
+	
+	ls $PREFIX_DIR/bin/gdb
+	if [ $? -ne 0 ]; then
+	    echo -e "\\033[31;1mError: build gdb failed.\\033[39;49;0m"
+	fi
 fi
  
 
