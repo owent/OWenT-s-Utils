@@ -28,7 +28,7 @@ PS：4.8.1开始全面支持C++11特性，并且脱离了ppl库，gdb也开始�
 
 <h3><span style="color:#008080;">我编译的环境</span></h3>
 <h4><span style="color:#4B0082;">系统：</span></h4>
-CentOS 6.2 & CentOS 6.4 & Suse 的不知道哪个很老的版本
+CentOS 6.2 & CentOS 6.5 & Suse 的不知道哪个很老的版本
 
 <h4><span style="color:#4B0082;">系统库：</span></h4>
 + gzip 1.3.12
