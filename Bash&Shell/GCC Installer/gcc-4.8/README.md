@@ -80,3 +80,4 @@ end
 + 2013-05-24     增加安装pretty-printer的方法
 + 2013-06-03     更新gcc到4.8.1，更新基础库，更新gdb到7.6，添加clean功能，gdb添加python支持(用于pretty-printer)
 + 2013-10-29     更新gcc到4.8.2，更新gdb到7.6.1，更新GMP到5.1.3
++ 2013-12-13     更新binutils到2.24，更新gdb到7.6.2，移除对ppl的依赖，显式开启gold等一些选项，显式开启链接时优化选项
