@@ -232,8 +232,8 @@ ln -s $PREFIX_DIR/bin/gcc $PREFIX_DIR/bin/cc
 # ======================= install binutils(链接器,汇编器 等) ======================= 
 BINUTILS_PKG=$(check_and_download "binutils" "binutils-*.tar.bz2" "http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.bz2" );
 if [ $? -ne 0 ]; then
-echo -e "$BINUTILS_PKG"
-exit -1;
+    echo -e "$BINUTILS_PKG"
+    exit -1;
 fi
 tar -jxvf $BINUTILS_PKG
 BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
@@ -300,8 +300,7 @@ fi
 # 再执行ldconfig就可以用新的gcc啦  
 
 echo -e "\\033[33;1mAddition, run the cmds below to add environment var(s).\\033[39;49;0m"
-echo -e "\\033[31;1mexport PATH=$PREFIX_DIR/bin:$PATH\\033[39;49;0m"
-echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$PREFIX_DIR/lib:$PREFIX_DIR/libexec:$LD_LIBRARY_PATH\\033[39;49;0m"
-echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$PREFIX_DIR/lib64:$LD_LIBRARY_PATH # run this if in a x86_64 arch.\\033[39;49;0m"
+echo -e "\\033[31;1mexport PATH=$PATH\\033[39;49;0m"
+echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH\\033[39;49;0m"
 echo -e "\tor you can add $PREFIX_DIR/lib, $PREFIX_DIR/lib64 (if in x86_64) and $PREFIX_DIR/libexec to file [/etc/ld.so.conf] and then run [ldconfig]"
 echo -e "\\033[33;1mBuild Gnu Compile Collection done.\\033[39;49;0m"
