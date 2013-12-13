@@ -261,13 +261,13 @@ else
 		GDB_PYTHON_OPT="--with-python=$PREFIX_DIR"
 	else
 		# =======================  尝试编译安装python  =======================
-		PYTHON_PKG=$(check_and_download "python" "Python-2.*.tar.bz2" "http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz" );
+		PYTHON_PKG=$(check_and_download "python" "Python-2.*.tgz" "http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz" );
 		if [ $? -ne 0 ]; then
 			return;
 		fi
 
 		tar -axvf $PYTHON_PKG
-		PYTHON_DIR=$(ls -d Python-2.* | grep -v \.tar\.xz)
+		PYTHON_DIR=$(ls -d Python-2.* | grep -v \.tgz)
 		cd $PYTHON_DIR
 		./configure --prefix=$PREFIX_DIR
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
