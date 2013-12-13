@@ -243,7 +243,7 @@ make -j2 && make install
 # ---- 某个版本编译线程数过高会导致编译不过 
 # ---- 另外某个版本的make check有failed用例就被发布了,应该gnu的自动化测试有遗漏 ----
 make check
-cd "$WORKING_DIR"
+cd "$WORKING_DIR";
 
 ls $PREFIX_DIR/bin/ld
 if [ $? -ne 0 ]; then
@@ -273,6 +273,7 @@ else
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
 	fi
 	
+	cd "$WORKING_DIR";
 	# ======================= 正式安装GDB =======================
 	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.2.tar.bz2" );
 	if [ $? -ne 0 ]; then
