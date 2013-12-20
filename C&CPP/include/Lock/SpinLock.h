@@ -12,6 +12,9 @@
  * @note 低版本 GCC采用__sync_lock_test_and_set等实现原子操作
  *
  * @history
+ *     2013-12-20
+ *         1. add support for clang & intel compiler
+ *         2. add try unlock function
  *
  */
 
@@ -81,8 +84,11 @@ namespace util
             #if !defined(__GCC_ATOMIC_INT_LOCK_FREE) && (!defined(__GNUC__) || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
                 #error Clang version is too old
             #endif
+            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
         #elif defined(_MSC_VER)
             #include <WinBase.h>
+            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC 1
+            
         #elif defined(__GNUC__) || defined(__clang__) || defined(__clang__) || defined(__INTEL_COMPILER)
             #if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
                 #error GCC version must be greater or equal than 4.1
@@ -91,6 +97,7 @@ namespace util
             #if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 1100
                 #error Intel Compiler version must be greater or equal than 11.0
             #endif
+            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
         #else
             #error Currently only gcc, msvc, intel compiler & llvm-clang are supported
         #endif
@@ -106,7 +113,7 @@ namespace util
 
           void Lock()
           {
-            #ifdef _MSC_VER
+            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
                 while(InterlockedExchange(&m_enStatus, Locked) == Locked); /* busy-wait */
             #else
                 while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked); /* busy-wait */
@@ -115,8 +122,7 @@ namespace util
 
           void Unlock()
           {
-
-            #ifdef _MSC_VER
+            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
               InterlockedExchange(&m_enStatus, Unlocked);
             #else
               __sync_lock_release(&m_enStatus, Unlocked);
@@ -125,7 +131,7 @@ namespace util
 
           bool IsLocked()
           {
-            #ifdef _MSC_VER
+            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
               return InterlockedExchangeAdd(&m_enStatus, 0) == Locked;
             #else
               return __sync_add_and_fetch(&m_enStatus, 0) == Locked;
@@ -135,7 +141,7 @@ namespace util
           bool TryLock()
           {
 
-            #ifdef _MSC_VER
+            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
               return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
             #else
               return __sync_lock_test_and_set(&m_enStatus, Locked) == Unlocked;
@@ -144,8 +150,7 @@ namespace util
           
           bool TryUnlock()
           {
-
-            #ifdef _MSC_VER
+            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
               return InterlockedExchange(&m_enStatus, Unlocked) == Locked;
             #else
               return __sync_lock_test_and_set(&m_enStatus, Unlocked) == Locked;
