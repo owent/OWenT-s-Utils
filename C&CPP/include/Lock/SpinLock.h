@@ -1,15 +1,15 @@
 /**
  * @file SpinLock.h
- * @brief ×ÔÐýËø
+ * @brief è‡ªæ—‹é”
  *
  *
  * @version 1.0
  * @author OWenT
  * @date 2013-3-18
  *
- * @note VC 2012+, GCC 4.4 + Ê¹ÓÃC++0x/11ÊµÏÖÊµÏÖÔ­×Ó²Ù×÷
- * @note µÍ°æ±¾ VCÊ¹ÓÃInterlockedExchangeµÈÊµÏÖÔ­×Ó²Ù×÷
- * @note µÍ°æ±¾ GCC²ÉÓÃ__sync_lock_test_and_setµÈÊµÏÖÔ­×Ó²Ù×÷
+ * @note VC 2012+, GCC 4.4 + ä½¿ç”¨C++0x/11å®žçŽ°å®žçŽ°åŽŸå­æ“ä½œ
+ * @note ä½Žç‰ˆæœ¬ VCä½¿ç”¨InterlockedExchangeç­‰å®žçŽ°åŽŸå­æ“ä½œ
+ * @note ä½Žç‰ˆæœ¬ GCCé‡‡ç”¨__sync_lock_test_and_setç­‰å®žçŽ°åŽŸå­æ“ä½œ
  *
  * @history
  *
@@ -22,10 +22,10 @@
 # pragma once
 #endif
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1700)
+#if defined(_MSC_VER) && (_MSC_VER >= 1700) && defined(_HAS_CPP0X) && _HAS_CPP0X
     #include <atomic>
     #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
-#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 5 && defined(__GXX_EXPERIMENTAL_CXX0X__)
+#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 5 && (__cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__))
     #include <atomic>
     #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
 
@@ -36,7 +36,7 @@ namespace util
     namespace lock
     {
 
-        // C++ 0x/11°æÊµÏÖ
+        // C++ 0x/11ç‰ˆå®žçŽ°
         #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
         class SpinLock
         {
