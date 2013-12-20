@@ -54,7 +54,7 @@ namespace util
 
           void Lock()
           {
-              while (m_enStatus.exchange(Locked, std::memory_order_acquire) == Locked); /* busy-wait */
+              while (m_enStatus.exchange(Locked, std::memory_order_acq_rel) == Locked); /* busy-wait */
           }
 
           void Unlock()
@@ -69,12 +69,12 @@ namespace util
 
           bool TryLock()
           {
-              return m_enStatus.exchange(Locked, std::memory_order_acquire) == Unlocked;
+              return m_enStatus.exchange(Locked, std::memory_order_acq_rel) == Unlocked;
           }
           
           bool TryUnlock()
           {
-              return m_enStatus.exchange(Unlocked, std::memory_order_acquire) == Locked;
+              return m_enStatus.exchange(Unlocked, std::memory_order_acq_rel) == Locked;
           }
 
         };
