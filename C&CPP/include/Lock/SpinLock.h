@@ -22,7 +22,10 @@
 # pragma once
 #endif
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1700) && defined(_HAS_CPP0X) && _HAS_CPP0X
+#if defined(__clang__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 1 ) ) && __cplusplus >= 201103L
+    #include <atomic>
+    #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
+#elif defined(_MSC_VER) && (_MSC_VER >= 1700) && defined(_HAS_CPP0X) && _HAS_CPP0X
     #include <atomic>
     #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
 #elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 5 && (__cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__))
@@ -65,24 +68,31 @@ namespace util
           {
               return m_enStatus.exchange(Locked, std::memory_order_acquire) == Unlocked;
           }
+          
+          bool TryUnlock()
+          {
+              return m_enStatus.exchange(Unlocked, std::memory_order_acquire) == Locked;
+          }
 
         };
         #else
 
-        #ifdef _MSC_VER
+        #if defined(__clang__)
+            #if !defined(__GCC_ATOMIC_INT_LOCK_FREE) && (!defined(__GNUC__) || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
+                #error Clang version is too old
+            #endif
+        #elif defined(_MSC_VER)
             #include <WinBase.h>
         #elif defined(__GNUC__) || defined(__clang__) || defined(__clang__) || defined(__INTEL_COMPILER)
             #if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
-                #error GCC version must be greater or equal than 4.1.2
+                #error GCC version must be greater or equal than 4.1
             #endif
             
             #if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 1100
                 #error Intel Compiler version must be greater or equal than 11.0
             #endif
-            
-            #include <sched.h>
         #else
-            #error Currently only windows and linux os are supported
+            #error Currently only gcc, msvc, intel compiler & llvm-clang are supported
         #endif
 
         class SpinLock
@@ -129,6 +139,16 @@ namespace util
               return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
             #else
               return __sync_lock_test_and_set(&m_enStatus, Locked) == Unlocked;
+            #endif
+          }
+          
+          bool TryUnlock()
+          {
+
+            #ifdef _MSC_VER
+              return InterlockedExchange(&m_enStatus, Unlocked) == Locked;
+            #else
+              return __sync_lock_test_and_set(&m_enStatus, Unlocked) == Locked;
             #endif
           }
 
