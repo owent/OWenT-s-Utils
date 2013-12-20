@@ -28,7 +28,6 @@
 #elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 5 && (__cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__))
     #include <atomic>
     #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
-
 #endif
 
 namespace util
@@ -59,7 +58,7 @@ namespace util
 
           bool IsLocked()
           {
-              return m_enStatus.load(std::memory_order_release) == Locked;
+              return m_enStatus.load(std::memory_order_acquire) == Locked;
           }
 
           bool TryLock()
@@ -72,10 +71,15 @@ namespace util
 
         #ifdef _MSC_VER
             #include <WinBase.h>
-        #elif defined(__GNUC__)
-            #if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1)
-            #error GCC version must be greater or equal than 4.1.2
-        #endif
+        #elif defined(__GNUC__) || defined(__clang__) || defined(__clang__) || defined(__INTEL_COMPILER)
+            #if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
+                #error GCC version must be greater or equal than 4.1.2
+            #endif
+            
+            #if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 1100
+                #error Intel Compiler version must be greater or equal than 11.0
+            #endif
+            
             #include <sched.h>
         #else
             #error Currently only windows and linux os are supported
@@ -94,7 +98,7 @@ namespace util
           {
             #ifdef _MSC_VER
                 while(InterlockedExchange(&m_enStatus, Locked) == Locked); /* busy-wait */
-            #elif defined(__GNUC__)
+            #else
                 while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked); /* busy-wait */
             #endif
           }
@@ -104,7 +108,7 @@ namespace util
 
             #ifdef _MSC_VER
               InterlockedExchange(&m_enStatus, Unlocked);
-            #elif defined(__GNUC__)
+            #else
               __sync_lock_release(&m_enStatus, Unlocked);
             #endif
           }
@@ -113,7 +117,7 @@ namespace util
           {
             #ifdef _MSC_VER
               return InterlockedExchangeAdd(&m_enStatus, 0) == Locked;
-            #elif defined(__GNUC__)
+            #else
               return __sync_add_and_fetch(&m_enStatus, 0) == Locked;
             #endif
           }
@@ -123,7 +127,7 @@ namespace util
 
             #ifdef _MSC_VER
               return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
-            #elif defined(__GNUC__)
+            #else
               return __sync_lock_test_and_set(&m_enStatus, Locked) == Unlocked;
             #endif
           }
