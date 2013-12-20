@@ -15,7 +15,8 @@
  *     2013-12-20
  *         1. add support for clang & intel compiler
  *         2. add try unlock function
- *
+ *         3. fix atom operator
+ *         4. add gcc atomic support
  */
 
 #ifndef _UTIL_LOCK_SPINLOCK_H_
@@ -84,7 +85,11 @@ namespace util
             #if !defined(__GCC_ATOMIC_INT_LOCK_FREE) && (!defined(__GNUC__) || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
                 #error Clang version is too old
             #endif
-            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+            #if defined(__GCC_ATOMIC_INT_LOCK_FREE)
+                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
+            #else
+                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+            #endif
         #elif defined(_MSC_VER)
             #include <WinBase.h>
             #define __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC 1
@@ -97,7 +102,12 @@ namespace util
             #if defined(__INTEL_COMPILER) && __INTEL_COMPILER < 1100
                 #error Intel Compiler version must be greater or equal than 11.0
             #endif
-            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+            
+            #if defined(__GCC_ATOMIC_INT_LOCK_FREE)
+                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
+            #else
+                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+            #endif
         #else
             #error Currently only gcc, msvc, intel compiler & llvm-clang are supported
         #endif
@@ -115,6 +125,8 @@ namespace util
           {
             #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
                 while(InterlockedExchange(&m_enStatus, Locked) == Locked); /* busy-wait */
+            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+                while (__atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Locked); /* busy-wait */
             #else
                 while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked); /* busy-wait */
             #endif
@@ -123,18 +135,22 @@ namespace util
           void Unlock()
           {
             #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
-              InterlockedExchange(&m_enStatus, Unlocked);
+                InterlockedExchange(&m_enStatus, Unlocked);
+            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+                __atomic_store_n(&m_enStatus, Unlocked, __ATOMIC_RELEASE);
             #else
-              __sync_lock_release(&m_enStatus, Unlocked);
+                __sync_lock_release(&m_enStatus, Unlocked);
             #endif
           }
 
           bool IsLocked()
           {
             #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
-              return InterlockedExchangeAdd(&m_enStatus, 0) == Locked;
+                return InterlockedExchangeAdd(&m_enStatus, 0) == Locked;
+            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+                __atomic_load_n(&m_enStatus, __ATOMIC_ACQUIRE) == Locked;
             #else
-              return __sync_add_and_fetch(&m_enStatus, 0) == Locked;
+                return __sync_add_and_fetch(&m_enStatus, 0) == Locked;
             #endif
           }
 
@@ -142,18 +158,22 @@ namespace util
           {
 
             #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
-              return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
+                return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
+            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+                return __atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Unlocked;
             #else
-              return __sync_lock_test_and_set(&m_enStatus, Locked) == Unlocked;
+                return __sync_bool_compare_and_swap(&m_enStatus, Unlocked, Locked);
             #endif
           }
           
           bool TryUnlock()
           {
             #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
-              return InterlockedExchange(&m_enStatus, Unlocked) == Locked;
+                return InterlockedExchange(&m_enStatus, Unlocked) == Locked;
+            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+                return __atomic_exchange_n(&m_enStatus, Unlocked, __ATOMIC_ACQ_REL) == Locked;
             #else
-              return __sync_lock_test_and_set(&m_enStatus, Unlocked) == Locked;
+                return __sync_bool_compare_and_swap(&m_enStatus, Locked, Unlocked);
             #endif
           }
 
