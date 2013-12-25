@@ -2,6 +2,8 @@
  * @file UUIDGenerator.h
  * @brief UUID 生成器
  *
+ *
+ * Licensed under the MIT licenses.
  * @note Windows 下需要链接Rpcrt4.dll或Rpcrt4.lib
  * @note Linux 下需要安装libuuid-devel包并链接libuuid.a 或 libuuid.so
  *

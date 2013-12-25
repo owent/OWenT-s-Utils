@@ -79,11 +79,11 @@ enum EN_SAMPLE_ATTR
 
 struct AttributeManagerSampleValid
 {
-    typedef util::logic::AttributeManager<EN_SAMPLE_ATTR, ESA_MAX_HP + 1, AttributeManagerSampleValid, int> mt;
+    typedef util::logic::AttributeManager<ESA_MAX_HP + 1, AttributeManagerSampleValid, int> mt;
 
     static void GenAttrFormulaMap(mt::formula_builder_type& stFormulas)
     {
-        using namespace util::logic::Operator;
+        using namespace util::logic::detail;
 
         /* 公式：最大生命 = 力量 * 2 + BLABLABLA */
         stFormulas[ESA_MAX_HP] = stFormulas[ESA_STRENTH] * 2 + _<mt>(ESA_BLABLAB);
@@ -98,11 +98,11 @@ struct AttributeManagerSampleValid
 
 struct AttributeManagerSampleInvalid
 {
-    typedef util::logic::AttributeManager<EN_SAMPLE_ATTR, ESA_MAX_HP + 1, AttributeManagerSampleInvalid, int> mt;
+    typedef util::logic::AttributeManager<ESA_MAX_HP + 1, AttributeManagerSampleInvalid, int> mt;
 
     static void GenAttrFormulaMap(mt::formula_builder_type& stFormulas)
     {
-        using namespace util::logic::Operator;
+        using namespace util::logic::detail;
 
         /* 公式：最大生命 = 2 * 力量 + BLABLABLA / 基础攻击 */
         stFormulas[ESA_MAX_HP] = 2 * stFormulas[ESA_STRENTH] + _<mt>(ESA_BLABLAB) / stFormulas[ESA_BASIC_ATTACK];
@@ -231,7 +231,6 @@ void AttributeManagerSample()
 
     puts("===============end attribute manager sample==============");
 }
-
 //=======================================================================================================
 
 //=======================================================================================================

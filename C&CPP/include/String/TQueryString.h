@@ -4,6 +4,7 @@
  *        依赖智能指针库 <br />
  *        注: 解析参数字符串的时候，除最后*[]=...外的所有符合结构将全部解析为Object类型 <br />
  *            数据和key中不允许出现[和]
+ * Licensed under the MIT licenses.
  *
  * @version 1.0
  * @author OWenT

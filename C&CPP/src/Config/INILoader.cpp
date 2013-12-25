@@ -1,3 +1,5 @@
+// Licensed under the MIT licenses.
+
 #include <fstream>
 #include <algorithm>
 #include <cstring>

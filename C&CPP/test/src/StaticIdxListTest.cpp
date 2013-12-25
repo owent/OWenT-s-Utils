@@ -25,8 +25,8 @@ struct static_idx_list_helper_class_func_obj
 
 TEST(StaticIdxListTest, Count)
 {
-    ::util::ds::StaticIdxList<static_idx_list_helper_class, 128> stList;
-    typedef ::util::ds::StaticIdxList<static_idx_list_helper_class, 128>::size_type size_type;
+    util::ds::StaticIdxList<static_idx_list_helper_class, 128> stList;
+    typedef util::ds::StaticIdxList<static_idx_list_helper_class, 128>::size_type size_type;
 
     stList.construct();
 
@@ -61,7 +61,7 @@ TEST(StaticIdxListTest, Foreach)
 {
     int sum = 0;
 
-    ::util::ds::StaticIdxList<static_idx_list_helper_class, 128> stList;
+    util::ds::StaticIdxList<static_idx_list_helper_class, 128> stList;
     stList.construct();
 
     stList.Create(10);
@@ -77,8 +77,8 @@ TEST(StaticIdxListTest, Foreach)
 
 TEST(StaticIdxListTest, Create)
 {
-    typedef ::util::ds::StaticIdxList<int, 3>::size_type size_type;
-    ::util::ds::StaticIdxList<int, 3> stList;
+    typedef util::ds::StaticIdxList<int, 3>::size_type size_type;
+    util::ds::StaticIdxList<int, 3> stList;
     stList.construct();
 
     size_type idx1 = stList.Create();
@@ -89,7 +89,7 @@ TEST(StaticIdxListTest, Create)
     ASSERT_EQ((size_type)0, idx1);
     ASSERT_EQ((size_type)1, idx2);
     ASSERT_EQ((size_type)2, idx3);
-    size_type npos = ::util::ds::StaticIdxList<int, 3>::npos;
+    size_type npos = util::ds::StaticIdxList<int, 3>::npos;
     ASSERT_EQ(npos, idx4);
 
     ASSERT_EQ((size_type)3, stList.Count());
@@ -97,9 +97,9 @@ TEST(StaticIdxListTest, Create)
 
 TEST(StaticIdxListTest, Remove)
 {
-    typedef ::util::ds::StaticIdxList<int, 5>::size_type size_type;
+    typedef util::ds::StaticIdxList<int, 5>::size_type size_type;
 
-    ::util::ds::StaticIdxList<int, 5> stList;
+    util::ds::StaticIdxList<int, 5> stList;
     stList.construct();
 
     stList.Create(4);
@@ -125,11 +125,26 @@ TEST(StaticIdxListTest, Remove)
     ASSERT_EQ(6, *stList.Get(2));
 
     ASSERT_EQ((size_type)5, stList.Count());
+
+    stList.Remove(0);
+    stList.Remove(1);
+    stList.Remove(2);
+    stList.Remove(3);
+    idx3 = stList.Create(7);
+    idx5 = stList.Create(8);
+    ASSERT_EQ((size_type)3, idx3);
+    ASSERT_EQ((size_type)2, idx5);
+
+    stList.Remove(2);
+    stList.Remove(3);
+    stList.Remove(4);
+    idx3 = stList.Create(9);
+    ASSERT_EQ((size_type)0, idx3);
 }
 
 TEST(StaticIdxListTest, EdgeCondition)
 {
-    typedef ::util::ds::StaticIdxList<int, 4> core_type;
+    typedef util::ds::StaticIdxList<int, 4> core_type;
     typedef core_type::size_type size_type;
 
     core_type stList;
@@ -150,7 +165,7 @@ TEST(StaticIdxListTest, EdgeCondition)
     ASSERT_EQ(6, *stList.Get(idx4));
 
     // 只有一个元素（左右都是边界）
-    ::util::ds::StaticIdxList<int, 1> stEle;
+    util::ds::StaticIdxList<int, 1> stEle;
     stEle.construct();
 
     idx1 = stEle.Create(7);
@@ -177,7 +192,7 @@ TEST(StaticIdxListTest, EdgeCondition)
     stList.destruct();
     idx4 = stList.Create(10);
 
-    ASSERT_EQ(idx4, idx1);
+    ASSERT_EQ(0, idx4);
 
     // 共享内存恢复测试
     char pData[sizeof(core_type)];
@@ -199,7 +214,7 @@ TEST(StaticIdxListTest, EdgeCondition)
 
 TEST(StaticIdxListTest, Iterator)
 {
-    typedef ::util::ds::StaticIdxList<int, 10> core_type;
+    typedef util::ds::StaticIdxList<int, 10> core_type;
     typedef core_type::size_type size_type;
 
     core_type stList;
@@ -215,7 +230,7 @@ TEST(StaticIdxListTest, Iterator)
 
     // const iterator
     int iTestBit = 0;
-    for(::util::ds::StaticIdxList<int, 10>::const_iterator iter = stList.begin();
+    for(util::ds::StaticIdxList<int, 10>::const_iterator iter = stList.begin();
         iter != stList.end(); ++ iter)
     {
         iTestBit |= *iter;
@@ -224,7 +239,7 @@ TEST(StaticIdxListTest, Iterator)
     ASSERT_EQ(63, iTestBit);
 
     // non-const iterator
-    for(::util::ds::StaticIdxList<int, 10>::iterator iter = stList.begin();
+    for(util::ds::StaticIdxList<int, 10>::iterator iter = stList.begin();
         iter != stList.end(); ++ iter)
     {
         (*iter) <<= 6;

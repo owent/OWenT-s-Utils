@@ -1,3 +1,5 @@
+// Licensed under the MIT licenses.
+
 #include <cstring>
 #include <algorithm>
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.9)
 
 project(OWenTsUtilsCPP)
 
@@ -9,8 +9,8 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-include(${PROJECT_SOURCE_DIR}/CompilerOption.cmake)
-include(${PROJECT_SOURCE_DIR}/TargetOption.cmake)
+include(${PROJECT_SOURCE_DIR}/project/cmake/CompilerOption.cmake)
+include(${PROJECT_SOURCE_DIR}/project/cmake/TargetOption.cmake)
 
 # 设置输出目录 
 set(PROJECT_ALL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")

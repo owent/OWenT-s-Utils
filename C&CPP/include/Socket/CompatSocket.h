@@ -3,6 +3,7 @@
  * @brief 兼容型Socket封装
  *        兼容Windows Socket和BSD Socket
  *        仅提供基本socket操作(测试用)
+ * Licensed under the MIT licenses.
  *
  * @version 1.0
  * @author OWenT

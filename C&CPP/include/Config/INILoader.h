@@ -1,6 +1,8 @@
 /**
  * @file INILoader.h
  * @brief INI解析器
+ * Licensed under the MIT licenses.
+ *
  * @note 与标准INI有略微不同，请注意
  * 1. 支持Section
  * 2. Secion支持父子关系,即 [ A : B : C ] 语法

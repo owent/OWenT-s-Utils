@@ -17,11 +17,11 @@ enum EN_SAMPLE_ATTR
 
 struct AttributeManagerValidSample
 {
-    typedef util::logic::AttributeManager<EN_SAMPLE_ATTR, ESA_MAX_HP + 1, AttributeManagerValidSample, int> mt;
+    typedef util::logic::AttributeManager<ESA_MAX_HP + 1, AttributeManagerValidSample, int> mt;
 
     static void GenAttrFormulaMap(mt::formula_builder_type& stFormulas)
     {
-        using namespace util::logic::Operator;
+        using namespace util::logic::detail;
 
         /* 公式：最大生命 = 力量 * 2 + BLABLABLA */
         stFormulas[ESA_MAX_HP] = stFormulas[ESA_STRENTH] * 2 + _<mt>(ESA_BLABLAB);
@@ -36,11 +36,11 @@ struct AttributeManagerValidSample
 
 struct AttributeManagerInvalidSample
 {
-    typedef util::logic::AttributeManager<EN_SAMPLE_ATTR, ESA_MAX_HP + 1, AttributeManagerInvalidSample, int> mt;
+    typedef util::logic::AttributeManager<ESA_MAX_HP + 1, AttributeManagerInvalidSample, int> mt;
 
     static void GenAttrFormulaMap(mt::formula_builder_type& stFormulas)
     {
-        using namespace util::logic::Operator;
+        using namespace util::logic::detail;
 
         /* 公式：最大生命 = 2 * 力量 + BLABLABLA / 基础攻击 */
         stFormulas[ESA_MAX_HP] = 2 * stFormulas[ESA_STRENTH] + _<mt>(ESA_BLABLAB) / stFormulas[ESA_BASIC_ATTACK];
@@ -59,16 +59,10 @@ struct AttributeManagerInvalidSample
     }
 };
 
-TEST(AttributeManager, ValidCheck)
+
+void _check_value()
 {
     AttributeManagerValidSample::mt foo;
-    EXPECT_TRUE(foo.CheckValid());
-
-    if (false == foo.CheckValid())
-    {
-        return;
-    }
-
     // 初始置空
     foo.Construct();
     foo[ESA_STRENTH] = 1000;
@@ -150,8 +144,32 @@ TEST(AttributeManager, ValidCheck)
     EXPECT_EQ(foo[ESA_STRENTH] * 2 + foo[ESA_BLABLAB], foo[ESA_MAX_HP]);
 }
 
+TEST(AttributeManager, ValidCheck)
+{
+
+    EXPECT_TRUE(AttributeManagerValidSample::mt::CheckValid());
+
+    if (false == AttributeManagerValidSample::mt::CheckValid())
+    {
+        return;
+    }
+
+    _check_value();
+}
+
 TEST(AttributeManager, InvalidCheck)
 {
     EXPECT_FALSE(AttributeManagerInvalidSample::mt::CheckValid());
     AttributeManagerInvalidSample::mt::PrintInvalidLoops(std::cout);
+}
+
+TEST(AttributeManager, Serialize)
+{
+    std::stringstream ss;
+    AttributeManagerValidSample::mt::Serialize(std::cout);
+    AttributeManagerValidSample::mt::Serialize(ss);
+    AttributeManagerValidSample::mt::ClearAllFormula();
+    AttributeManagerValidSample::mt::Unserialize(ss);
+
+    _check_value();
 }

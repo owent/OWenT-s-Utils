@@ -28,11 +28,11 @@ struct dynamic_idx_list_helper_class_func_obj
 
 TEST(DynamicIdxListTest, Count)
 {
-    size_t lnpos = ::util::ds::StaticIdxList<int, 10>::npos;
-    size_t rnpos = ::util::ds::DynamicIdxList<dynamic_idx_list_helper_class>::npos;
+    size_t lnpos = util::ds::StaticIdxList<int, 10>::npos;
+    size_t rnpos = util::ds::DynamicIdxList<dynamic_idx_list_helper_class>::npos;
     ASSERT_EQ(lnpos, rnpos);
 
-    ::util::ds::DynamicIdxList<dynamic_idx_list_helper_class> stList;
+    util::ds::DynamicIdxList<dynamic_idx_list_helper_class> stList;
 
     ASSERT_EQ((size_t)0, stList.Count());
 
@@ -65,7 +65,7 @@ TEST(DynamicIdxListTest, Foreach)
 {
     int sum = 0;
 
-    ::util::ds::DynamicIdxList<dynamic_idx_list_helper_class> stList;
+    util::ds::DynamicIdxList<dynamic_idx_list_helper_class> stList;
 
     stList.Create(10);
     stList.Create(20);
@@ -80,11 +80,11 @@ TEST(DynamicIdxListTest, Foreach)
 
 TEST(DynamicIdxListTest, Create)
 {
-    ::util::ds::DynamicIdxList<int> stList;
+    util::ds::DynamicIdxList<int> stList;
 
-    ::util::ds::DynamicIdxList<int>::size_type idx1 = stList.Create();
-    ::util::ds::DynamicIdxList<int>::size_type idx2 = stList.Create(1);
-    ::util::ds::DynamicIdxList<int>::size_type idx3 = stList.Create(2);
+    util::ds::DynamicIdxList<int>::size_type idx1 = stList.Create();
+    util::ds::DynamicIdxList<int>::size_type idx2 = stList.Create(1);
+    util::ds::DynamicIdxList<int>::size_type idx3 = stList.Create(2);
 
     ASSERT_EQ((size_t)0, idx1);
     ASSERT_EQ((size_t)1, idx2);
@@ -95,13 +95,13 @@ TEST(DynamicIdxListTest, Create)
 
 TEST(DynamicIdxListTest, Remove)
 {
-    ::util::ds::DynamicIdxList<int> stList;
+    util::ds::DynamicIdxList<int> stList;
 
     stList.Create(4);
     stList.Create(1);
-    ::util::ds::DynamicIdxList<int>::size_type idx3 = stList.Create(2);
+    util::ds::DynamicIdxList<int>::size_type idx3 = stList.Create(2);
     stList.Create(3);
-    ::util::ds::DynamicIdxList<int>::size_type idx5 = stList.Create(5);
+    util::ds::DynamicIdxList<int>::size_type idx5 = stList.Create(5);
 
     ASSERT_EQ(4, *stList.Get(0));
     ASSERT_EQ(2, *stList.Get(2));
@@ -124,7 +124,7 @@ TEST(DynamicIdxListTest, Remove)
 
 TEST(DynamicIdxListTest, EdgeCondition)
 {
-    typedef ::util::ds::DynamicIdxList<int> core_type;
+    typedef util::ds::DynamicIdxList<int> core_type;
     core_type stList;
 
     core_type::size_type idx1 = stList.Create(4);
@@ -142,7 +142,7 @@ TEST(DynamicIdxListTest, EdgeCondition)
     ASSERT_EQ(6, *stList.Get(idx4));
 
     // 只有两个元素（左右边界）
-    ::util::ds::DynamicIdxList<int> stEle;
+    util::ds::DynamicIdxList<int> stEle;
 
     idx1 = stEle.Create(7);
     stEle.Create(8);
@@ -182,7 +182,7 @@ TEST(DynamicIdxListTest, EdgeCondition)
 
 TEST(DynamicIdxListTest, Iterator)
 {
-    typedef ::util::ds::DynamicIdxList<int> core_type;
+    typedef util::ds::DynamicIdxList<int> core_type;
     core_type stList;
 
     typedef core_type::node_type node_type;
@@ -195,7 +195,7 @@ TEST(DynamicIdxListTest, Iterator)
 
     // const iterator
     int iTestBit = 0;
-    for(::util::ds::DynamicIdxList<int>::const_iterator iter = stList.begin();
+    for(util::ds::DynamicIdxList<int>::const_iterator iter = stList.begin();
         iter != stList.end(); ++ iter)
     {
         iTestBit |= *iter;
@@ -204,7 +204,7 @@ TEST(DynamicIdxListTest, Iterator)
     ASSERT_EQ(63, iTestBit);
 
     // non-const iterator
-    for(::util::ds::DynamicIdxList<int>::iterator iter = stList.begin();
+    for(util::ds::DynamicIdxList<int>::iterator iter = stList.begin();
         iter != stList.end(); ++ iter)
     {
         (*iter) <<= 6;

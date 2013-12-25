@@ -1,7 +1,7 @@
 
 # µº»ÎGTest  
-add_subdirectory("${PROJECT_SOURCE_DIR}/test/3rd_party/src/gtest-1.6.0")
-include_directories ("${PROJECT_SOURCE_DIR}/test/3rd_party/src/gtest-1.6.0/include")
+add_subdirectory("${PROJECT_SOURCE_DIR}/test/3rd_party/src/gtest-1.7.0")
+include_directories ("${PROJECT_SOURCE_DIR}/test/3rd_party/src/gtest-1.7.0/include")
 
 aux_source_directory(src SRC_LIST_TEST)
 

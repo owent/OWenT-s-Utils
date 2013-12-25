@@ -3,6 +3,7 @@
  * @brief 伪随机数生成器  - 梅森旋转算法
  *
  *
+ * Licensed under the MIT licenses.
  * @version 1.0
  * @author OWenT
  * @date 2013年8月6日

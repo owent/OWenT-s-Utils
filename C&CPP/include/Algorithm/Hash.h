@@ -1,6 +1,7 @@
 /**
  * @file Hash.h
  * @brief »ù±¾HashËã·¨
+ * Licensed under the MIT licenses.
  *
  * @version 1.0
  * @author OWenT

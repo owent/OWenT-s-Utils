@@ -1,7 +1,7 @@
 /**
  * @file SpinLock.h
  * @brief 自旋锁
- *
+ * Licensed under the MIT licenses.
  *
  * @version 1.0
  * @author OWenT

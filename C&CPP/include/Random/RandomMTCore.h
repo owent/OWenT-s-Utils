@@ -2,6 +2,7 @@
  * @file RandomMTCore.h
  * @brief 伪随机数生成器  - 梅森旋转算法
  *
+ * Licensed under the MIT licenses.
  * @note 提供mt19937、mt19937-64和mt11213b标准算法
  *
  * @version 1.0
