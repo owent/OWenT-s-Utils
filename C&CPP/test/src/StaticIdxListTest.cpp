@@ -192,7 +192,7 @@ TEST(StaticIdxListTest, EdgeCondition)
     stList.destruct();
     idx4 = stList.Create(10);
 
-    ASSERT_EQ(0, idx4);
+    ASSERT_EQ(static_cast<size_type>(0), idx4);
 
     // π≤œÌƒ⁄¥Êª÷∏¥≤‚ ‘
     char pData[sizeof(core_type)];

@@ -133,6 +133,7 @@ TEST(DynamicIdxListTest, EdgeCondition)
     core_type::size_type idx4 = stList.Create(3);
 
     // 多次删除和创建
+
     stList.Remove(idx4);
     idx4 = stList.Create(5);
     stList.Remove(idx4);
@@ -163,6 +164,7 @@ TEST(DynamicIdxListTest, EdgeCondition)
     ASSERT_EQ((size_t)1, idx1);
 
     // destruct后创建
+
     stList.Remove(0);
     stList.Remove(1);
     stList.Remove(2);
