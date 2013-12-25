@@ -38,6 +38,9 @@
 #if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1)) || (_MSC_VER > 1500 && defined(_HAS_CPP0X) && _HAS_CPP0X)
     // 采用VC std::tr1库
     #include <array>
+#elif defined(__clang__) && __clang_major__ >= 3
+    // 采用Clang c++11库
+    #include <array>
 #elif defined(__GNUC__) && __GNUC__ >= 4
     // 采用G++ std::tr1库
     #if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
