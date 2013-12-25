@@ -57,7 +57,12 @@ namespace util
             size_type max_size() const throw() { return MAX_SIZE; }
 
             // 特例内存对象
-            char stData[MAX_SIZE * sizeof(TObj)];
+            union
+            {
+                char stBuff[MAX_SIZE * sizeof(TObj)];
+                char c;
+            } stData;
+            
 
             // 静态分配器特例函数
             pointer get(size_type i) throw()
@@ -67,7 +72,7 @@ namespace util
                     return NULL;
                 }
 
-                return (pointer)(&stData[i * sizeof(TObj)]);
+                return (pointer)(&stData.c + i * sizeof(TObj));
             }
 
             const_pointer get(size_type i) const throw()
@@ -77,7 +82,7 @@ namespace util
                     return NULL;
                 }
 
-                return (const_pointer)(&stData[i * sizeof(TObj)]);
+                return (const_pointer)(&stData.c + i * sizeof(TObj));
             }
         };
     }

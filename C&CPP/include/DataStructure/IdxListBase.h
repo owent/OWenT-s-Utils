@@ -28,7 +28,11 @@ namespace util
                 TSize iPreIdx;
                 TSize iNextIdx;
                 bool bIsInited;
-                char stObjData[sizeof(TObj)];
+                union
+                {
+                    char strBuff[sizeof(TObj)];
+                    char c;
+                } stObjData;
             };
 
             /**
@@ -101,12 +105,12 @@ namespace util
 
                     ITObj* get()
                     {
-                        return (ITObj*)(m_pListPtr->m_stData[iIndex].stObjData);
+                        return (ITObj*)(&m_pListPtr->m_stData[iIndex].stObjData.c);
                     }
 
                     const ITObj* get() const
                     {
-                        return (const ITObj*)(m_pListPtr->m_stData[iIndex].stObjData);
+                        return (const ITObj*)(&m_pListPtr->m_stData[iIndex].stObjData.c);
                     }
 
                     friend bool operator==(const Iterator& l, const Iterator& r)
@@ -417,7 +421,7 @@ namespace util
 
                     if (npos != ret)
                     {
-                        new ((void*)m_stData[ret].stObjData)TObj();
+                        new ((void*) &m_stData[ret].stObjData.c)TObj();
                     }
 
                     return ret;
@@ -435,7 +439,7 @@ namespace util
 
                     if (npos != ret)
                     {
-                        new ((void*)m_stData[ret].stObjData)TObj(param1);
+                        new ((void*) &m_stData[ret].stObjData.c)TObj(param1);
                     }
 
                     return ret;
@@ -454,7 +458,7 @@ namespace util
 
                     if (npos != ret)
                     {
-                        new ((void*)m_stData[ret].stObjData)TObj(param1, param2);
+                        new ((void*) &m_stData[ret].stObjData.c)TObj(param1, param2);
                     }
 
                     return ret;
@@ -474,7 +478,7 @@ namespace util
 
                     if (npos != ret)
                     {
-                        new ((void*)m_stData[ret].stObjData)TObj(param1, param2, param3);
+                        new ((void*) &m_stData[ret].stObjData.c)TObj(param1, param2, param3);
                     }
 
                     return ret;
@@ -576,7 +580,7 @@ namespace util
                     m_stData[idx].bIsInited = false;
 
                     // 执行析构
-                    TObj* pRemovedDataSect = (TObj*)(m_stData[idx].stObjData);
+                    TObj* pRemovedDataSect = (TObj*) (&m_stData[idx].stObjData.c);
                     pRemovedDataSect->~TObj();
                     // 计数减一
                     -- m_stHeader.m_iSize;
