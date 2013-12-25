@@ -51,6 +51,12 @@ namespace util
                 ::new((void *)__p) TObj(__val);
             }
 
+            pointer construct(pointer __p)
+            {
+                ::new((void *) __p) TObj();
+                return __p;
+            }
+
             void destroy(pointer __p) { __p->~TObj(); }
 
             // 扩展分配器函数

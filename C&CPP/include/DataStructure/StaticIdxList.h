@@ -56,7 +56,7 @@ namespace util
                         return NULL;
                     }
 
-                    return m_stData.get(m_uAllocTop ++);
+                    return m_stData.construct(m_stData.get(m_uAllocTop++));
                 }
 
                 void release()
