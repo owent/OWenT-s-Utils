@@ -20,6 +20,10 @@
 #if defined(_MSC_VER) && _MSC_VER >= 1700 && _HAS_CPP0X
     #define FUNC_DEFAULT = default
     #define FUNC_DELETE = delete
+#elif defined(__clang__) && __clang_major__ >= 3 && defined(__cplusplus) && __cplusplus >= 201103L
+    // clang
+    #define FUNC_DEFAULT = default
+    #define FUNC_DELETE = delete
 #elif defined(__GNUC__) && __GNUC__ >= 4 && (__GNUC__ > 4 || __GNUC_MINOR__ >= 4) && defined(__cplusplus)
     // 采用GCC
     #if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
