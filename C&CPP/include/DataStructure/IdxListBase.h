@@ -28,11 +28,12 @@ namespace util
                 TSize iPreIdx;
                 TSize iNextIdx;
                 bool bIsInited;
-                union
+                typedef union
                 {
                     char strBuff[sizeof(TObj)];
                     char c;
-                } stObjData;
+                } obj_type;
+                obj_type stObjData
             };
 
             /**
