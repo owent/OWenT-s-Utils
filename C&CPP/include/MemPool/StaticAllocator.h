@@ -62,7 +62,7 @@ namespace util
                 char stBuff[MAX_SIZE * sizeof(TObj)];
                 char c;
             } buff_type;
-            buff_type stData
+            buff_type stData;
 
             // 静态分配器特例函数
             pointer get(size_type i) throw()

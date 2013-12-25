@@ -33,7 +33,7 @@ namespace util
                     char strBuff[sizeof(TObj)];
                     char c;
                 } obj_type;
-                obj_type stObjData
+                obj_type stObjData;
             };
 
             /**
