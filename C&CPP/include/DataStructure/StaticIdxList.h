@@ -56,7 +56,9 @@ namespace util
                         return NULL;
                     }
 
-                    return m_stData.construct(m_stData.get(m_uAllocTop++));
+                    value_type* pRet = m_stData.get(m_uAllocTop++);
+                    ::new ((void*)pRet)value_type();
+                    return pRet;
                 }
 
                 void release()
