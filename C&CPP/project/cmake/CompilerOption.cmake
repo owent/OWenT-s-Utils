@@ -12,6 +12,8 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
 	#set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
+message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+
 
 # 设置公共编译选项 
 set(ALL_FLAGS_IN_ONE_COMMON "")
@@ -20,7 +22,7 @@ set(CXX_FLAGS_IN_ONE_COMMON "")
 
 # 编译器选项 (仅做了GCC、VC和Clang兼容)
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-		# 目前还没有 -fPIC, 以后有了再加上
+	# 目前还没有 -fPIC, 以后有了再加上
         add_definitions(-Wall -Werror -rdynamic)
 
         # 检测GCC版本大于等于4.8时，默认-Wno-unused-local-typedefs (普片用于type_traits，故而关闭该警告)
