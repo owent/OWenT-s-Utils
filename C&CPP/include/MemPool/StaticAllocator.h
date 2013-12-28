@@ -61,8 +61,16 @@ namespace util
             {
                 char stBuff[MAX_SIZE * sizeof(TObj)];
                 char c;
+                TObj stNodes[MAX_SIZE];
             } buff_type;
             buff_type stData;
+
+            // template<typename TF, typename TT>
+            // struct alias_cast_t 
+            // {
+            //     TF* pFrom;
+            //     TT* pTo;
+            // } ;
 
             // 静态分配器特例函数
             pointer get(size_type i) throw()
@@ -72,7 +80,11 @@ namespace util
                     return NULL;
                 }
 
-                return (pointer)(&stData.c + i * sizeof(TObj));
+                return &stData.stNodes[i];
+                // return (pointer)(&stData.c + i * sizeof(TObj));
+                // alias_cast_t<char, TObj> alias_cast;
+                // alias_cast.pFrom = &stData.c + i * sizeof(TObj);
+                // return alias_cast.pTo;
             }
 
             const_pointer get(size_type i) const throw()
@@ -82,7 +94,11 @@ namespace util
                     return NULL;
                 }
 
-                return (const_pointer)(&stData.c + i * sizeof(TObj));
+                return &stData.stNodes[i];
+                // return (const_pointer)(&stData.c + i * sizeof(TObj));
+                // alias_cast_t<const char, TObj> alias_cast;
+                // alias_cast.pFrom = &stData.c + i * sizeof(TObj);
+                // return alias_cast.pTo;
             }
         };
     }
