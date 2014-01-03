@@ -115,7 +115,7 @@ function remove_user_ipc()
 # 获取系统IPv4地址
 function get_ipv4_address()
 {
-	ALL_IP_ADDRESS=($(ifconfig | grep 'inet addr' | awk '{print $2}' | cut -d: -f2));
+	ALL_IP_ADDRESS=($(/sbin/ifconfig | grep 'inet addr' | awk '{print $2}' | cut -d: -f2));
 	if [ $# -gt 0 ]; then
 		if [ "$1" == "count" ] || [ "$1" == "number" ]; then
 			echo ${#ALL_IP_ADDRESS[@]};
@@ -130,7 +130,7 @@ function get_ipv4_address()
 # 获取系统IPv6地址
 function get_ipv6_address()
 {
-	ALL_IP_ADDRESS=($(ifconfig | grep 'inet6 addr' | awk '{print $3}' | cut -d/ -f1));
+	ALL_IP_ADDRESS=($(/sbin/ifconfig | grep 'inet6 addr' | awk '{print $3}' | cut -d/ -f1));
 	if [ $# -gt 0 ]; then
 		if [ "$1" == "count" ] || [ "$1" == "number" ]; then
 			echo ${#ALL_IP_ADDRESS[@]};
