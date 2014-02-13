@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>情人节快乐</title>
+</head>
+<body title="拖到鼠标">
+<canvas id="pad" width="800" height="800">提醒您：本例使用了HTML5的canvas标签。ie9以下用户请一边惭愧去吧</canvas>
+
+<script type="text/javascript">
+	function g(e){
+		return document.getElementById(e);
+	}
+	var theta = -0.4; //转角
+	var eleva = -0.1; //仰角
+	var pad = g('pad');
+	var ctx = pad.getContext('2d');
+		ctx.translate(200,200);
+		ctx.scale(82,82);
+	/* 将三维投射到二维（三维直角坐标系转平面直角坐标系） */
+	function iso(x,y,z){
+		var dist = Math.sqrt(x*x+y*y);
+		var angle = (x==0 && y==0) ? 0 : Math.atan(y/x) + theta + ((x<0)? Math.PI : 0);
+		x=Math.cos(angle)*dist;
+		y=-Math.sin(angle)*dist;
+		var fact = (y*Math.cos(eleva) + z*Math.sin(eleva)+8)/8;
+		y=y*Math.sin(eleva) - z*Math.cos(eleva);
+		x*=fact;
+		y*=fact;
+		return {
+			x: x,
+			y: y
+		};
+	}
+	/* 方程式: (x^2 + (9/4)y^2 + z^2 - 1)^3 - x^2*z^3 - (9/80)y^2*z^3 < 0 */
+	function love(){
+		var x,y,z,m,t=3;
+		for(z=-3;z<=3;){
+			for(y=-3;y<=3;){
+				for(x=-3;x<=3;){
+					m=(x*x + (9/4)*y*y + z*z - 1)*(x*x + (9/4)*y*y + z*z - 1)*(x*x + (9/4)*y*y + z*z - 1) - x*x*z*z*z - (9/80)*y*y*z*z*z;
+					if(m<0){
+						co = iso(x,y,z);
+						ctx.strokeRect(co.x, co.y,0.02,0.02);
+						ctx.closePath();
+					}
+					x+=0.11;
+				}
+				y+=0.11;
+			}
+			z+=0.11;
+		}
+	}
+	function preview(){
+		ctx.clearRect(-10,-10,20,20);
+		ctx.lineWidth=0.008;
+		ctx.lineJoin = "round";
+		ctx.strokeStyle = 'rgba(150,0,100,0.3)';
+		var co;
+		ctx.beginPath();
+		love();
+		ctx.stroke();
+	};
+	preview();
+	/* 鼠标拖动控制 */
+	pad.onmousedown=function(e){
+		var x0 = e.clientX, y0 = e.clientY;
+		document.onmousemove=function(e){
+				theta -= (x0 - (x0=e.clientX))/100;
+				eleva -= (y0 - (y0=e.clientY))/100;
+				theta%=Math.PI*2; if (theta<0) theta+=Math.PI*2;
+				eleva%=Math.PI*2; if (eleva<0) eleva+=Math.PI*2;
+				preview();
+		}
+		document.onmouseup=function(e){
+			document.onmousemove=null;
+		}
+	}
+</script>
+
+</body></html>

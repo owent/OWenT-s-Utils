@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>情人节快乐</title>
+</head>
+<body style="background-color: Black;">
+
+<div style="text-align: center; margin: 0 auto;">
+<canvas id="myCanvas" width="800" height="600" style="border: None; background-color: Black; color: White;">
+Your browser does not support the canvas element.
+</canvas>
+</div>
+    <script>
+          function randomRegion(n, t) { return n + Math.floor(Math.random() * (t - n + 1)) } function initPoint(n) { n.x = emitter.x, n.y = emitter.y; var t = randomRegion(0, 360); n.vx = randomRegion(1, 4) * Math.sin(t) * (randomRegion(1, 2) == 1 ? -1 : 1), n.vy = randomRegion(1, 3) * Math.cos(t) * (randomRegion(1, 2) == 1 ? -1 : 1), n.radius = Math.random() * 1 + 1, n.color = randomColor() } function randomColor() { var n, t, i; return n = Math.floor(Math.random() * 255), t = Math.floor(Math.random() * 255), i = Math.floor(Math.random() * 255), "rgb(" + n + "," + t + "," + i + ")" } function update() { for (var n, f = points.length, t = 0; t < f; t += 1) if (n = points[t], n.vx != 0 || n.vy != 0) { n.vy += gravity, n.x += n.vx, n.y += n.vy, (n.x > width / 2 || n.x < -width / 2 || n.y > height / 2 || n.y < -height / 2) && initPoint(n); var e = n.x / heartR, i = n.y / heartR, r = Math.pow(e, 2), u = Math.pow(i, 2), o = Math.pow(r + u - 1, 3) - r * u * i; o < 0 || (n.vx = 0, n.vy = 0) } } function draw() { var t, n, i = points.length; for (context.fillStyle = "rgba(0,0,0,0.5)", context.fillRect(-width / 2, -height / 2, width, height), t = 0; t < i; t += 1) n = points[t], context.fillStyle = n.color, context.beginPath(), context.arc(n.x, n.y, n.radius, 0, Math.PI * 2, !1), context.fill() } function addPoint() { var n; points.length < numPoints && (n = {}, initPoint(n), points.push(n)) } var points = [], numPoints = 1e4, i, canvas, context, width, height, gravity = 0, emitter, heartR; canvas = document.querySelector("canvas"), width = canvas.width, height = canvas.height, context = canvas.getContext("2d"), context.translate(400, 300), context.scale(1, -1), emitter = { x: 0, y: 0 }, heartR = 200, setInterval(function () { addPoint(), update(), draw() }, 1e3 / 60); 
+    </script>
+</body></html>
