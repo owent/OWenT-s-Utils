@@ -31,7 +31,7 @@
 // VC 2003
 #elif defined(_MSC_VER) && (_MSC_VER >= 1300)
     #define THREAD_TLS __declspec( thread )
-#else defined(__clang__) || defined(__GNUC__)
+#else
     #define THREAD_TLS __thread
 #endif
 
