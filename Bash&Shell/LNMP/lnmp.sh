@@ -188,7 +188,7 @@ function install_eaccelerator()
 	eaccelerator.compress_level="9"
 ' >> $PHP_EACC_CONF_FILE;
     echo "eaccelerator admin can be download from http://eaccelerator.net/";
-    # 需要手动配置eaccelerator服务控制台 http://eaccelerator.net/
+    # 需要手动配置eaccelerator服务控制台 http://eaccelerator.net/ (源码包内所有php文件)
 }
 
 function install_pecl_apcu()
@@ -199,6 +199,8 @@ function install_pecl_apcu()
     PHP_PECL_APCU_CONF_FILE="$PHP_CONF_DIR_PATH/apcu.ini";
     cp $PHP_PECL_APCU_CONF_FILE $PHP_PECL_APCU_CONF_FILE.bak;
     sed -i "s#apc\\.mmap_file_mask\\s*=.*#apc\\.mmap_file_mask=\"$PHP_CACHE_DIR_PATH/apc.XXXXXXX\"#g" $PHP_PECL_APCU_CONF_FILE;
+    echo "apcu admin can be download http://pecl.php.net/package/APCU";
+    # 需要手动配置apcu服务控制台 http://pecl.php.net/package/APCU (源码包内所有php文件)
 }
 
 function install_xcache()
