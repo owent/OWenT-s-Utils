@@ -89,7 +89,7 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 	gzip_vary on; 
 	
 	```
-5. 建议**/etc/php-fpm.conf**内配置*sendmail*选项</b></font>
+5. 建议**/etc/php-fpm.conf**内配置*sendmail*选项
 	```ini
 
 	php_admin_value[sendmail_path] = /usr/sbin/sendmail -t -i -f admin@owent.net
