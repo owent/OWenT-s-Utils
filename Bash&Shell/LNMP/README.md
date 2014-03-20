@@ -20,6 +20,7 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 1. **eaccelerator**
 
 	> 从 http://eaccelerator.net/ 下载 对应版本
+	>
 	> 把源码包内的所有php文件放置到网站目录即可
 	> 
 	> **注意设置admin用户名和密码**
@@ -27,6 +28,7 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 2. **xcache**
 
 	> 从 http://xcache.lighttpd.net/ 下载 对应版本源码包
+	> 
 	> 把htdoc目录内所有文件放置到网站目录即可
 	> 
 	> **注意设置admin用户名和密码**
@@ -44,6 +46,7 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 4. **apcu**
 
 	> 从 http://pecl.php.net/package/APCU 下载 对应版本源码包
+	> 
 	> 把源码包内的所有php文件放置到网站目录即可
 	>
 	> **注意设置admin用户名和密码**
