@@ -19,8 +19,8 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 
 1. **eaccelerator**
 
-	> 从 http://eaccelerator.net/ 下载 对应版本源码包内的所有php文件
-	> 放置到网站目录即可
+	> 从 http://eaccelerator.net/ 下载 对应版本
+	> 把源码包内的所有php文件放置到网站目录即可
 	> 
 	> **注意设置admin用户名和密码**
 
@@ -43,8 +43,8 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 	
 4. **apcu**
 
-	> apcu 官方没有提供UI管理器，可以使用第三方管理器
-	> + 试试： http://apc.neuropeans.com/  ？（没有测试过）
+	> 从 http://pecl.php.net/package/APCU 下载 对应版本源码包
+	> 把源码包内的所有php文件放置到网站目录即可
 	>
 	> **注意设置admin用户名和密码**
 
