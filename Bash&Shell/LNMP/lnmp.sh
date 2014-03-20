@@ -27,16 +27,19 @@ while getopts "a:c:d:l:f:ho:" arg; do
              f)
                 PHP_FPM_CONF_FILE_PATH="$OPTARG";
                 ;;
+             o)
+                PHP_OPT_COMP_INSTALL="$PHP_OPT_COMP_INSTALL $OPTARG";
+                ;;
              h)
-                echo "
-    usage: $0 [options]
-    options:
--a  <dir path>              ext cache dir path
--c  <php.ini path>          path of php.ini(Notice: must match rpm packages)
--d  <php conf dir>          dir path of php.d(Notice: must match rpm packages)
--l  <php conf dir>          dir path of php ext logs
--f  <php opt compoments>    can be one or some of [xcache, zendopcache, eaccelerator, apcu, none]
--h                          help message
+                echo "usage: $0 [options]
+options:
+-a  <dir path>                  ext cache dir path
+-c  <php.ini path>              path of php.ini(Notice: must match rpm packages)
+-d  <php conf dir>              dir path of php.d(Notice: must match rpm packages)
+-l  <php conf dir>              dir path of php ext logs
+-f  <php-fpm.d/www.conf path>   path of php-fpm.d/www.conf path(Notice: must match rpm packages)
+-o  <php opt compoments>        can be one or some of [xcache, zendopcache, eaccelerator, apcu, none]
+-h                              help message
                 ";
                 exit 0;
                 ;;
@@ -63,11 +66,11 @@ rpm -K rpmforge-release-0.5.3-1.el6.rf.*.rpm  # 这里会报一个错，无视�
  
 yum install -y nginx
 chkconfig nginx on
-yum install -y autoconf zlib zlib-devel libpng libpng-devel freetype freetype-devel sendmail mysql-server mysql memcached procmail php php-adodb php-bcmath php-cli php-common php-devel php-enchant php-fpm php-gd php-imap php-intl php-jpgraph php-ldap php-markdown php-mbstring php-mcrypt php-mssql php-mysql php-odbc php-pdo php-pear php-pear-db php-pear-file php-pear-file-util php-pear-http php-pear-http-* php-pear-mail php-pear-xml-* php-pecl-mailparse php-pecl-memcache php-pecl-session_mysql php-pecl-memprof php-pecl-mongo php-pecl-oauth php-pecl-redis php-pecl-uuid php-pgsql php-process php-pspell php-recode php-soap php-tidy php-xml php-xmlrpc php-zipstream
+yum install -y autoconf zlib zlib-devel libpng libpng-devel freetype freetype-devel sendmail mysql-server mysql memcached procmail php php-adodb php-bcmath php-cli php-common php-devel php-enchant php-fpm php-gd php-imap php-intl php-jpgraph php-ldap php-markdown php-mbstring php-mcrypt php-mssql php-mysql php-odbc php-pdo php-pear php-pear-db php-pear-File php-pear-File-Util php-pear-HTTP php-pear-HTTP-* php-pear-Mail php-pear-XML-* php-pecl-mailparse php-pecl-memcache php-pecl-session_mysql php-pecl-memprof php-pecl-mongo php-pecl-oauth php-pecl-redis php-pecl-uuid php-pgsql php-process php-pspell php-recode php-soap php-tidy php-xml php-xmlrpc php-zipstream
 chkconfig httpd off
 
 cp $PHP_CONF_FILE_PATH $PHP_CONF_FILE_PATH.bak
- 
+
 # 替换PHP配置
 sed -i 's#output_buffering = Off#output_buffering = On#' $PHP_CONF_FILE_PATH
 sed -i 's/memory_limit = 128M/memory_limit = 300M/g' $PHP_CONF_FILE_PATH
@@ -108,7 +111,7 @@ zend_loader.disable_licensing=1
 zend_loader.obfuscation_level_support=3
 zend_loader.license_path=
 zend_extension=$(php-config --extension-dir)/ZendGuardLoader.so
-" > $PHP_CONF_DIR_PATH/00_zendloader.ini
+" > $PHP_CONF_DIR_PATH/zendloader.ini
 
 # 复制通用配置文件
 NGINX_CONF_PATH="/etc/nginx"
