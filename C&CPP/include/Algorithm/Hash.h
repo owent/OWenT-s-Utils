@@ -1,6 +1,6 @@
 /**
  * @file Hash.h
- * @brief »ù±¾HashËã·¨
+ * @brief å¸¸ç”¨Hashç®—æ³•
  * Licensed under the MIT licenses.
  *
  * @version 1.0
@@ -22,286 +22,309 @@
 
 namespace util
 {
-    namespace hash
+        namespace hash
     {
         namespace core
         {
-            template<typename Ty>
-            inline const Ty fnv_magic_prime_number(Ty&)
+            template<typename Ty, size_t s>
+            struct fnv_magic_prime_number
             {
-                if (sizeof(Ty) == 4)
-                    return ((Ty)0x01000193);
-                else if (sizeof(Ty) == 8)
-                    return ((Ty)0x100000001b3ULL);
+                static const Ty value = 0x01000193U;
+            };
 
-                return 0;
-            }
+            template<typename Ty>
+            struct fnv_magic_prime_number<Ty, 8>
+            {
+                static const Ty value = 0x100000001b3ULL;
+            };
+
+            template<typename Ty, size_t s>
+            struct fnv_magic_offset_basis
+            {
+                static const Ty value = 0x811C9DC5U;
+
+                static Ty fix(Ty hval)
+                {
+                    return hval;
+                }
+            };
+
+            template<typename Ty>
+            struct fnv_magic_offset_basis<Ty, 8>
+            {
+                static const Ty value = 0xCBF29CE484222325ULL;
+
+                static Ty fix(Ty hval)
+                {
+                    return hval ^ (hval>>32);
+                }
+            };
 
             /**
-             * @brief fnv-1 Ëã·¨ £¨¶ş½øÖÆ£©
-             * @param [in] buf ¶ş½øÖÆÊı¾İ
-             * @param [in] len ¶ş½øÖÆ³¤¶È
-             * @param [in] hval ³õÊ¼Öµ
-             * @return ·µ»ØµÄÖ¸¶¨ÀàĞÍµÄÖµ
-             */
+            * @brief fnv-1 ç®—æ³• ï¼ˆäºŒè¿›åˆ¶ï¼‰
+            * @param [in] buf äºŒè¿›åˆ¶æ•°æ®
+            * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+            * @param [in] hval åˆå§‹å€¼
+            * @return è¿”å›çš„æŒ‡å®šç±»å‹çš„å€¼
+            */
             template<typename Ty>
-            Ty fnv_n_buf(const void *buf, size_t len, Ty hval = 0)
+            Ty fnv_n_buf(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
             {
-                unsigned char *bp = (unsigned char *)buf;
+                unsigned char *bp = (unsigned char *) buf;
                 unsigned char *be = bp + len;
-                Ty mn = fnv_magic_prime_number(hval);
+                Ty mn = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
 
                 while (bp < be)
                 {
                     hval *= mn;
-                    hval ^= (Ty)*bp++;
+                    hval ^= (Ty) *bp++;
                 }
 
-                return hval;
+                return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
             }
 
             /**
-             * @brief fnv-1a Ëã·¨ £¨¶ş½øÖÆ£©
-             * @param [in] buf ¶ş½øÖÆÊı¾İ
-             * @param [in] len ¶ş½øÖÆ³¤¶È
-             * @param [in] hval ³õÊ¼Öµ
-             * @return ·µ»ØµÄÖ¸¶¨ÀàĞÍµÄÖµ
-             */
+            * @brief fnv-1a ç®—æ³• ï¼ˆäºŒè¿›åˆ¶ï¼‰
+            * @param [in] buf äºŒè¿›åˆ¶æ•°æ®
+            * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+            * @param [in] hval åˆå§‹å€¼
+            * @return è¿”å›çš„æŒ‡å®šç±»å‹çš„å€¼
+            */
             template<typename Ty>
-            Ty fnv_n_buf_a(const void *buf, size_t len, Ty hval = 0)
+            Ty fnv_n_buf_a(const void *buf, size_t len, Ty hval = fnv_magic_offset_basis<Ty, sizeof(Ty)>::value)
             {
-                unsigned char *bp = (unsigned char *)buf;
+                unsigned char *bp = (unsigned char *) buf;
                 unsigned char *be = bp + len;
-                Ty mn = fnv_magic_prime_number(hval);
+                Ty mn = fnv_magic_prime_number<Ty, sizeof(Ty)>::value;
 
                 while (bp < be)
                 {
-                    hval ^= (Ty)*bp++;
+                    hval ^= (Ty) *bp++;
                     hval *= mn;
                 }
 
-                return hval;
+                return fnv_magic_offset_basis<Ty, sizeof(Ty)>::fix(hval);
             }
         }
 
         /**
-         * fnv-1Ëã·¨hashº¯Êı £¨¶ş½øÖÆ£©
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * fnv-1ç®—æ³•hashå‡½æ•° ï¼ˆäºŒè¿›åˆ¶ï¼‰
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
-        THVal HashFNV1(const void* bin, size_t len, THVal hval = 0)
+        THVal HashFNV1(const void* bin, size_t len, THVal hval = core::fnv_magic_offset_basis<THVal, sizeof(THVal)>::value)
         {
             return core::fnv_n_buf(bin, len, hval);
         }
 
 
         /**
-         * fnv-1aËã·¨hashº¯Êı £¨¶ş½øÖÆ£©
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * fnv-1aç®—æ³•hashå‡½æ•° ï¼ˆäºŒè¿›åˆ¶ï¼‰
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
-        THVal HashFNV1A(const void* bin, size_t len, THVal hval = 0)
+        THVal HashFNV1A(const void* bin, size_t len, THVal hval = core::fnv_magic_offset_basis<THVal, sizeof(THVal)>::value)
         {
             return core::fnv_n_buf_a(bin, len, hval);
         }
 
         /**
-         * SDBM Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * SDBM Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashSDBM(const void* bin, size_t len, THVal hval = 0)
         {
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
             size_t iIndex = 0;
             while (iIndex < len)
             {
                 // equivalent to: hval = 65599 * hval + strBuff[iIndex ++]);
-                hval = strBuff[iIndex ++] + (hval << 6) + (hval << 16) - hval;
+                hval = strBuff[iIndex++] + (hval << 6) + (hval << 16) - hval;
             }
- 
+
             return hval;
         }
 
         /**
-         * RS Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * RS Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashRS(const void* bin, size_t len, THVal hval = 0)
         {
             unsigned int b = 378551;
             unsigned int a = 63689;
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             while (iIndex < len)
             {
-                hval = hval * a + strBuff[iIndex ++];
+                hval = hval * a + strBuff[iIndex++];
                 a *= b;
             }
- 
+
             return hval;
         }
 
         /**
-         * JS Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * JS Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashJS(const void* bin, size_t len, THVal hval = 1315423911)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             while (iIndex < len)
             {
-                hval ^= ((hval << 5) + strBuff[iIndex ++] + (hval >> 2));
+                hval ^= ((hval << 5) + strBuff[iIndex++] + (hval >> 2));
             }
- 
+
             return hval;
         }
 
         /**
-         * P. J. Weinberger Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * P. J. Weinberger Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashPJW(const void* bin, size_t len, THVal hval = 0)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
-            THVal BitsInUnignedInt = (THVal)(sizeof(THVal) * 8);
-            THVal ThreeQuarters    = (THVal)((BitsInUnignedInt  * 3) / 4);
-            THVal OneEighth        = (THVal)(BitsInUnignedInt / 8);
-            THVal HighBits         = (THVal)(-1) << (BitsInUnignedInt - OneEighth);
-            THVal test             = 0;
+            THVal BitsInUnignedInt = (THVal) (sizeof(THVal) * 8);
+            THVal ThreeQuarters = (THVal) ((BitsInUnignedInt * 3) / 4);
+            THVal OneEighth = (THVal) (BitsInUnignedInt / 8);
+            THVal HighBits = (THVal) (-1) << (BitsInUnignedInt - OneEighth);
+            THVal test = 0;
             while (iIndex < len)
             {
-                hval = (hval << OneEighth) + strBuff[iIndex ++];
+                hval = (hval << OneEighth) + strBuff[iIndex++];
                 if ((test = hval & HighBits) != 0)
                 {
                     hval = ((hval ^ (test >> ThreeQuarters)) & (~HighBits));
                 }
             }
- 
+
             return hval;
         }
 
         /**
-         * ELF Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * ELF Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashELF(const void* bin, size_t len, THVal hval = 0)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             THVal x = 0;
             while (iIndex < len)
             {
-                hval = (hval << 4) + strBuff[iIndex ++];
+                hval = (hval << 4) + strBuff[iIndex++];
                 if ((x = hval & 0xF0000000L) != 0)
                 {
                     hval ^= (x >> 24);
                     hval &= ~x;
                 }
             }
- 
+
             return hval;
         }
 
         /**
-         * BKDR Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * BKDR Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashBKDR(const void* bin, size_t len, THVal hval = 0)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             THVal seed = 131; // 31 131 1313 13131 131313 etc..
             while (iIndex < len)
             {
-                hval = hval * seed + strBuff[iIndex ++];
+                hval = hval * seed + strBuff[iIndex++];
             }
- 
+
             return hval;
         }
 
         /**
-         * DJB Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * DJB Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashDJB(const void* bin, size_t len, THVal hval = 5381)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             while (iIndex < len)
             {
-                hval += (hval << 5) + strBuff[iIndex ++];
+                hval += (hval << 5) + strBuff[iIndex++];
             }
- 
+
             return hval;
         }
 
         /**
-         * AP Hashº¯Êı
-         * @param [in] bin ¶ş½øÖÆÊı¾İ
-         * @param [in] len ¶ş½øÖÆ³¤¶È
-         * @param [in] hval ³õÊ¼É¢ÁĞÖµ
-         * @return É¢ÁĞÖµ
-         */
+        * AP Hashå‡½æ•°
+        * @param [in] bin äºŒè¿›åˆ¶æ•°æ®
+        * @param [in] len äºŒè¿›åˆ¶é•¿åº¦
+        * @param [in] hval åˆå§‹æ•£åˆ—å€¼
+        * @return æ•£åˆ—å€¼
+        */
         template<typename THVal>
         THVal HashAP(const void* bin, size_t len, THVal hval = 0)
         {
             size_t iIndex = 0;
-            unsigned char* strBuff = (unsigned char*)bin;
+            unsigned char* strBuff = (unsigned char*) bin;
 
             for (int i = 0; iIndex < len; i++)
             {
                 if ((i & 1) == 0)
                 {
-                    hval ^= ((hval << 7) ^ strBuff[iIndex ++] ^ (hval >> 3));
+                    hval ^= ((hval << 7) ^ strBuff[iIndex++] ^ (hval >> 3));
                 }
                 else
                 {
-                    hval ^= (~((hval << 11) ^ strBuff[iIndex ++] ^ (hval >> 5)));
+                    hval ^= (~((hval << 11) ^ strBuff[iIndex++] ^ (hval >> 5)));
                 }
             }
- 
+
             return hval;
         }
     }
