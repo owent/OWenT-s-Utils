@@ -1,7 +1,7 @@
 #!/bin/sh
  
 # ======================================= 配置 ======================================= 
-PREFIX_DIR=/usr/local/gcc-4.8.2
+PREFIX_DIR=/usr/local/gcc-4.9.0
  
 # ======================= 非交叉编译 ======================= 
 BUILD_TARGET_CONF_OPTION=""
@@ -133,7 +133,7 @@ sleep $CHECK_INFO_SLEEP
 swapoff -a
  
 # install gmp
-GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-5.1.3.tar.bz2" );
+GMP_PKG=$(check_and_download "gmp" "gmp-*.tar.bz2" "ftp://ftp.gmplib.org/pub/gmp/gmp-6.0.0a.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GMP_PKG"
     exit -1;
@@ -159,7 +159,7 @@ make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
    
 # install mpc
-MPC_PKG=$(check_and_download "mpc" "mpc-*.tar.gz" "http://www.multiprecision.org/mpc/download/mpc-1.0.1.tar.gz" );
+MPC_PKG=$(check_and_download "mpc" "mpc-*.tar.gz" "ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz" );
 if [ $? -ne 0 ]; then
     echo -e "$MPC_PKG"
     exit -1;
@@ -172,7 +172,7 @@ make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
   
 # install isl
-ISL_PKG=$(check_and_download "isl-0.11" "isl-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.11.1.tar.bz2" );
+ISL_PKG=$(check_and_download "isl-0.12" "isl-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.12.2.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$ISL_PKG"
     exit -1;
@@ -185,7 +185,7 @@ make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
   
 # install cloog
-CLOOG_PKG=$(check_and_download "cloog-0.18" "cloog-0.*.tar.gz" "ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-0.18.0.tar.gz" );
+CLOOG_PKG=$(check_and_download "cloog-0.18" "cloog-0.*.tar.gz" "ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-0.18.1.tar.gz" );
 if [ $? -ne 0 ]; then
     echo -e "$CLOOG_PKG"
     exit -1;
@@ -204,7 +204,7 @@ make install
 cd "$WORKING_DIR"
  
 # ======================= gcc包 ======================= 
-GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.8.2/gcc-4.8.2.tar.bz2" );
+GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.9.0/gcc-4.9.0.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$GCC_PKG"
     exit -1;
@@ -238,12 +238,12 @@ fi
 tar -jxvf $BINUTILS_PKG
 BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
 cd $BINUTILS_DIR
-./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-ld --enable-libada --enable-libssp --enable-lto --enable-objc-gc --enable-vtable-verify $BUILD_TARGET_CONF_OPTION
+./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $BUILD_TARGET_CONF_OPTION
 make -j2 && make install
 # ---- 某个版本编译线程数过高会导致编译不过 
 # ---- 另外某个版本的make check有failed用例就被发布了,应该gnu的自动化测试有遗漏 ----
 make check
-cd "$WORKING_DIR";
+cd "$WORKING_DIR"
 
 ls $PREFIX_DIR/bin/ld
 if [ $? -ne 0 ]; then
@@ -273,9 +273,8 @@ else
 		make $BUILD_THREAD_OPT && make install && GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
 	fi
 	
-	cd "$WORKING_DIR";
 	# ======================= 正式安装GDB =======================
-	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.6.2.tar.bz2" );
+	GDB_PKG=$(check_and_download "gdb" "gdb-*.tar.bz2" "http://ftp.gnu.org/gnu/gdb/gdb-7.7.tar.bz2" );
 	if [ $? -ne 0 ]; then
 		echo -e "$GDB_PKG"
 		exit -1;
@@ -283,7 +282,7 @@ else
 	tar -jxvf $GDB_PKG
 	GDB_DIR=$(ls -d gdb-* | grep -v \.tar\.bz2)
 	cd $GDB_DIR
-	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-objc-gc $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
+	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-ld --enable-libada --enable-libssp --enable-objc-gc --enable-vtable-verify $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
 	make $BUILD_THREAD_OPT && make install
 	cd "$WORKING_DIR"
 	

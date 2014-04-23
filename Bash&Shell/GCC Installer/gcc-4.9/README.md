@@ -1,9 +1,8 @@
-Linux 编译安装 GCC 4.8
+Linux 编译安装 GCC 4.9
 ======
+详情及变更请参照: [Linux 编译安装 GCC 4.9](https://github.com/owt5008137/OWenT-s-Utils/tree/master/Bash%26Shell/GCC%20Installer/gcc-4.9)
 
-详见: [Linux 编译安装 GCC 4.8](http://www.owent.net/?p=730)
-
- GCC4.9发布啦，本脚本在之前4.8的基础上做了稍许改进，更新
+GCC4.9发布啦，本脚本在之前4.8的基础上做了稍许改进，更新
 PS：4.9.0 开始支持C++1y特性
 GCC 4.9 的大致变更如下，因为我只用C/C++所以更关注**通用性高的C和C++**的部分啦： 
 
