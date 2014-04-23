@@ -172,7 +172,7 @@ make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
   
 # install isl
-ISL_PKG=$(check_and_download "isl-0.12" "isl-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.12.2.tar.bz2" );
+ISL_PKG=$(check_and_download "isl-0.11" "isl-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-0.11.1.tar.bz2" );
 if [ $? -ne 0 ]; then
     echo -e "$ISL_PKG"
     exit -1;
@@ -193,16 +193,11 @@ fi
 tar -zxvf $CLOOG_PKG
 CLOOG_DIR=$(ls -d cloog-0.* | grep -v \.tar\.gz)
 cd $CLOOG_DIR
-./configure --prefix=$PREFIX_DIR --with-gmp=system --with-gmp-prefix=$PREFIX_DIR --with-bits=gmp --with-isl=$PREFIX_DIR $BUILD_OTHER_CONF_OPTION
-make $BUILD_THREAD_OPT && make check && make install
+./configure --prefix=$PREFIX_DIR --with-gmp=system --with-gmp-prefix=$PREFIX_DIR --with-bits=gmp --with-isl=system --with-isl-prefix=$PREFIX_DIR $BUILD_OTHER_CONF_OPTION
+make $BUILD_THREAD_OPT && make install && make check
 cd "$WORKING_DIR"
    
 # ======================= install gcc ======================= 
-# ======================= 解决检测ISL有时候会失效的问题 ======================= 
-cd $ISL_DIR
-make install
-cd "$WORKING_DIR"
- 
 # ======================= gcc包 ======================= 
 GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.9.0/gcc-4.9.0.tar.bz2" );
 if [ $? -ne 0 ]; then
@@ -214,7 +209,7 @@ GCC_DIR=$(ls -d gcc-* | grep -v \.tar\.bz2)
 mkdir objdir
 cd objdir
 # ======================= 这一行的最后一个参数请注意，如果要支持其他语言要安装依赖库并打开对该语言的支持 ======================= 
-GCC_CONF_OPTION_ALL="--prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-bootstrap --enable-build-with-cxx --enable-cloog-backend=isl --disable-libjava-multilib --enable-checking=release --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $GCC_OPT_DISABLE_MULTILIB $BUILD_TARGET_CONF_OPTION";
+GCC_CONF_OPTION_ALL="--prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-bootstrap --enable-build-with-cxx --enable-cloog-backend=isl --disable-libjava-multilib --enable-checking=release --enable-gold --enable-ld --enable-libada --enable-libssp --enable-lto --enable-objc-gc --enable-vtable-verify $GCC_OPT_DISABLE_MULTILIB $BUILD_TARGET_CONF_OPTION";
 ../$GCC_DIR/configure $GCC_CONF_OPTION_ALL
 make $BUILD_THREAD_OPT && make install
 cd "$WORKING_DIR"
@@ -282,7 +277,7 @@ else
 	tar -jxvf $GDB_PKG
 	GDB_DIR=$(ls -d gdb-* | grep -v \.tar\.bz2)
 	cd $GDB_DIR
-	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-ld --enable-libada --enable-libssp --enable-objc-gc --enable-vtable-verify $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
+	./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-objc-gc $GDB_PYTHON_OPT $BUILD_TARGET_CONF_OPTION
 	make $BUILD_THREAD_OPT && make install
 	cd "$WORKING_DIR"
 	
