@@ -45,7 +45,7 @@ GCC 4.9 的大致变更如下，因为我只用C/C++所以更关注**通用性�
 13. gmp库 版本4.3.2及以上 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org 下载 ）
 14. mpfr库 版本2.4.2及以上 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org 下载 ）
 15. mpc库 版本0.8.1及以上 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org 下载 ）
-16. isl 版本 0.12.2 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org  中gcc目录中的infrastructure目录下载 ）
+16. isl 版本 0.10, 0.11 或0.12 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org  中gcc目录中的infrastructure目录下载 ）
 17. cloog 版本0.18.1（此处可下载 ftp://gcc.gnu.org/pub/gcc/infrastructure/ ）
 
 ### 我编译的环境
@@ -65,12 +65,12 @@ CentOS 6.2 & CentOS 6.5 & Fedora 20
 + gmp 6.0.0a
 + mpfr 3.1.2
 + mpc 1.0.2
-+ isl 0.12.2
++ isl 0.11.1
 + cloog 0.18.1
 
 #### 编译目标：
 + gcc 4.9.X
-+ binutils 2.24 *（2.24版本的binutils依赖isl 0.10或0.11，但是gcc 4.9是0.12，所以坐等binutils更新以后再加这一项）*
++ binutils 2.24
 + python 2.7.6 *[按需]*
 + gdb 7.7.0 (如果存在ncurses-devel包)
 
