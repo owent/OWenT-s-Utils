@@ -234,7 +234,7 @@ tar -jxvf $BINUTILS_PKG
 BINUTILS_DIR=$(ls -d binutils-* | grep -v \.tar\.bz2)
 cd $BINUTILS_DIR
 ./configure --prefix=$PREFIX_DIR --with-gmp=$PREFIX_DIR --with-mpc=$PREFIX_DIR --with-mpfr=$PREFIX_DIR --with-isl=$PREFIX_DIR --with-cloog=$PREFIX_DIR --enable-build-with-cxx --enable-gold --enable-libada --enable-libssp --enable-lto --enable-objc-gc $BUILD_TARGET_CONF_OPTION
-make -j2 && make install
+make && make install
 # ---- 某个版本编译线程数过高会导致编译不过 
 # ---- 另外某个版本的make check有failed用例就被发布了,应该gnu的自动化测试有遗漏 ----
 make check
