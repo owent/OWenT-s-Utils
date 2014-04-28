@@ -54,9 +54,12 @@ function auto_scp()
     src="$1";
     dst="$2";
     pass="$3";
-
+    port=""
+    if [ $# -gt 3 ]; then
+        port="-P $4";
+    fi
     expect -c "set timeout -1;
-            spawn scp -p -o StrictHostKeyChecking=no -r $src $dst;
+            spawn scp -p -o StrictHostKeyChecking=no -r $port $src $dst;
             expect "*assword:*" { send $pass\r\n; };
             expect eof {exit;};
             "
