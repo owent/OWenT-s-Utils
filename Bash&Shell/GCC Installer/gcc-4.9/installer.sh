@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
  
 # ======================================= 配置 ======================================= 
 PREFIX_DIR=/usr/local/gcc-4.9.0
@@ -62,8 +62,8 @@ PREFIX_DIR="$( cd "$PREFIX_DIR" && pwd )";
 WORKING_DIR="$PWD";
 
 # ======================= 如果是64位系统且没安装32位的开发包，则编译要gcc加上 --disable-multilib 参数, 不生成32位库 ======================= 
-SYS_LONG_BIT=$(getconf LONG_BIT)
-GCC_OPT_DISABLE_MULTILIB=""
+SYS_LONG_BIT=$(getconf LONG_BIT);
+GCC_OPT_DISABLE_MULTILIB="";
 if [ $SYS_LONG_BIT == "64" ]; then
     GCC_OPT_DISABLE_MULTILIB="--disable-multilib";
     echo "int main() { return 0; }" > conftest.c;
@@ -99,7 +99,7 @@ if [ $BUILD_THREAD_OPT -gt 8 ]; then
     BUILD_THREAD_OPT=8;
 fi
 BUILD_THREAD_OPT="-j$BUILD_THREAD_OPT";
-echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile."
+echo -e "\\033[32;1mnotice: $BUILD_CPU_NUMBER cpu(s) detected. use $BUILD_THREAD_OPT for multi-thread compile.";
  
 # ======================= 统一的包检查和下载函数 ======================= 
 function check_and_download(){
