@@ -65,30 +65,25 @@ WORKING_DIR="$PWD";
 SYS_LONG_BIT=$(getconf LONG_BIT)
 GCC_OPT_DISABLE_MULTILIB=""
 if [ $SYS_LONG_BIT == "64" ]; then
-    GCC_OPT_DISABLE_MULTILIB="--disable-multilib"
-    GCC_OPT_DISABLE_MULTILIB_DEV_LIBS=($(whereis librt))
-    if [ ${#GCC_OPT_DISABLE_MULTILIB_DEV_LIBS[@]} -lt 2 ]; then
-        echo -e "\\033[31;1mglibc-devel is required.\\033[39;49;0m"
-        exit -1
+    GCC_OPT_DISABLE_MULTILIB="--disable-multilib";
+    echo "int main() { return 0; }" > conftest.c;
+    gcc -m32 -o conftest ${CFLAGS} ${CPPFLAGS} ${LDFLAGS} conftest.c > /dev/null 2>&1;
+    if test $? = 0 ; then
+        echo -e "\\033[32;1mnotice: check 32 bit build test success, multilib enabled.\\033[39;49;0m";
+        GCC_OPT_DISABLE_MULTILIB="--enable-multilib";
+        rm -f conftest;
+    else
+        echo -e "\\033[32;1mwarning: check 32 bit build test failed, --disable-multilib is added when build gcc.\\033[39;49;0m";
+        let CHECK_INFO_SLEEP=$CHECK_INFO_SLEEP+1;
     fi
-    for FILE_PATH in ${GCC_OPT_DISABLE_MULTILIB_DEV_LIBS[@]}; do
-        if [ ${FILE_PATH:0:9} == "/usr/lib/" ]; then
-            echo -e "\\033[32;1mnotice: librt x86_64 found multilib enabled.\\033[39;49;0m"
-            GCC_OPT_DISABLE_MULTILIB=""
-        fi
-    done
-    GCC_OPT_DISABLE_MULTILIB_DEV_LIBS=""
-    if [ "$GCC_OPT_DISABLE_MULTILIB" == "--disable-multilib" ]; then
-        echo -e "\\033[32;1mwarning: --disable-multilib is added when build gcc.\\033[39;49;0m"
-        let CHECK_INFO_SLEEP=$CHECK_INFO_SLEEP+1
-    fi
+    rm -f conftest.c;
 fi
  
 # ======================= 如果强制开启，则开启 ======================= 
-if [ ! -z "$GCC_OPT_DISABLE_MULTILIB" ]; then
+if [ ! -z "$GCC_OPT_DISABLE_MULTILIB" ] && [ "$GCC_OPT_DISABLE_MULTILIB"=="--disable-multilib" ] ; then
     for opt in $BUILD_TARGET_CONF_OPTION ; do
         if [ "$opt" == "--enable-multilib" ]; then
-            echo -e "\\033[32;1mwarning: librt not found in [*]/lib64 but --enable-multilib enabled in GCC_OPT_DISABLE_MULTILIB.\\033[39;49;0m"
+            echo -e "\\033[32;1mwarning: 32 bit build test failed, but --enable-multilib enabled in GCC_OPT_DISABLE_MULTILIB.\\033[39;49;0m"
             GCC_OPT_DISABLE_MULTILIB="";
             break;
         fi
