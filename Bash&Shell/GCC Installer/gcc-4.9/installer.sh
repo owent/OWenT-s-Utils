@@ -322,7 +322,7 @@ fi
 
 # ======================= install gdb(调试器) [依赖 ncurses-devel 包] ======================= 
 if [ -z "$BUILD_TARGET_COMPOMENTS" ] || [ "0" == $(is_in_list gdb $BUILD_TARGET_COMPOMENTS) ]; then
-    if [ -z "$(whereis libncurses | awk '{print $2;}')" ]; then
+    if [ -z "$(whereis ncurses | awk '{print $2;}')" ]; then
 	    echo -e "\\033[32;1mwarning: libncurses not found, skip build [gdb].\\033[39;49;0m";
     else
 	    # ======================= 检查Python开发包，如果存在，则增加 --with-pyton 选项 =======================
