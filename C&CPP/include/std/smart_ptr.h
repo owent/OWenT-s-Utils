@@ -7,7 +7,7 @@
  * @version 1.0
  * @author OWenT, owt5008137@live.com
  * @date 2012.08.02
- *
+ *     2014.05.17 vc add include <memory>
  * @history
  *
  */
@@ -35,7 +35,11 @@
 *
 * 否则启用boost中的smart_ptr库（如果是这种情况需要加入boost库）
 */
- 
+
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+    #include <memory>
+#endif
+
 // VC9.0 SP1以上分支判断
 #if defined(_MSC_VER) && (_MSC_VER == 1500 && defined (_HAS_TR1)) || (_MSC_VER > 1500 && defined(_HAS_CPP0X) && _HAS_CPP0X)
     // 采用VC std::tr1库
