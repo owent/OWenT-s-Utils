@@ -11,10 +11,12 @@ namespace util
     namespace uri
     {
         typedef bool uri_map_type[256];
+        static uri_map_type g_raw_url_map = { false };
         static uri_map_type g_uri_map = { false };
         static uri_map_type g_uri_component_map = { false };
 
-        static void _init_uri_component_map(uri_map_type& pUriMap)
+        // RFC 3986
+        static void _init_raw_url_map(uri_map_type& pUriMap)
         {
             if (pUriMap[static_cast<int>('0')])
                 return;
@@ -29,8 +31,23 @@ namespace util
                 pUriMap['0' + i] = true;
             }
 
+            // -_.
+            const char strSpec[] = "-_.";
+            for (int i = 0; strSpec[i]; ++ i)
+            {
+                pUriMap[static_cast<int>(strSpec[i])] = true;
+            }
+        }
+
+        static void _init_uri_component_map(uri_map_type& pUriMap)
+        {
+            if (pUriMap[static_cast<int>('0')])
+                return;
+
+            _init_raw_url_map(pUriMap);
+
             // -_.!~*'()
-            const char strSpec[] = "-_.!~*'()";
+            const char strSpec[] = "!~*'()";
             for (int i = 0; strSpec[i]; ++ i)
             {
                 pUriMap[static_cast<int>(strSpec[i])] = true;
@@ -52,9 +69,15 @@ namespace util
         }
 
 
-        static std::string _encode_uri(uri_map_type& pUriMap, const char*& strData, std::size_t& uSize)
+        static std::string _encode_uri(
+            uri_map_type& pUriMap,
+            const char* strData,
+            std::size_t uSize,
+            bool like_php
+        )
         {
             std::string strRet;
+            strRet.reserve(uSize);
 
             while (uSize --)
             {
@@ -62,11 +85,15 @@ namespace util
                 {
                     strRet += *strData;
                 }
+                else if (like_php && ' ' == *strData)
+                {
+                    strRet += '+';
+                }
                 else
                 {
                     strRet += '%';
                     static char strHexMap[16] = {0};
-                    // ³õÊ¼»¯16½øÖÆ±í
+                    // åˆå§‹åŒ–16è¿›åˆ¶è¡¨
                     if (0 == strHexMap[0])
                     {
                         for (int i = 0; i < 10; i ++)
@@ -80,9 +107,9 @@ namespace util
                         }
                     }
 
-                    // ×ªÒåÇ°4Î»
+                    // è½¬ä¹‰å‰4ä½
                     strRet += strHexMap[*strData >> 4];
-                    // ×ªÒåºó4Î»
+                    // è½¬ä¹‰å4ä½
                     strRet += strHexMap[*strData & 0x0F];
                 }
 
@@ -92,22 +119,14 @@ namespace util
             return strRet;
         }
 
-        std::string EncodeUri(const char* strContent, std::size_t uSize)
-        {
-            _init_uri_map(g_uri_map);
-            uSize = uSize? uSize: strlen(strContent);
-
-            return _encode_uri(g_uri_map, strContent, uSize);
-        }
-
-        std::string DecodeUri(const char* strUri, std::size_t uSize)
+        static std::string _decode_uri(const char* strData, std::size_t uSize, bool like_php)
         {
             std::string strRet;
 
-            uSize = uSize? uSize: strlen(strUri);
+            uSize = uSize? uSize: strlen(strData);
             static char strHexMap[256] = {0};
 
-            // ³õÊ¼»¯×Ö·û±í
+            // åˆå§‹åŒ–å­—ç¬¦è¡¨
             if (0 == strHexMap[static_cast<int>('A')])
             {
                 for (int i = 0; i < 10; i ++)
@@ -123,26 +142,41 @@ namespace util
 
             while (uSize --)
             {
-                if (*strUri == '+')
+                if (like_php && '+' == *strData)
                 {
                     strRet += ' ';
                 }
-                else if (*strUri != '%' || uSize < 2)
+                else if (*strData != '%' || uSize < 2)
                 {
-                    strRet += *strUri;
+                    strRet += *strData;
                 }
                 else
                 {
-                    const char &cHigh = strUri[1], &cLow = strUri[2];
+                    const char &cHigh = strData[1], &cLow = strData[2];
                     strRet += (strHexMap[static_cast<int>(cHigh)]<< 4) + strHexMap[static_cast<int>(cLow)];
-                    strUri += 2;
+                    strData += 2;
                     uSize -= 2;
                 }
 
-                ++ strUri;
+                ++ strData;
             }
 
             return strRet;
+        }
+
+
+        std::string EncodeUri(const char* strContent, std::size_t uSize)
+        {
+            _init_uri_map(g_uri_map);
+            uSize = uSize? uSize: strlen(strContent);
+
+            return _encode_uri(g_uri_map, strContent, uSize, false);
+        }
+
+        std::string DecodeUri(const char* strUri, std::size_t uSize)
+        {
+            uSize = uSize? uSize: strlen(strUri);
+            return _decode_uri(strUri, uSize, false);
         }
 
         std::string EncodeUriComponent(const char* strContent, std::size_t uSize)
@@ -150,12 +184,43 @@ namespace util
             _init_uri_component_map(g_uri_component_map);
             uSize = uSize? uSize: strlen(strContent);
 
-            return _encode_uri(g_uri_component_map, strContent, uSize);
+            return _encode_uri(g_uri_component_map, strContent, uSize, false);
         }
 
         std::string DecodeUriComponent(const char* strUri, std::size_t uSize)
         {
-            return DecodeUri(strUri, uSize);
+            uSize = uSize? uSize: strlen(strUri);
+            return _decode_uri(strUri, uSize, false);
+        }
+
+        // ==== RFC 3986 ====
+        std::string RawEncodeUrl(const char* strContent, std::size_t uSize)
+        {
+            _init_raw_url_map(g_raw_url_map);
+            uSize = uSize? uSize: strlen(strContent);
+
+            return _encode_uri(g_raw_url_map, strContent, uSize, false);
+        }
+
+        std::string RawDecodeUrl(const char* strUri, std::size_t uSize)
+        {
+            uSize = uSize? uSize: strlen(strUri);
+            return _decode_uri(strUri, uSize, false);
+        }
+
+        // ==== application/x-www-form-urlencoded ====
+        std::string EncodeUrl(const char* strContent, std::size_t uSize)
+        {
+            _init_raw_url_map(g_raw_url_map);
+            uSize = uSize? uSize: strlen(strContent);
+
+            return _encode_uri(g_raw_url_map, strContent, uSize, true);
+        }
+
+        std::string DecodeUrl(const char* strUri, std::size_t uSize)
+        {
+            uSize = uSize? uSize: strlen(strUri);
+            return _decode_uri(strUri, uSize, true);
         }
     }
 
@@ -166,7 +231,7 @@ namespace util
             strTar += uri::EncodeUriComponent(key.c_str(), key.size()) + "=" + uri::EncodeUriComponent(value.c_str(), value.size()) + "&";
         }
 
-        // ×Ö·û´®ÀàĞÍ
+        // å­—ç¬¦ä¸²ç±»å‹
         ItemString::ItemString(){}
 
         ItemString::ItemString(const std::string& strData): m_strData(strData){}
@@ -200,7 +265,7 @@ namespace util
             return true;
         }
 
-        // Êı×éÀàĞÍ
+        // æ•°ç»„ç±»å‹
         ItemArray::ItemArray(){}
 
         ItemArray::~ItemArray() {}
@@ -256,7 +321,7 @@ namespace util
                 }
             }
 
-            // ²»´øÏÂ±ê±àÂë
+            // ä¸å¸¦ä¸‹æ ‡ç¼–ç 
             if (uIndex >= m_stData.size())
             {
                 strNewPrefix = strPrePrefix + "[]";
@@ -265,7 +330,7 @@ namespace util
                     ret = m_stData[uIndex]->Encode(strOutput, strNewPrefix.c_str()) && ret;
                 }
             }
-            else // ´øÏÂ±ê±àÂë
+            else // å¸¦ä¸‹æ ‡ç¼–ç 
             {
                 for(uIndex = 0; uIndex < m_stData.size(); ++ uIndex)
                 {
@@ -277,7 +342,7 @@ namespace util
             return ret;
         }
 
-        // Ó³ÉäÀàĞÍ
+        // æ˜ å°„ç±»å‹
         ItemObject::ItemObject(){}
 
         ItemObject::~ItemObject() {}
@@ -315,17 +380,17 @@ namespace util
             if (iter == m_stData.end())
             {
                 types::ItemImpl::ptr_type ptr;
-                // ×îºóÒ»¼¶£¬×Ö·û´®ÀàĞÍ
+                // æœ€åä¸€çº§ï¼Œå­—ç¬¦ä¸²ç±»å‹
                 if (index + 1 == stKeys.size())
                 {
                     ptr = ItemString::Create();
                 }
-                // µ¹ÊıµÚ¶ş¼¶£¬ÇÒ×îºóÒ»¼¶keyÎª¿Õ£¬Êı×éÀàĞÍ
+                // å€’æ•°ç¬¬äºŒçº§ï¼Œä¸”æœ€åä¸€çº§keyä¸ºç©ºï¼Œæ•°ç»„ç±»å‹
                 else if (index + 2 == stKeys.size() && stKeys.back().size() == 0)
                 {
                     ptr = ItemArray::Create();
                 }
-                // ObjectÀàĞÍ
+                // Objectç±»å‹
                 else
                 {
                     ptr = ItemObject::Create();
@@ -435,7 +500,7 @@ namespace util
         std::vector<std::string> keys;
         strOrigin.assign(strContent, uSize);
 
-        // ¼ÆËãÖµ
+        // è®¡ç®—å€¼
         std::size_t uValStart = strOrigin.find_last_of('=');
         if (uValStart != strOrigin.npos)
         {
@@ -446,7 +511,7 @@ namespace util
 
         strOrigin = uri::DecodeUriComponent(strOrigin.data(), strOrigin.size());
 
-        // ¼ÆËãkeyÁĞ±í
+        // è®¡ç®—keyåˆ—è¡¨
         for(uSize = 0; uSize < strOrigin.size(); ++ uSize)
         {
             while (uSize < strOrigin.size() && strOrigin[uSize] == ']')
