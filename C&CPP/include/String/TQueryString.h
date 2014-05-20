@@ -1,9 +1,9 @@
 /**
  * @file TQueryString.h
- * @brief Ö§³ÖÇ¶Ì×½á¹¹µÄWeb QuerystringÀà£¬Éú³ÉºÍ½âÎö·½Ê½ÀàËÆPHP <br />
- *        ÒÀÀµÖÇÄÜÖ¸Õë¿â <br />
- *        ×¢: ½âÎö²ÎÊı×Ö·û´®µÄÊ±ºò£¬³ı×îºó*[]=...ÍâµÄËùÓĞ·ûºÏ½á¹¹½«È«²¿½âÎöÎªObjectÀàĞÍ <br />
- *            Êı¾İºÍkeyÖĞ²»ÔÊĞí³öÏÖ[ºÍ]
+ * @brief æ”¯æŒåµŒå¥—ç»“æ„çš„Web Querystringç±»ï¼Œç”Ÿæˆå’Œè§£ææ–¹å¼ç±»ä¼¼PHP <br />
+ *        ä¾èµ–æ™ºèƒ½æŒ‡é’ˆåº“ <br />
+ *        æ³¨: è§£æå‚æ•°å­—ç¬¦ä¸²çš„æ—¶å€™ï¼Œé™¤æœ€å*[]=...å¤–çš„æ‰€æœ‰ç¬¦åˆç»“æ„å°†å…¨éƒ¨è§£æä¸ºObjectç±»å‹ <br />
+ *            æ•°æ®å’Œkeyä¸­ä¸å…è®¸å‡ºç°[å’Œ]
  * Licensed under the MIT licenses.
  *
  * @version 1.0
@@ -11,6 +11,7 @@
  * @date 2012.08.01
  *
  * @history
+ *     2014.05.20 å¢åŠ ç±»ä¼¼phpçš„rawurlencodeå’Œurlencodeå‡½æ•°
  *
  */
 
@@ -30,41 +31,75 @@ namespace util
     namespace uri
     {
         /**
-         * @brief ±àÂëURI£¬ÀàËÆJavascriptµÄencodeURIº¯Êı
-         * @param [in] strContent ´ı±àÂëÄÚÈİÖ¸Õë
-         * @param [in] uSize      ±àÂëÄÚÈİ´óĞ¡£¨Ä¬ÈÏµ±×÷×Ö·û´®£©
-         * @return ±àÂëºóµÄ×Ö·û´®
+         * @brief ç¼–ç URIï¼Œç±»ä¼¼Javascriptçš„encodeURIå‡½æ•°
+         * @param [in] strContent å¾…ç¼–ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      ç¼–ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
          */
         std::string EncodeUri(const char* strContent, std::size_t uSize = 0);
 
         /**
-         * @brief ½âÂëURI£¬ÀàËÆJavascriptµÄdecodeURIº¯Êı
-         * @param [in] strUri     ´ı½âÂëÄÚÈİÖ¸Õë
-         * @param [in] uSize      ½âÂëÄÚÈİ´óĞ¡£¨Ä¬ÈÏµ±×÷×Ö·û´®£©
-         * @return ½âÂëºóµÄ×Ö·û´®
+         * @brief è§£ç URIï¼Œç±»ä¼¼Javascriptçš„decodeURIå‡½æ•°
+         * @param [in] strUri     å¾…è§£ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      è§£ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return è§£ç åçš„å­—ç¬¦ä¸²
          */
         std::string DecodeUri(const char* strUri, std::size_t uSize = 0);
 
         /**
-         * @brief ±àÂë²¢×ªÒåURI£¬ÀàËÆJavascriptµÄdecodeURIComponentº¯Êı
-         * @param [in] strContent ´ı±àÂëÄÚÈİÖ¸Õë
-         * @param [in] uSize      ±àÂëÄÚÈİ´óĞ¡£¨Ä¬ÈÏµ±×÷×Ö·û´®£©
-         * @return ±àÂëºóµÄ×Ö·û´®
+         * @brief ç¼–ç å¹¶è½¬ä¹‰URIï¼Œç±»ä¼¼Javascriptçš„decodeURIComponentå‡½æ•°
+         * @param [in] strContent å¾…ç¼–ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      ç¼–ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
          */
         std::string EncodeUriComponent(const char* strContent, std::size_t uSize = 0);
 
         /**
-         * @brief ½âÂë×ªÒåµÄURI£¬ÀàËÆJavascriptµÄencodeURIComponentº¯Êı
-         * @param [in] strUri     ´ı½âÂëÄÚÈİÖ¸Õë
-         * @param [in] uSize      ½âÂëÄÚÈİ´óĞ¡£¨Ä¬ÈÏµ±×÷×Ö·û´®£©
-         * @return ±àÂëºóµÄ×Ö·û´®
+         * @brief è§£ç è½¬ä¹‰çš„URIï¼Œç±»ä¼¼Javascriptçš„encodeURIComponentå‡½æ•°
+         * @param [in] strUri     å¾…è§£ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      è§£ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
          */
         std::string DecodeUriComponent(const char* strUri, std::size_t uSize = 0);
+        
+                /**
+         * @brief ç¼–ç å¹¶è½¬ä¹‰URLï¼Œç±»ä¼¼phpçš„rawurlencodeå‡½æ•°
+         * æ ¹æ®RFC 3986 ç¼–ç å­—ç¬¦ä¸²
+         * @param [in] strContent å¾…ç¼–ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      ç¼–ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
+         */
+        std::string RawEncodeUrl(const char* strContent, std::size_t uSize = 0);
 
         /**
-         * @brief ×Ö·û´®×ª»»ÎªÈÎÒâÀàĞÍ
-         * @param [in] str     ×Ö·û´®±íÊ¾µÄÊı¾İÄÚÈİ
-         * @return ÈÎÒâÀàĞÍ
+         * @brief è§£ç è½¬ä¹‰çš„URLï¼Œç±»ä¼¼phpçš„rawurldecodeå‡½æ•°
+         * @param [in] strUri     å¾…è§£ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      è§£ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
+         */
+        std::string RawDecodeUrl(const char* strUri, std::size_t uSize = 0);
+
+        /**
+         * @brief ç¼–ç å¹¶è½¬ä¹‰URLï¼Œç±»ä¼¼phpçš„urlencodeå‡½æ•°
+         * æ ¹æ® application/x-www-form-urlencoded ç¼–ç å­—ç¬¦ä¸²
+         * @param [in] strContent å¾…ç¼–ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      ç¼–ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
+         */
+        std::string EncodeUrl(const char* strContent, std::size_t uSize = 0);
+
+        /**
+         * @brief è§£ç è½¬ä¹‰çš„URLï¼Œç±»ä¼¼Javascriptçš„urldecodeå‡½æ•°
+         * @param [in] strUri     å¾…è§£ç å†…å®¹æŒ‡é’ˆ
+         * @param [in] uSize      è§£ç å†…å®¹å¤§å°ï¼ˆé»˜è®¤å½“ä½œå­—ç¬¦ä¸²ï¼‰
+         * @return ç¼–ç åçš„å­—ç¬¦ä¸²
+         */
+        std::string DecodeUrl(const char* strUri, std::size_t uSize = 0);
+
+        /**
+         * @brief å­—ç¬¦ä¸²è½¬æ¢ä¸ºä»»æ„ç±»å‹
+         * @param [in] str     å­—ç¬¦ä¸²è¡¨ç¤ºçš„æ•°æ®å†…å®¹
+         * @return ä»»æ„ç±»å‹
          */
         template<typename T>
         T QueryStringToAny(const char* str)
@@ -77,9 +112,9 @@ namespace util
         }
 
         /**
-         * @brief ÈÎÒâÀàĞÍ×ª»»Îª×Ö·û´®
-         * @param [in] val     ÈÎÒâÀàĞÍÊı¾İ
-         * @return ¶ÔÓ¦µÄ×Ö·û´®
+         * @brief ä»»æ„ç±»å‹è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+         * @param [in] val     ä»»æ„ç±»å‹æ•°æ®
+         * @return å¯¹åº”çš„å­—ç¬¦ä¸²
          */
         template<typename T>
         std::string AnyToQueryString(const T& val)
@@ -94,7 +129,7 @@ namespace util
     namespace types
     {
         /**
-         * @brief Êı¾İÀàĞÍÃ¶¾Ù£¬Ğ¡ÓÚITEM_TYPE_QUERYSTRINGµÄÎªÔªÀàĞÍ
+         * @brief æ•°æ®ç±»å‹æšä¸¾ï¼Œå°äºITEM_TYPE_QUERYSTRINGçš„ä¸ºå…ƒç±»å‹
          */
         enum ITEM_TYPE
         {
@@ -105,7 +140,7 @@ namespace util
         };
 
         /**
-         * @brief Êı¾İÀàĞÍ³éÏó½Ó¿Ú
+         * @brief æ•°æ®ç±»å‹æŠ½è±¡æ¥å£
          */
         class ItemImpl
         {
@@ -113,60 +148,60 @@ namespace util
             ItemImpl(){}
 
             /**
-             * @brief Ìí¼Óµ½×Ö·û´®
-             * @param [in] strTar   Ìî³äÄ¿±ê
-             * @param [in] key      keyÖµ
-             * @param [in] value    valueÖµ
+             * @brief æ·»åŠ åˆ°å­—ç¬¦ä¸²
+             * @param [in] strTar   å¡«å……ç›®æ ‡
+             * @param [in] key      keyå€¼
+             * @param [in] value    valueå€¼
              */
             void appendTo(std::string& strTar, const std::string& key, const std::string& value) const;
 
         public:
             /**
-             * @brief ¶ÔÓ¦Êı¾İÀàĞÍµÄÖÇÄÜÖ¸ÕëÀàĞÍ
+             * @brief å¯¹åº”æ•°æ®ç±»å‹çš„æ™ºèƒ½æŒ‡é’ˆç±»å‹
              */
             typedef std::shared_ptr<ItemImpl> ptr_type;
 
             virtual ~ItemImpl(){}
 
             /**
-             * @brief »ñÈ¡Êı¾İÊıÁ¿
-             * @return Êı¾İ³¤¶È
+             * @brief è·å–æ•°æ®æ•°é‡
+             * @return æ•°æ®é•¿åº¦
              */
             virtual std::size_t GetSize() const = 0;
 
             /**
-             * @brief »ñÈ¡Êı¾İÀàĞÍ
-             * @return ±íÊ¾ÀàĞÍµÄÃ¶¾ÙÀàĞÍ
+             * @brief è·å–æ•°æ®ç±»å‹
+             * @return è¡¨ç¤ºç±»å‹çš„æšä¸¾ç±»å‹
              */
             virtual ITEM_TYPE GetType() const = 0;
 
             /**
-             * @brief °ÑÊı¾İ×ªÎª×Ö·û´®
-             * @param [in] strPrefix Êı¾İÏîÇ°×º
-             * @return ×Ö·û´®±íÊ¾
+             * @brief æŠŠæ•°æ®è½¬ä¸ºå­—ç¬¦ä¸²
+             * @param [in] strPrefix æ•°æ®é¡¹å‰ç¼€
+             * @return å­—ç¬¦ä¸²è¡¨ç¤º
              */
             virtual std::string ToString(const char* strPrefix = "") const = 0;
 
             /**
-             * @brief ±àÂë²¢×·¼ÓÄ¿±ê×Ö·û´®Î²²¿
-             * @param [out] strOutput Êä³öÄÚÈİ
-             * @param [in] strPrefix ±àÂëÄÚÈİÇ°×º
-             * @return Èç¹û³É¹¦£¬·µ»Øtrue£¬·ñÔò·µ»Øfalse
+             * @brief ç¼–ç å¹¶è¿½åŠ ç›®æ ‡å­—ç¬¦ä¸²å°¾éƒ¨
+             * @param [out] strOutput è¾“å‡ºå†…å®¹
+             * @param [in] strPrefix ç¼–ç å†…å®¹å‰ç¼€
+             * @return å¦‚æœæˆåŠŸï¼Œè¿”å›trueï¼Œå¦åˆ™è¿”å›false
              */
             virtual bool Encode(std::string& strOutput, const char* strPrefix = "") const = 0;
 
             /**
-             * @brief Êı¾İ½âÂë
-             * @param [in] stKeys   keyÁĞ±í
-             * @param [in] index    µ±Ç°½âÂëÎ»ÖÃÏÂ±ê
-             * @param [in] strValue Ä¿±êÖµ
-             * @return Èç¹û³É¹¦£¬·µ»Øtrue£¬·ñÔò·µ»Øfalse
+             * @brief æ•°æ®è§£ç 
+             * @param [in] stKeys   keyåˆ—è¡¨
+             * @param [in] index    å½“å‰è§£ç ä½ç½®ä¸‹æ ‡
+             * @param [in] strValue ç›®æ ‡å€¼
+             * @return å¦‚æœæˆåŠŸï¼Œè¿”å›trueï¼Œå¦åˆ™è¿”å›false
              */
             virtual bool parse(const std::vector<std::string>& stKeys, std::size_t index, const std::string& strValue) = 0;
         };
 
         /**
-         * @brief ÆÕÍ¨×Ö·û´®ÀàĞÍ
+         * @brief æ™®é€šå­—ç¬¦ä¸²ç±»å‹
          */
         class ItemString: public ItemImpl
         {
@@ -175,7 +210,7 @@ namespace util
 
         public:
             /**
-             * @brief ¶ÔÓ¦Êı¾İÀàĞÍµÄÖÇÄÜÖ¸ÕëÀàĞÍ
+             * @brief å¯¹åº”æ•°æ®ç±»å‹çš„æ™ºèƒ½æŒ‡é’ˆç±»å‹
              */
             typedef std::shared_ptr<ItemString> ptr_type;
 
@@ -186,15 +221,15 @@ namespace util
             virtual ~ItemString();
 
             /**
-             * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-             * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+             * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+             * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             static inline ptr_type Create() { return std::shared_ptr<ItemString>(new ItemString()); }
 
             /**
-             * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-             * @param [in] strData ³õÊ¼Êı¾İ
-             * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+             * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+             * @param [in] strData åˆå§‹æ•°æ®
+             * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             static inline ptr_type Create(const std::string& strData) { return std::shared_ptr<ItemString>(new ItemString(strData)); }
 
@@ -209,32 +244,32 @@ namespace util
             virtual bool parse(const std::vector<std::string>& stKeys, std::size_t index, const std::string& strValue);
 
             /**
-             * @breif ÀàĞÍ×ª»»²Ù×÷
+             * @breif ç±»å‹è½¬æ¢æ“ä½œ
              */
             inline operator std::string() { return Get(); };
 
             /**
-             * @breif ¼æÈİ¸³Öµ²Ù×÷
-             * @param [in] strData Ô­Ê¼Êı¾İ
-             * @return ÒÀ¾İµÈºÅ²Ù×÷·û¹æÔò·µ»Ø×ÔÉíÒıÓÃ
+             * @breif å…¼å®¹èµ‹å€¼æ“ä½œ
+             * @param [in] strData åŸå§‹æ•°æ®
+             * @return ä¾æ®ç­‰å·æ“ä½œç¬¦è§„åˆ™è¿”å›è‡ªèº«å¼•ç”¨
              */
             inline ItemString& operator=(const std::string& strData) { Set(strData); return (*this); };
 
             /**
-             * @breif ÉèÖÃÊı¾İ
-             * @param [in] strData Ô­Ê¼Êı¾İ
+             * @breif è®¾ç½®æ•°æ®
+             * @param [in] strData åŸå§‹æ•°æ®
              */
             inline void Set(const std::string& strData) { m_strData = strData; };
 
             /**
-             * @breif »ñÈ¡Êı¾İ
-             * @return Êı¾İÄÚÈİ
+             * @breif è·å–æ•°æ®
+             * @return æ•°æ®å†…å®¹
              */
             inline std::string& Get() { return m_strData; };
         };
 
         /**
-         * @brief Êı×éÀàĞÍ
+         * @brief æ•°ç»„ç±»å‹
          */
         class ItemArray: public ItemImpl
         {
@@ -243,7 +278,7 @@ namespace util
 
         public:
             /**
-             * @brief ¶ÔÓ¦Êı¾İÀàĞÍµÄÖÇÄÜÖ¸ÕëÀàĞÍ
+             * @brief å¯¹åº”æ•°æ®ç±»å‹çš„æ™ºèƒ½æŒ‡é’ˆç±»å‹
              */
             typedef std::shared_ptr<ItemArray> ptr_type;
 
@@ -252,9 +287,9 @@ namespace util
             virtual ~ItemArray();
 
             /**
-             * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-             * @param [in] strData ³õÊ¼Êı¾İ
-             * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+             * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+             * @param [in] strData åˆå§‹æ•°æ®
+             * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             static inline ptr_type Create() { return std::shared_ptr<ItemArray>(new ItemArray()); }
 
@@ -269,60 +304,60 @@ namespace util
             virtual bool parse(const std::vector<std::string>& stKeys, std::size_t index, const std::string& strValue);
 
             /**
-             * @breif ÒÀ¾İÏÂ±ê»ñÈ¡Êı¾İ
-             * @param [in] uIndex ÏÂ±ê
-             * @return Êı¾İÄÚÈİµÄÖÇÄÜÖ¸Õë
+             * @breif ä¾æ®ä¸‹æ ‡è·å–æ•°æ®
+             * @param [in] uIndex ä¸‹æ ‡
+             * @return æ•°æ®å†…å®¹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             inline std::shared_ptr<ItemImpl> Get(std::size_t uIndex) { return m_stData[uIndex]; };
 
             /**
-             * @breif ÒÀ¾İÏÂ±ê»ñÈ¡Êı¾İµÄ×Ö·û´®Öµ
-             * @param [in] uIndex ÏÂ±ê
-             * @return Êı¾İÄÚÈİµÄ×Ö·û´®±íÊ¾
+             * @breif ä¾æ®ä¸‹æ ‡è·å–æ•°æ®çš„å­—ç¬¦ä¸²å€¼
+             * @param [in] uIndex ä¸‹æ ‡
+             * @return æ•°æ®å†…å®¹çš„å­—ç¬¦ä¸²è¡¨ç¤º
              */
             inline std::string GetString(std::size_t uIndex) const { return m_stData[uIndex]->ToString(); };
 
             /**
-             * @breif ÉèÖÃÖµ
-             * @param [in] uIndex ÏÂ±ê
-             * @param [in] value ÖµµÄÖÇÄÜÖ¸Õë
+             * @breif è®¾ç½®å€¼
+             * @param [in] uIndex ä¸‹æ ‡
+             * @param [in] value å€¼çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             inline void Set(std::size_t uIndex, const std::shared_ptr<ItemImpl>& value) { m_stData[uIndex] = value; };
 
             /**
-             * @breif ÉèÖÃ×Ö·û´®Öµ
-             * @param [in] uIndex ÏÂ±ê
-             * @param [in] value ×Ö·û´®Öµ
+             * @breif è®¾ç½®å­—ç¬¦ä¸²å€¼
+             * @param [in] uIndex ä¸‹æ ‡
+             * @param [in] value å­—ç¬¦ä¸²å€¼
              */
             inline void Set(std::size_t uIndex, const std::string& value) { m_stData[uIndex] = std::shared_ptr<ItemString>(new ItemString(value)); };
 
             /**
-             * @breif Ìí¼ÓÖµ
-             * @param [in] uIndex ÏÂ±ê
-             * @param [in] value ÖµµÄÖÇÄÜÖ¸Õë
+             * @breif æ·»åŠ å€¼
+             * @param [in] uIndex ä¸‹æ ‡
+             * @param [in] value å€¼çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             inline void Append(const std::shared_ptr<ItemImpl>& value) { m_stData.push_back(value); };
 
             /**
-             * @breif Ìí¼Ó×Ö·û´®Öµ
-             * @param [in] uIndex ÏÂ±ê
-             * @param [in] value ×Ö·û´®Öµ
+             * @breif æ·»åŠ å­—ç¬¦ä¸²å€¼
+             * @param [in] uIndex ä¸‹æ ‡
+             * @param [in] value å­—ç¬¦ä¸²å€¼
              */
             inline void Append(const std::string& value) { m_stData.push_back(std::shared_ptr<ItemString>(new ItemString(value))); };
 
             /**
-             * @breif Çå³ı×îºóÒ»ÏîÊı¾İ
+             * @breif æ¸…é™¤æœ€åä¸€é¡¹æ•°æ®
              */
             inline void PopBack() { m_stData.pop_back(); };
 
             /**
-             * @breif Çå¿ÕÊı¾İ
+             * @breif æ¸…ç©ºæ•°æ®
              */
             inline void Clear() { m_stData.clear(); };
         };
 
         /**
-         * @brief Ó³ÉäÀàĞÍ
+         * @brief æ˜ å°„ç±»å‹
          */
         class ItemObject: public ItemImpl
         {
@@ -333,14 +368,14 @@ namespace util
 
         public:
             /**
-             * @brief ¶ÔÓ¦Êı¾İÀàĞÍµÄÖÇÄÜÖ¸ÕëÀàĞÍ
+             * @brief å¯¹åº”æ•°æ®ç±»å‹çš„æ™ºèƒ½æŒ‡é’ˆç±»å‹
              */
             typedef std::shared_ptr<ItemObject> ptr_type;
 
             /**
-             * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-             * @param [in] strData ³õÊ¼Êı¾İ
-             * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+             * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+             * @param [in] strData åˆå§‹æ•°æ®
+             * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             static inline ptr_type Create() { return std::shared_ptr<ItemObject>(new ItemObject()); }
 
@@ -361,9 +396,9 @@ namespace util
             std::vector<std::string> GetKeys() const;
 
             /**
-             * @breif ÒÀ¾İKey»ñÈ¡Êı¾İ
+             * @breif ä¾æ®Keyè·å–æ•°æ®
              * @param [in] key Key
-             * @return Êı¾İÄÚÈİµÄÖÇÄÜÖ¸Õë
+             * @return æ•°æ®å†…å®¹çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             inline std::shared_ptr<ItemImpl> Get(const std::string& key) 
             { 
@@ -372,9 +407,9 @@ namespace util
             };
 
             /**
-             * @breif ÒÀ¾İKey»ñÈ¡Êı¾İµÄ×Ö·û´®Öµ
+             * @breif ä¾æ®Keyè·å–æ•°æ®çš„å­—ç¬¦ä¸²å€¼
              * @param [in] key Key
-             * @return Êı¾İÄÚÈİµÄ×Ö·û´®±íÊ¾
+             * @return æ•°æ®å†…å®¹çš„å­—ç¬¦ä¸²è¡¨ç¤º
              */
             inline std::string GetString(const std::string& key) const 
             { 
@@ -383,9 +418,9 @@ namespace util
             };
 
             /**
-             * @breif Ìí¼Ó»òÉèÖÃÖµ
+             * @breif æ·»åŠ æˆ–è®¾ç½®å€¼
              * @param [in] key Key
-             * @param [in] value ÖµµÄÖÇÄÜÖ¸Õë
+             * @param [in] value å€¼çš„æ™ºèƒ½æŒ‡é’ˆ
              */
             inline void Set(const std::string& key, const std::shared_ptr<ItemImpl>& value) 
             {
@@ -401,20 +436,20 @@ namespace util
             };
 
             /**
-             * @breif Ìí¼Ó»òÉèÖÃ×Ö·û´®Öµ
+             * @breif æ·»åŠ æˆ–è®¾ç½®å­—ç¬¦ä¸²å€¼
              * @param [in] key Key
-             * @param [in] value ×Ö·û´®Öµ
+             * @param [in] value å­—ç¬¦ä¸²å€¼
              */
             inline void Set(const std::string& key, const std::string& value) { Set(key, std::shared_ptr<ItemString>(new ItemString(value))); };
 
             /**
-             * @breif É¾³ıÊı¾İ
+             * @breif åˆ é™¤æ•°æ®
              * @param [in] key Key
              */
             inline void Del(const std::string& key) { m_stData.erase(key); };
 
             /**
-             * @breif Çå¿ÕÊı¾İ
+             * @breif æ¸…ç©ºæ•°æ®
              */
             inline void Clear() { m_stData.clear(); };
         };
@@ -432,7 +467,7 @@ namespace util
 
     public:
         /**
-         * @brief ¶ÔÓ¦Êı¾İÀàĞÍµÄÖÇÄÜÖ¸ÕëÀàĞÍ
+         * @brief å¯¹åº”æ•°æ®ç±»å‹çš„æ™ºèƒ½æŒ‡é’ˆç±»å‹
          */
         typedef std::shared_ptr<TQueryString> ptr_type;
 
@@ -443,15 +478,15 @@ namespace util
         virtual ~TQueryString();
 
         /**
-         * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-         * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+         * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+         * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
          */
         static inline ptr_type Create() { return std::shared_ptr<TQueryString>(new TQueryString()); }
 
         /**
-         * @brief ´´½¨×ÔÉíÀàĞÍµÄÊµÀı
-         * @param [in] strSpliter Ä¬ÈÏ·Ö¸ô·û
-         * @return ĞÂÊµÀıµÄÖÇÄÜÖ¸Õë
+         * @brief åˆ›å»ºè‡ªèº«ç±»å‹çš„å®ä¾‹
+         * @param [in] strSpliter é»˜è®¤åˆ†éš”ç¬¦
+         * @return æ–°å®ä¾‹çš„æ™ºèƒ½æŒ‡é’ˆ
          */
         static inline ptr_type Create(const std::string& strSpliter) { return std::shared_ptr<TQueryString>(new TQueryString(strSpliter)); }
 
@@ -464,48 +499,48 @@ namespace util
         virtual bool Encode(std::string& strOutput, const char* strPrefix = "") const;
 
         /**
-         * @breif ½âÂëÊı¾İ
-         * @param [in] strContent Êı¾İÖ¸Õë
-         * @param [in] uSize      Êı¾İ³¤¶È
-         * @return ³É¹¦·µ»Øtrue
+         * @breif è§£ç æ•°æ®
+         * @param [in] strContent æ•°æ®æŒ‡é’ˆ
+         * @param [in] uSize      æ•°æ®é•¿åº¦
+         * @return æˆåŠŸè¿”å›true
          */
         bool Decode(const char* strContent, std::size_t uSize = 0);
 
         /**
-         * @breif ¸ù¾İID»ñÈ¡Êı¾İ
+         * @breif æ ¹æ®IDè·å–æ•°æ®
          * @param [in] key Key
-         * @return ´æÔÚ·µ»Ø¶ÔÓ¦µÄÖÇÄÜÖ¸Õë£¬·ñÔò·µ»Ø¿ÕÖÇÄÜÖ¸Õë
+         * @return å­˜åœ¨è¿”å›å¯¹åº”çš„æ™ºèƒ½æŒ‡é’ˆï¼Œå¦åˆ™è¿”å›ç©ºæ™ºèƒ½æŒ‡é’ˆ
          */
         std::shared_ptr<types::ItemImpl> operator[](const std::string& key);
 
         /**
-         * @breif ÉèÖÃÊı¾İ·Ö¸ô·û
-         * @param [in] strSpliter ·Ö¸î·û£¬Ã¿¸ö×Ö·û¶¼ÊÇµ¥¶ÀµÄ·Ö¸ô·û
+         * @breif è®¾ç½®æ•°æ®åˆ†éš”ç¬¦
+         * @param [in] strSpliter åˆ†å‰²ç¬¦ï¼Œæ¯ä¸ªå­—ç¬¦éƒ½æ˜¯å•ç‹¬çš„åˆ†éš”ç¬¦
          */
         inline void SetSpliter(const std::string& strSpliter) { m_strSpliter = strSpliter; };
 
         /**
-         * @breif ´´½¨×Ö·û´®ÊµÀı
-         * @return ĞÂÊµÀıÖ¸Õë
+         * @breif åˆ›å»ºå­—ç¬¦ä¸²å®ä¾‹
+         * @return æ–°å®ä¾‹æŒ‡é’ˆ
          */
         static inline types::ItemString::ptr_type CreateString() { return types::ItemString::Create(); };
 
         /**
-         * @breif ´´½¨×Ö·û´®ÊµÀı
-         * @param [in] val ³õÊ¼Öµ
-         * @return ĞÂÊµÀıÖ¸Õë
+         * @breif åˆ›å»ºå­—ç¬¦ä¸²å®ä¾‹
+         * @param [in] val åˆå§‹å€¼
+         * @return æ–°å®ä¾‹æŒ‡é’ˆ
          */
         static inline types::ItemString::ptr_type CreateString(const std::string& val) { return types::ItemString::Create(val); };
 
         /**
-         * @breif ´´½¨Êı×éÊµÀı
-         * @return ĞÂÊµÀıÖ¸Õë
+         * @breif åˆ›å»ºæ•°ç»„å®ä¾‹
+         * @return æ–°å®ä¾‹æŒ‡é’ˆ
          */
         static inline types::ItemArray::ptr_type CreateArray() { return types::ItemArray::Create(); };
 
         /**
-         * @breif ´´½¨ObjectÊµÀı
-         * @return ĞÂÊµÀıÖ¸Õë
+         * @breif åˆ›å»ºObjectå®ä¾‹
+         * @return æ–°å®ä¾‹æŒ‡é’ˆ
          */
         static inline types::ItemObject::ptr_type CreateObject() { return types::ItemObject::Create(); };
     };
