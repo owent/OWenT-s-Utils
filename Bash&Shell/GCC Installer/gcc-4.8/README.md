@@ -24,7 +24,7 @@ PS：4.8.1开始全面支持C++11特性，并且脱离了ppl库，gdb也开始�
 13. mpfr库 版本2.4.2及以上 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org 下载 ）
 14. mpc库 版本0.8.1及以上 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org 下载 ）
 15. isl 版本 0.11.1 （可由GNU镜像列表 http://www.gnu.org/prep/ftp.html 或自动选择最佳镜像 http://ftpmirror.gnu.org  中gcc目录中的infrastructure目录下载 ）
-16. cloog 版本0.18.0（此处可下载 ftp://gcc.gnu.org/pub/gcc/infrastructure/ ）
+16. cloog 版本0.18.1（此处可下载 ftp://gcc.gnu.org/pub/gcc/infrastructure/ ）
 
 <h3><span style="color:#008080;">我编译的环境</span></h3>
 <h4><span style="color:#4B0082;">系统：</span></h4>
@@ -40,16 +40,16 @@ CentOS 6.2 & CentOS 6.5 & Suse 的不知道哪个很老的版本
 + gcc 4.4.7 or gcc 4.1.2 or gcc 4.4.5
 
 <h4><span style="color:#4B0082;">编译的依赖库：</span></h4>
-+ gmp 5.1.3
++ gmp 6.0.0a
 + mpfr 3.1.2
-+ mpc 1.0.1
++ mpc 1.0.2
 + isl 0.11.1
-+ cloog 0.18.0
++ cloog 0.18.1
 
 <h4><span style="color:#4B0082;">编译目标：</span></h4>
 + gcc 4.8.X
 + binutils 2.24
-+ gdb 7.6.2 (如果存在ncurses-devel包)
++ gdb 7.7.1
 
 <h4><span style="color:#4B0082;">注：</span></h4>
 + (所有的库都会被安装在**$PREFEX_DIR**里)
@@ -81,3 +81,4 @@ end
 + 2013-06-03     更新gcc到4.8.1，更新基础库，更新gdb到7.6，添加clean功能，gdb添加python支持(用于pretty-printer)
 + 2013-10-29     更新gcc到4.8.2，更新gdb到7.6.1，更新GMP到5.1.3
 + 2013-12-13     更新binutils到2.24，更新gdb到7.6.2，移除对ppl的依赖，显式开启gold等一些选项，显式开启链接时优化选项
++ 2014-05-23     更新gcc到4.8.3，更新gdb到7.7.1，完全移除对ppl的依赖，同步gcc4.9编译脚本中修复的一些问题，增加编译选项等
