@@ -4,8 +4,8 @@ Gnome 配置记录
 主题: gnome-look.org, art.gnome.org
 ------
 1. Numix, numixproject.org
-    1.1 sudo add-apt-repository ppa:numix/ppa
-    1.2 sudo fedy -e numix_themes
+    - 1.1 sudo add-apt-repository ppa:numix/ppa
+    - 1.2 sudo fedy -e numix_themes
 2. Moka, mokaproject.com
 
 
