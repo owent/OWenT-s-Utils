@@ -72,7 +72,7 @@ CentOS 6.2 & CentOS 6.5 & Fedora 20 & Ubuntu 14.04 LTS
 + gcc 4.9.X
 + binutils 2.24
 + python 2.7.6 *[按需]*
-+ gdb 7.7.0 (如果存在ncurses-devel包)
++ gdb 7.7.1 (如果存在ncurses-devel包)
 
 #### 注：
 + (所有的库都会被安装在**$PREFEX_DIR**里)
@@ -99,3 +99,4 @@ end
 #### History:
 + 2014-04-23     Created
 + 2014-04-28     增加一些控制选项
++ 2014-05-23     更新gdb到7.7.1
