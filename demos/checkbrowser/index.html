@@ -55,11 +55,151 @@
     </script>
 </head>
 <body>
+    <h1>Browser & Environment Detect</h1>
     <script type="text/javascript">
         document.write("<table>" + res + "</table>");
     </script>
     
     <a href="https://github.com/owt5008137/OWenT-s-Utils/blob/master/Web/js/jquery.browser.ts" target="_blank">Check Browser Script Source</a>
+
+    <br /><br />
+    <hr />
+    <h2>Ext. Browser Function Check</h2>
+    <script type="text/javascript" src="//modernizr.github.io/Modernizr/dist/modernizr-build.min.js"></script>
+    <script type="text/javascript">
+    (function(){
+        if (! window.Modernizr) {
+            document.write('<h6>Load Modernizr Failed!</h6>');
+            return;
+        }
+
+        document.write("<table><tr><th>Name</th><th>Status</th></tr>");
+        var write_item = (function (_name, _value) {
+            document.write("<tr><td>" + _name + "</td><td>" + _value + "</td></tr>")
+        });
+        // css
+        for (var key in Modernizr) {
+            if ('css' == key.substr(0, 3))
+                write_item("CSS." + key.substr(3), Modernizr[key]? "Yes": "No");
+            else if ('background' == key.substr(0, 10))
+                write_item("CSS.background." + key.substr(10), Modernizr[key]? "Yes": "No");
+            else if ('bg' == key.substr(0, 2))
+                write_item("CSS.background." + key.substr(2), Modernizr[key]? "Yes": "No");
+            else if ('border' == key.substr(0, 6))
+                write_item("CSS.border." + key.substr(6), Modernizr[key]? "Yes": "No");
+            else if ('box' == key.substr(0, 3))
+                write_item("CSS.box." + key.substr(3), Modernizr[key]? "Yes": "No");
+        }
+        if (undefined !== Modernizr.textshadow) write_item("CSS.textshadow", Modernizr.textshadow? "Yes": "No");
+        if (undefined !== Modernizr.opacity) write_item("CSS.opacity", Modernizr.opacity? "Yes": "No");
+        if (undefined !== Modernizr.fontface) write_item("CSS.fontface", Modernizr.fontface? "Yes": "No");
+        if (undefined !== Modernizr.overflowscrolling) write_item("CSS.overflowscrolling", Modernizr.overflowscrolling? "Yes": "No");
+        if (undefined !== Modernizr.displayrunin || undefined !== Modernizr["display-runin"]) write_item("CSS.display.runin", Modernizr.displayrunin || Modernizr["display-runin"]? "Yes": "No");
+        if (undefined !== Modernizr.displaytable || undefined !== Modernizr["display-table"]) write_item("CSS.display.table", Modernizr.displaytable || Modernizr["display-table"]? "Yes": "No");
+
+        // dom
+        if (undefined !== Modernizr.adownload) write_item("Dom.anchor.download", Modernizr.adownload? "Yes": "No");
+        if (Modernizr.input) {
+            for (var key in Modernizr.input) {
+                write_item("Dom.input.attr." + key, Modernizr.input[key]? "Yes": "No");
+            }
+        }
+        if (Modernizr.inputtypes) {
+            for (var key in Modernizr.inputtypes) {
+                write_item("Dom.input.type." + key, Modernizr.inputtypes[key]? "Yes": "No");
+            }
+        }
+        for (var key in Modernizr.video) {
+            if ('form' == key.substr(0, 4))
+                write_item("Dom.form." + key.substr(4), Modernizr[key]? "Yes": "No");
+        }
+        if (undefined !== Modernizr.contextmenu) write_item("Dom.menu.contextmenu", Modernizr.contextmenu? "Yes": "No");
+        if (undefined !== Modernizr.progressbar) write_item("Dom.progressbar", Modernizr.progressbar? "Yes": "No");
+        if (undefined !== Modernizr.sandbox) write_item("Dom.iframe.sandbox", Modernizr.sandbox? "Yes": "No");
+        if (undefined !== Modernizr.seamless) write_item("Dom.iframe.seamless", Modernizr.seamless? "Yes": "No");
+
+        // video
+        if (undefined !== Modernizr.videoautoplay) write_item("Video.autoplay", Modernizr.videoautoplay? "Yes": "No");
+        if (Modernizr.video) {
+            for (var key in Modernizr.video) {
+                write_item("Video.format." + key, Modernizr.video[key]);
+            }
+        }
+
+        // audio
+        if (undefined !== Modernizr.webaudio) write_item("Audio.webaudio", Modernizr.webaudio? "Yes": "No");
+        if (undefined !== Modernizr.audiodata) write_item("Audio.audiodata", Modernizr.audiodata? "Yes": "No");
+        if (Modernizr.audio) {
+            for (var key in Modernizr.audio) {
+                write_item("Audio.format." + key, Modernizr.audio[key]);
+            }
+        }
+
+        // image
+        if (undefined !== Modernizr.webp) write_item("Image.webp", Modernizr.webp? "Yes": "No");
+        if (undefined !== Modernizr.webplossless) write_item("Image.webp.lossless", Modernizr.webplossless? "Yes": "No");
+        if (undefined !== Modernizr.todataurljpeg) write_item("Image.todataurl.jpeg", Modernizr.todataurljpeg? "Yes": "No");
+        if (undefined !== Modernizr.todataurlpng) write_item("Image.todataurl.png", Modernizr.todataurlpng? "Yes": "No");
+        if (undefined !== Modernizr.todataurlwebp) write_item("Image.todataurl.webp", Modernizr.todataurlwebp? "Yes": "No");
+        if (undefined !== Modernizr.inlinesvg) write_item("Image.svg.inline", Modernizr.inlinesvg? "Yes": "No");
+        if (undefined !== Modernizr.svg) write_item("Image.svg", Modernizr.svg? "Yes": "No");
+        if (undefined !== Modernizr.svgimg) write_item("Image.svg.img", Modernizr.svgimg? "Yes": "No");
+        if (undefined !== Modernizr.svgclippaths) write_item("Image.svg.clippaths", Modernizr.svgclippaths? "Yes": "No");
+        if (undefined !== Modernizr.svgfilters) write_item("Image.svg.filters", Modernizr.svgfilters? "Yes": "No");
+
+        // graph
+        if (undefined !== Modernizr.webgl) write_item("Graph.WebGL", Modernizr.webgl? "Yes": "No");
+        if (Modernizr.webglextensions) {
+            for (var key in Modernizr.webglextensions)
+                write_item("Graph.WebGL.extension." + key, Modernizr.webglextensions[key]? "Yes": "No");
+        }
+        if (undefined !== Modernizr.canvas) write_item("Graph.canvas", Modernizr.canvas? "Yes": "No");
+        if (undefined !== Modernizr.canvastext) write_item("Graph.canvas.text", Modernizr.canvastext? "Yes": "No");
+        if (undefined !== Modernizr.ellipsis) write_item("Graph.ellipsis", Modernizr.ellipsis? "Yes": "No");
+
+        // component
+        if (undefined !== Modernizr.websockets) write_item("WebSockets", Modernizr.websockets? "Yes": "No");
+        if (undefined !== Modernizr.websocketsbinary) write_item("WebSockets.Binary", Modernizr.websocketsbinary? "Yes": "No");
+        if (undefined !== Modernizr.json) write_item("JSON", Modernizr.json? "Yes": "No");
+        for(var key in Modernizr) {
+            if ('data' == key.substr(0, 4)) {
+                if ('boolean' == typeof(Modernizr[key])) {
+                    write_item("Data." + key, Modernizr[key]? "Yes": "No");
+                    continue;
+                }
+
+                var val = "";
+                for (var s in Modernizr[key])
+                    val += s + ":" + Modernizr[key][s] + ",";
+                write_item("Data." + key, val.substr(0, val.length - 1));
+            }
+        }
+        if (undefined !== Modernizr.sessionstorege) write_item("Data.sessionstorage", Modernizr.sessionstorege? "Yes": "No");
+        if (undefined !== Modernizr.localstorage) write_item("Data.localstorage", Modernizr.localstorage? "Yes": "No");
+        if (undefined !== Modernizr.localizednumber) write_item("LocalizedNumber", Modernizr.localizednumber? "Yes": "No");
+        if (undefined !== Modernizr.indexddb) write_item("Data.indexddb", Modernizr.indexddb? "Yes": "No");
+        if (undefined !== Modernizr.notification) write_item("Notification", Modernizr.notification? "Yes": "No");
+
+        // language
+        if (undefined !== Modernizr.dart) write_item("Language.dart", Modernizr.dart? "Yes": "No");
+        if (undefined !== Modernizr.ruby) write_item("Language.ruby", Modernizr.ruby? "Yes": "No");
+
+        // device
+        for (var key in Modernizr.audio) {
+            if ('device' == key.substr(0, 6))
+                write_item("Device." + key, Modernizr[key]? "Yes": "No");
+        }
+        if (undefined !== Modernizr.geolocation) write_item("Device.geolocation", Modernizr.geolocation? "Yes": "No");
+        if (undefined !== Modernizr.lowbattery) write_item("Device.lowbattery", Modernizr.lowbattery? "Yes": "No");
+        if (undefined !== Modernizr.batteryapi || undefined !== Modernizr["battery-api"]) write_item("Device.batteryapi", Modernizr.batteryapi || Modernizr["battery-api"]? "Yes": "No");
+        if (undefined !== Modernizr.fullscreen) write_item("Device.fullscreen", Modernizr.fullscreen? "Yes": "No");
+        if (undefined !== Modernizr.gamepads) write_item("Device.gamepads", Modernizr.gamepads? "Yes": "No");
+
+        // 
+        document.write("</table>");
+    })()
+    </script>
+
 <!-- 腾讯分析服务 -->
 <script type="text/javascript" src="http://tajs.qq.com/stats?sId=15289219" charset="UTF-8"></script>
 
