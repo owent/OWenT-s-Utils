@@ -164,14 +164,14 @@
         for(var key in Modernizr) {
             if ('data' == key.substr(0, 4)) {
                 if ('boolean' == typeof(Modernizr[key])) {
-                    write_item("Data." + key, Modernizr[key]? "Yes": "No");
+                    write_item("Data." + key.substr(4), Modernizr[key]? "Yes": "No");
                     continue;
                 }
 
                 var val = "";
                 for (var s in Modernizr[key])
                     val += s + ":" + Modernizr[key][s] + ",";
-                write_item("Data." + key, val.substr(0, val.length - 1));
+                write_item("Data." + key.substr(4), val.substr(0, val.length - 1));
             }
         }
         if (undefined !== Modernizr.sessionstorege) write_item("Data.sessionstorage", Modernizr.sessionstorege? "Yes": "No");
