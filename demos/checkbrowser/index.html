@@ -122,7 +122,7 @@
         if (undefined !== Modernizr.videoautoplay) write_item("Video.autoplay", Modernizr.videoautoplay? "Yes": "No");
         if (Modernizr.video) {
             for (var key in Modernizr.video) {
-                write_item("Video.format." + key, Modernizr.video[key]);
+                write_item("Video.format." + key, Modernizr.video[key] || "Not Supported");
             }
         }
 
@@ -131,7 +131,7 @@
         if (undefined !== Modernizr.audiodata) write_item("Audio.audiodata", Modernizr.audiodata? "Yes": "No");
         if (Modernizr.audio) {
             for (var key in Modernizr.audio) {
-                write_item("Audio.format." + key, Modernizr.audio[key]);
+                write_item("Audio.format." + key, Modernizr.audio[key] || “Not Supported”);
             }
         }
 
@@ -167,17 +167,18 @@
                     write_item("Data." + key.substr(4), Modernizr[key]? "Yes": "No");
                     continue;
                 }
-
-                var val = "";
-                for (var s in Modernizr[key])
-                    val += s + ":" + Modernizr[key][s] + ",";
-                write_item("Data." + key.substr(4), val.substr(0, val.length - 1));
             }
         }
-        if (undefined !== Modernizr.sessionstorege) write_item("Data.sessionstorage", Modernizr.sessionstorege? "Yes": "No");
+        if (undefined !== Modernizr.datauri) {
+            var val = "";
+            for (var s in Modernizr[key])
+                val += s + ":" + Modernizr[key][s] + ",";
+            write_item("Data." + key.substr(4), val.substr(0, val.length - 1));
+        }
+        if (undefined !== Modernizr.sessionstorage) write_item("Data.sessionstorage", Modernizr.sessionstorage? "Yes": "No");
         if (undefined !== Modernizr.localstorage) write_item("Data.localstorage", Modernizr.localstorage? "Yes": "No");
         if (undefined !== Modernizr.localizednumber) write_item("LocalizedNumber", Modernizr.localizednumber? "Yes": "No");
-        if (undefined !== Modernizr.indexddb) write_item("Data.indexddb", Modernizr.indexddb? "Yes": "No");
+        if (undefined !== Modernizr.indexeddb) write_item("Data.indexeddb", Modernizr.indexeddb? "Yes": "No");
         if (undefined !== Modernizr.notification) write_item("Notification", Modernizr.notification? "Yes": "No");
 
         // language
@@ -185,7 +186,7 @@
         if (undefined !== Modernizr.ruby) write_item("Language.ruby", Modernizr.ruby? "Yes": "No");
 
         // device
-        for (var key in Modernizr.audio) {
+        for (var key in Modernizr) {
             if ('device' == key.substr(0, 6))
                 write_item("Device." + key, Modernizr[key]? "Yes": "No");
         }
