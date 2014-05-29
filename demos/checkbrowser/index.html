@@ -131,7 +131,7 @@
         if (undefined !== Modernizr.audiodata) write_item("Audio.audiodata", Modernizr.audiodata? "Yes": "No");
         if (Modernizr.audio) {
             for (var key in Modernizr.audio) {
-                write_item("Audio.format." + key, Modernizr.audio[key] || “Not Supported”);
+                write_item("Audio.format." + key, Modernizr.audio[key] || "Not Supported");
             }
         }
 
