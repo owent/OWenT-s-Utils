@@ -17,6 +17,8 @@
  *         2. add try unlock function
  *         3. fix atom operator
  *         4. add gcc atomic support
+ *    2014-07-08
+ *         1. add yield operation 
  */
 
 #ifndef _UTIL_LOCK_SPINLOCK_H_
@@ -28,14 +30,111 @@
 
 #if defined(__clang__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 1 ) ) && __cplusplus >= 201103L
     #include <atomic>
-    #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
+    #define __UTIL_LOCK_SPINLOCK_ATOMIC_STD
 #elif defined(_MSC_VER) && (_MSC_VER >= 1700) && defined(_HAS_CPP0X) && _HAS_CPP0X
     #include <atomic>
-    #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
+    #define __UTIL_LOCK_SPINLOCK_ATOMIC_STD
 #elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 5 && (__cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__))
     #include <atomic>
-    #define __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
+    #define __UTIL_LOCK_SPINLOCK_ATOMIC_STD
 #endif
+
+
+/**
+ * ==============================================
+ * ======            asm pause             ======
+ * ==============================================
+ */
+#if defined(__GNUC__) || defined(__clang__)
+    #if defined(__i386__) || defined(__x86_64__)
+        /**
+         * See: Intel(R) 64 and IA-32 Architectures Software Developer's Manual V2
+         * PAUSE-Spin Loop Hint, 4-57
+         * http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-instruction-set-reference-manual-325383.html?wapkw=instruction+set+reference
+         */
+        #define __UTIL_LOCK_SPIN_LOCK_PAUSE() __asm__ __volatile__("pause")
+    #elif defined(__ia64__) || defined(__ia64)
+        /**
+         * See: Intel(R) Itanium(R) Architecture Developer's Manual, Vol.3
+         * hint - Performance Hint, 3:145
+         * http://www.intel.com/content/www/us/en/processors/itanium/itanium-architecture-vol-3-manual.html
+         */
+        #define __UTIL_LOCK_SPIN_LOCK_PAUSE() __asm__ __volatile__ ("hint @pause")
+    #elif defined(__arm__)
+        /**
+         * See: ARM Architecture Reference Manuals (YIELD)
+         * http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.subset.architecture.reference/index.html
+         */
+        #define __UTIL_LOCK_SPIN_LOCK_PAUSE() __asm__ __volatile__ ("yield")
+    #endif
+
+#endif /*compilers*/
+
+// set pause do nothing
+#if !defined(__UTIL_LOCK_SPIN_LOCK_PAUSE)
+    #define __UTIL_LOCK_SPIN_LOCK_PAUSE()
+#endif/*!defined(CAPO_SPIN_LOCK_PAUSE)*/
+
+
+/**
+ * ==============================================
+ * ======            cpu yield             ======
+ * ==============================================
+ */
+#if defined(_MSC_VER)
+    #include <windows.h> // YieldProcessor
+
+    /*
+     * See: http://msdn.microsoft.com/en-us/library/windows/desktop/ms687419(v=vs.85).aspx
+     * Not for intel c++ compiler, so ignore http://software.intel.com/en-us/forums/topic/296168
+     */
+    #define __UTIL_LOCK_SPIN_LOCK_CPU_YIELD() YieldProcessor()
+
+#elif defined(__linux__) || defined(__unix__)
+    #include <sched.h>
+    #define __UTIL_LOCK_SPIN_LOCK_CPU_YIELD() sched_yield()
+#endif
+
+#ifndef __UTIL_LOCK_SPIN_LOCK_CPU_YIELD
+    #define __UTIL_LOCK_SPIN_LOCK_CPU_YIELD()
+#endif
+
+/**
+ * ==============================================
+ * ======           thread yield           ======
+ * ==============================================
+ */
+#if defined(__UTIL_LOCK_SPINLOCK_ATOMIC_STD)
+    #include <thread>
+    #include <chrono>
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD() std::this_thread::yield()
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP() std::this_thread::sleep_for(std::chrono::milliseconds(1))
+#elif defined(_MSC_VER)
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD() Sleep(0)
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP() Sleep(1)
+#endif
+
+#ifndef __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD()
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP()
+#endif
+
+/**
+ * ==============================================
+ * ======           spin lock wait         ======
+ * ==============================================
+ */
+#define __UTIL_LOCK_SPIN_LOCK_WAIT(x) \
+    { \
+        short try_lock_times = static_cast<short>(x); \
+        if (try_lock_times < 4) {} \
+        else if (try_lock_times < 16) { __UTIL_LOCK_SPIN_LOCK_PAUSE(); } \
+        else if (try_lock_times < 32) { __UTIL_LOCK_SPIN_LOCK_CPU_YIELD(); } \
+        else if (try_lock_times < 64) { __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD(); } \
+        else if (try_lock_times < 128) { __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP(); } \
+    }
+    
+    
 
 namespace util
 {
@@ -43,7 +142,7 @@ namespace util
     {
 
         // C++ 0x/11版实现
-        #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_STD
+        #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_STD
         class SpinLock
         {
         private:
@@ -86,13 +185,13 @@ namespace util
                 #error Clang version is too old
             #endif
             #if defined(__GCC_ATOMIC_INT_LOCK_FREE)
-                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
+                #define __UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
             #else
-                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+                #define __UTIL_LOCK_SPINLOCK_ATOMIC_GCC 1
             #endif
         #elif defined(_MSC_VER)
             #include <WinBase.h>
-            #define __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC 1
+            #define __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC 1
             
         #elif defined(__GNUC__) || defined(__clang__) || defined(__clang__) || defined(__INTEL_COMPILER)
             #if defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 1))
@@ -104,9 +203,9 @@ namespace util
             #endif
             
             #if defined(__GCC_ATOMIC_INT_LOCK_FREE)
-                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
+                #define __UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC 1
             #else
-                #define __BASELIB_LOCK_SPINLOCK_ATOMIC_GCC 1
+                #define __UTIL_LOCK_SPINLOCK_ATOMIC_GCC 1
             #endif
         #else
             #error Currently only gcc, msvc, intel compiler & llvm-clang are supported
@@ -123,9 +222,9 @@ namespace util
 
           void Lock()
           {
-            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
+            #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
                 while(InterlockedExchange(&m_enStatus, Locked) == Locked); /* busy-wait */
-            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+            #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
                 while (__atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Locked); /* busy-wait */
             #else
                 while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked); /* busy-wait */
@@ -134,9 +233,9 @@ namespace util
 
           void Unlock()
           {
-            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
+            #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
                 InterlockedExchange(&m_enStatus, Unlocked);
-            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+            #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
                 __atomic_store_n(&m_enStatus, Unlocked, __ATOMIC_RELEASE);
             #else
                 __sync_lock_release(&m_enStatus, Unlocked);
@@ -145,9 +244,9 @@ namespace util
 
           bool IsLocked()
           {
-            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
+            #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
                 return InterlockedExchangeAdd(&m_enStatus, 0) == Locked;
-            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+            #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
                 __atomic_load_n(&m_enStatus, __ATOMIC_ACQUIRE) == Locked;
             #else
                 return __sync_add_and_fetch(&m_enStatus, 0) == Locked;
@@ -157,9 +256,9 @@ namespace util
           bool TryLock()
           {
 
-            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
+            #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
                 return InterlockedExchange(&m_enStatus, Locked) == Unlocked;
-            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+            #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
                 return __atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Unlocked;
             #else
                 return __sync_bool_compare_and_swap(&m_enStatus, Unlocked, Locked);
@@ -168,9 +267,9 @@ namespace util
           
           bool TryUnlock()
           {
-            #ifdef __BASELIB_LOCK_SPINLOCK_ATOMIC_MSVC
+            #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
                 return InterlockedExchange(&m_enStatus, Unlocked) == Locked;
-            #elif defined(__BASELIB_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
+            #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
                 return __atomic_exchange_n(&m_enStatus, Unlocked, __ATOMIC_ACQ_REL) == Locked;
             #else
                 return __sync_bool_compare_and_swap(&m_enStatus, Locked, Unlocked);
