@@ -96,7 +96,7 @@
 #endif
 
 #ifndef __UTIL_LOCK_SPIN_LOCK_CPU_YIELD
-    #define __UTIL_LOCK_SPIN_LOCK_CPU_YIELD()
+    #define __UTIL_LOCK_SPIN_LOCK_CPU_YIELD() __UTIL_LOCK_SPIN_LOCK_PAUSE()
 #endif
 
 /**
@@ -116,7 +116,7 @@
 
 #ifndef __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD
     #define __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD()
-    #define __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP()
+    #define __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP() __UTIL_LOCK_SPIN_LOCK_CPU_YIELD()
 #endif
 
 /**
@@ -126,12 +126,12 @@
  */
 #define __UTIL_LOCK_SPIN_LOCK_WAIT(x) \
     { \
-        short try_lock_times = static_cast<short>(x); \
+        unsigned char try_lock_times = static_cast<unsigned char>(x); \
         if (try_lock_times < 4) {} \
         else if (try_lock_times < 16) { __UTIL_LOCK_SPIN_LOCK_PAUSE(); } \
-        else if (try_lock_times < 32) { __UTIL_LOCK_SPIN_LOCK_CPU_YIELD(); } \
-        else if (try_lock_times < 64) { __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD(); } \
-        else if (try_lock_times < 128) { __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP(); } \
+        else if (try_lock_times < 32) { __UTIL_LOCK_SPIN_LOCK_THREAD_YIELD(); } \
+        else if (try_lock_times < 64) { __UTIL_LOCK_SPIN_LOCK_CPU_YIELD(); } \
+        else { __UTIL_LOCK_SPIN_LOCK_THREAD_SLEEP(); } \
     }
     
     
@@ -154,7 +154,9 @@ namespace util
 
           void Lock()
           {
-              while (m_enStatus.exchange(Locked, std::memory_order_acq_rel) == Locked); /* busy-wait */
+              unsigned char try_times = 0;
+              while (m_enStatus.exchange(Locked, std::memory_order_acq_rel) == Locked)
+                  __UTIL_LOCK_SPIN_LOCK_WAIT(try_times ++); /* busy-wait */
           }
 
           void Unlock()
@@ -222,12 +224,16 @@ namespace util
 
           void Lock()
           {
+                unsigned char try_times = 0;
             #ifdef __UTIL_LOCK_SPINLOCK_ATOMIC_MSVC
-                while(InterlockedExchange(&m_enStatus, Locked) == Locked); /* busy-wait */
+                while(InterlockedExchange(&m_enStatus, Locked) == Locked)
+                    __UTIL_LOCK_SPIN_LOCK_WAIT(try_times ++); /* busy-wait */
             #elif defined(__UTIL_LOCK_SPINLOCK_ATOMIC_GCC_ATOMIC)
-                while (__atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Locked); /* busy-wait */
+                while (__atomic_exchange_n(&m_enStatus, Locked, __ATOMIC_ACQ_REL) == Locked)
+                    __UTIL_LOCK_SPIN_LOCK_WAIT(try_times ++); /* busy-wait */
             #else
-                while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked); /* busy-wait */
+                while(__sync_lock_test_and_set(&m_enStatus, Locked) == Locked)
+                    __UTIL_LOCK_SPIN_LOCK_WAIT(try_times ++); /* busy-wait */
             #endif
           }
 
