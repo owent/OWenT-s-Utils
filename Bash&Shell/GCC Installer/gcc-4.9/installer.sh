@@ -1,7 +1,7 @@
 #!/bin/bash
  
 # ======================================= 配置 ======================================= 
-PREFIX_DIR=/usr/local/gcc-4.9.0
+PREFIX_DIR=/usr/local/gcc-4.9.1
 BUILD_TARGET_COMPOMENTS="";
 
 # ======================= 非交叉编译 ======================= 
@@ -271,7 +271,7 @@ fi
 # ======================= install gcc ======================= 
 if [ -z "$BUILD_TARGET_COMPOMENTS" ] || [ "0" == $(is_in_list gcc $BUILD_TARGET_COMPOMENTS) ]; then
     # ======================= gcc包 ======================= 
-    GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.9.0/gcc-4.9.0.tar.bz2" );
+    GCC_PKG=$(check_and_download "gcc" "gcc-*.tar.bz2" "ftp://gcc.gnu.org/pub/gcc/releases/gcc-4.9.1/gcc-4.9.1.tar.bz2" );
     if [ $? -ne 0 ]; then
         echo -e "$GCC_PKG";
         exit -1;
@@ -332,7 +332,7 @@ if [ -z "$BUILD_TARGET_COMPOMENTS" ] || [ "0" == $(is_in_list gdb $BUILD_TARGET_
 		    GDB_PYTHON_OPT="--with-python=$PREFIX_DIR";
 	    else
 		    # =======================  尝试编译安装python  =======================
-		    PYTHON_PKG=$(check_and_download "python" "Python-2.*.tgz" "http://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz" );
+		    PYTHON_PKG=$(check_and_download "python" "Python-2.*.tgz" "http://www.python.org/ftp/python/2.7.8/Python-2.7.8.tgz" );
 		    if [ $? -ne 0 ]; then
 			    return;
 		    fi
