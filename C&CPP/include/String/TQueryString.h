@@ -62,7 +62,7 @@ namespace util
          */
         std::string DecodeUriComponent(const char* strUri, std::size_t uSize = 0);
         
-                /**
+        /**
          * @brief 编码并转义URL，类似php的rawurlencode函数
          * 根据RFC 3986 编码字符串
          * @param [in] strContent 待编码内容指针
@@ -89,7 +89,7 @@ namespace util
         std::string EncodeUrl(const char* strContent, std::size_t uSize = 0);
 
         /**
-         * @brief 解码转义的URL，类似Javascript的urldecode函数
+         * @brief 解码转义的URL，类似php的urldecode函数
          * @param [in] strUri     待解码内容指针
          * @param [in] uSize      解码内容大小（默认当作字符串）
          * @return 编码后的字符串
