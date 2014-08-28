@@ -9,7 +9,8 @@ set expandtab
 set showmatch
 
 " 去除vim的GUI版本中的toolbar 
-set guioptions=T
+" set guioptions+=T
+" set guioptions+=m
 
 " 背景及配色方案 
 if has('gui_running')
@@ -31,3 +32,10 @@ set fileencodings=utf-8,gb18030,gbk
 
 " 高亮搜索
 set hlsearch
+
+" GUI尝试使用自定义字体
+if has('gui_running')
+    set guifont=DejaVu_Sans_Mono:h12:cDEFAULT,WenQuanYi_Micro_Hei:h12:cDEFAULT,Microsoft_Yahei:h12:cDEFAULT,Yahei_Mono:h12:cDEFAULT
+     set guifontwide=DejaVu_Sans_Mono:h12:cDEFAULT,WenQuanYi_Micro_Hei_Mono:h12:cDEFAULT,Yahei_Mono:h12:cDEFAULT,Microsoft_Yahei_UI:h12:cDEFAULT
+endif
+

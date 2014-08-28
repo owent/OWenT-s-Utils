@@ -22,11 +22,11 @@ set number
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
-if has("vms")
+"if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
 " else
 "   set backup		" keep a backup file
-endif
+"endif
 set history=100		" keep 100 lines of command line history
 set ruler		" show the cursor position all the time
 set showcmd		" display incomplete commands
