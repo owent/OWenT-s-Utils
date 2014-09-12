@@ -82,10 +82,10 @@ php加速组件安装以后只有加速核心，没有UI部分，各个组件的
 	```nginx
 	gzip on;
 	gzip_min_length  1k;
-	gzip_buffers     4 16k;
+	gzip_buffers     16 64k;
 	gzip_http_version 1.0;
-	gzip_comp_level 2;
-	gzip_types       text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+	gzip_comp_level 5;
+	gzip_types       text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
 	gzip_vary on; 
 	
 	```
