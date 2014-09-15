@@ -11,7 +11,7 @@ LLVM和Clang工具链的生成配置文件写得比较搓，所以略微麻烦�
 2. **python-devel/python-dev**
 2. **swig**
 3. **libeditor/libeditor-devel/libeditor-dev**
-4. *gtest(lld依赖项)*
+4. *gtest, gtest-devel/gtest-dev(lld依赖项)*
 4. GCC 4.7 or higher
 
 ### 我编译的环境
@@ -35,7 +35,7 @@ CentOS 6.2 & CentOS 7.0
 + (所有的库都会被安装在**$PREFEX_DIR**里)
 
 #### 额外建议：
-暂无
++ 如果增加编译组件，比如已装有gtest要编译lld，使用命令 ./install.sh +lld
 
 #### History:
 + 2014-09-12     Created
