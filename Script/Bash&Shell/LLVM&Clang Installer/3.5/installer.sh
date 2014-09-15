@@ -5,7 +5,6 @@
 # ======================================= 配置 ======================================= 
 PREFIX_DIR=/usr/local/llvm-3.5.0
 BUILD_TARGET_COMPOMENTS="llvm clang compiler_rt libcxx libcxxabi lldb clang_tools_extra";
-BUILD_TARGET_COMPOMENTS_SET=0;
 BUILD_GCC="gcc-4.6";
 
 # ======================= 非交叉编译 ======================= 
@@ -44,11 +43,10 @@ while getopts "p:cht:l:g:m:" OPTION; do
             exit 0;
         ;;
         t)
-        	if [ 0 -eq $BUILD_TARGET_COMPOMENTS_SET ]; then
-        		BUILD_TARGET_COMPOMENTS_SET=1;
-        		BUILD_TARGET_COMPOMENTS="";
-        	fi
-            BUILD_TARGET_COMPOMENTS="$BUILD_TARGET_COMPOMENTS $OPTARG";
+            if [ "+" == "${OPTARG:0:1}" ]; then
+                BUILD_TARGET_COMPOMENTS="$BUILD_TARGET_COMPOMENTS ${OPTARG:1}";
+            fi
+            BUILD_TARGET_COMPOMENTS="$OPTARG";
         ;;
         l)
             BUILD_LLVM_CONF_OPTION="$BUILD_LLVM_CONF_OPTION $OPTARG";
@@ -476,7 +474,7 @@ build_libcxx -DLIBCXX_CXX_ABI=libcxxabi -DLIBCXX_LIBCXXABI_INCLUDE_PATHS=../$LIB
 # build_llvm "cmake" "Stage 3" -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DLIBCXX_CXX_ABI=libcxxabi;
 
 echo -e "\\033[33;1mAddition, run the cmds below to add environment var(s).\\033[39;49;0m"
-echo -e "\\033[31;1mexport PATH=$PATH\\033[39;49;0m"
-echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$LD_LIBRARY_PATH\\033[39;49;0m"
+echo -e "\\033[31;1mexport PATH=$PREFIX_DIR/bin:$PATH\\033[39;49;0m"
+echo -e "\\033[31;1mexport LD_LIBRARY_PATH=$PREFIX_DIR/lib:$PREFIX_DIR/lib64:$LD_LIBRARY_PATH\\033[39;49;0m"
 echo -e "\tor you can add $PREFIX_DIR/lib, $PREFIX_DIR/lib64 (if in x86_64) and $PREFIX_DIR/libexec to file [/etc/ld.so.conf] and then run [ldconfig]"
 echo -e "\\033[33;1mBuild Gnu Compile Collection done.\\033[39;49;0m"
