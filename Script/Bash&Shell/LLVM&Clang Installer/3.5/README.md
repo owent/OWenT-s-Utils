@@ -8,8 +8,10 @@ LLVM和Clang工具链的生成配置文件写得比较搓，所以略微麻烦�
 ### 准备环境及依赖项
 
 1. Python
-2. swig
-3. libeditor
+2. **python-devel/python-dev**
+2. **swig**
+3. **libeditor/libeditor-devel/libeditor-dev**
+4. *gtest(lld依赖项)*
 4. GCC 4.7 or higher
 
 ### 我编译的环境
