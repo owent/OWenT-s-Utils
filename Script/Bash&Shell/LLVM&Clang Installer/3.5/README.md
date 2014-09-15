@@ -35,7 +35,7 @@ CentOS 6.2 & CentOS 7.0
 + (所有的库都会被安装在**$PREFEX_DIR**里)
 
 #### 额外建议：
-+ 如果增加编译组件，比如已装有gtest要编译lld，使用命令*** ./install.sh +lld *** 
++ 如果增加编译组件，比如已装有gtest要编译lld，使用命令***./install.sh +lld*** 
 
 #### History:
 + 2014-09-12     Created
