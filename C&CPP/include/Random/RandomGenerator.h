@@ -79,7 +79,7 @@ namespace util
              * 产生一个随机数
              * @return 产生的随机数
              */
-            result_type Radom()
+            result_type Random()
             {
                 return m_stCore();
             }
@@ -90,7 +90,7 @@ namespace util
              */
             result_type operator()()
             {
-                return Radom();
+                return Random();
             }
 
             /**
@@ -101,7 +101,7 @@ namespace util
              * @return 产生的随机数
              */
             template<typename ResaultType>
-            ResaultType RadomBetween(ResaultType lowest, ResaultType highest)
+            ResaultType RandomBetween(ResaultType lowest, ResaultType highest)
             {
                 result_type res = (*this)();
                 return static_cast<ResaultType>(res % static_cast<result_type>(highest - lowest)) + lowest;
