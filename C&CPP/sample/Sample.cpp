@@ -18,9 +18,9 @@ void RandomSample()
     util::random::MT19937 stGen1;
     stGen1.InitSeed(123);
 
-    printf("Random - mt19937: %u\n", stGen1.Radom());
+    printf("Random - mt19937: %u\n", stGen1.Random());
     printf("Random - mt19937: %u\n", stGen1());
-    printf("Random - mt19937 - between [100, 10000): %d\n", stGen1.RadomBetween(100, 10000));
+    printf("Random - mt19937 - between [100, 10000): %d\n", stGen1.RandomBetween(100, 10000));
 
     printf("===============end random sample==============\n");
 }
