@@ -3,6 +3,11 @@ Lnmp yum 安装脚本 (for CentOS)
 详情见: [Lnmp yum 安装脚本 (for CentOS)](http://www.owent.net/?p=740)
 脚本执行完后**有几个需要注意的地方**
 
+文件列表
+------
+1. **lnmp.sh** 可用于CentOS 6及Redhat 6
+2. **lnmp_for_el7.sh** 可用于CentOS 7及Redhat 7(m替换成了MySQL开分支:mariadb)
+
 ## 脚本选项
 ```shell
 -a <加速器缓存目录路径> ext cache dir path
@@ -10,8 +15,14 @@ Lnmp yum 安装脚本 (for CentOS)
 -d <php.d 路径> dir path of php.d(Notice: must match rpm packages)
 -l <php部分扩展的日志路径> dir path of php ext logs
 -f <php-fpm.d/www.conf路径> path of php-fpm.d/www.conf path(Notice: must match rpm packages)
--o <要安装的 php 加速器> 可以是这几个 [xcache, zendopcache, eaccelerator, apcu, none], 其中apcu和其他的不冲突，另外几个互相冲突的只会安装第一个指定的加速器
+-m <数据库数据目录> (仅限lnmp_for_el7.sh)
+-o <要安装的 php 加速器> 可以是这几个 [xcache, zendopcache, eaccelerator, apcu, none]
+其中apcu和其他的不冲突，另外几个互相冲突的只会安装第一个指定的加速器
 -h 帮助信息
+
+# apcu会导致Centos 7下php-fpm 5.4崩溃，故已禁用
+# eaccelerator 在Centos 7下无软件源，故已禁用
+
 ```
 
 ## php加速器UI组件
