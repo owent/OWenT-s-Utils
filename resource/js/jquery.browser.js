@@ -1,10 +1,22 @@
+/**
+ * Environment judge
+ * Support browser: IE, Firefox, Chrome, Opera, Safari, Konqueror, Go
+ * Support system: Windows, Linux, Android, Windows Phone, Windows CE, Xbox, Mac OS, IOS, Symbian, Solaris, BSD, j2me
+ * jQuery plugin
+ * @version    2.0.0
+ * @example	var bro = new Util._TEnvironment();
+ * @example	var bro = Util.getEnvironment();
+ * @example	jQuery.environment;
+ */
 var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
 var Util;
 (function (Util) {
+    // 版本控制类
     var TEnvVersionInfo = (function () {
         function TEnvVersionInfo(str) {
             this.version = str;
@@ -12,12 +24,40 @@ var Util;
         TEnvVersionInfo.prototype.toString = function () {
             return this.version;
         };
-        TEnvVersionInfo.GetVersion = function GetVersion(strSrc, reg, pos) {
+        // 获取版本号
+        TEnvVersionInfo.GetVersion = function (strSrc, reg, pos) {
             var res = strSrc.match(reg);
-            if(res && res.length > pos) {
+            if (res && res.length > pos)
                 return new TEnvVersionInfo(res[pos]);
-            }
             return null;
+        };
+        TEnvVersionInfo.prototype.compare = function (right, cmp_func) {
+            var cpgl = this.version.split(".");
+            var cpgr = right.version.split(".");
+            for (var i = 0; i < cpgl.length && i < cpgr.length; ++i) {
+                var _check = cmp_func.ok(cpgl[i], cpgr[i]);
+                if (_check)
+                    return true;
+                _check = cmp_func.fail(cpgl[i], cpgr[i]);
+                if (_check)
+                    return false;
+            }
+            return cmp_func.ret;
+        };
+        TEnvVersionInfo.prototype.lessThan = function (right) {
+            return this.compare(right, TEnvVersionInfo.__less_than_obj);
+        };
+        TEnvVersionInfo.prototype.greaterThan = function (right) {
+            return right.lessThan(this);
+        };
+        TEnvVersionInfo.prototype.equal = function (right) {
+            return this.compare(right, TEnvVersionInfo.__equal_obj);
+        };
+        TEnvVersionInfo.prototype.lessEqualThan = function (right) {
+            return this.compare(right, TEnvVersionInfo.__less_equal_than_obj);
+        };
+        TEnvVersionInfo.prototype.greaterEqualThan = function (right) {
+            return right.lessEqualThan(this);
         };
         TEnvVersionInfo.__less_than_obj = {
             ok: function (l, r) {
@@ -52,54 +92,30 @@ var Util;
                 return lg.length <= rg.length;
             }
         };
-        TEnvVersionInfo.prototype.compare = function (right, cmp_func) {
-            var cpgl = this.version.split(".");
-            var cpgr = right.version.split(".");
-            for(var i = 0; i < cpgl.length && i < cpgr.length; ++i) {
-                var _check = cmp_func.ok(cpgl[i], cpgr[i]);
-                if(_check) {
-                    return true;
-                }
-                _check = cmp_func.fail(cpgl[i], cpgr[i]);
-                if(_check) {
-                    return false;
-                }
-            }
-            return cmp_func.ret;
-        };
-        TEnvVersionInfo.prototype.lessThan = function (right) {
-            return this.compare(right, TEnvVersionInfo.__less_than_obj);
-        };
-        TEnvVersionInfo.prototype.greaterThan = function (right) {
-            return right.lessThan(this);
-        };
-        TEnvVersionInfo.prototype.equal = function (right) {
-            return this.compare(right, TEnvVersionInfo.__equal_obj);
-        };
-        TEnvVersionInfo.prototype.lessEqualThan = function (right) {
-            return this.compare(right, TEnvVersionInfo.__less_equal_than_obj);
-        };
-        TEnvVersionInfo.prototype.greaterEqualThan = function (right) {
-            return right.lessEqualThan(this);
-        };
         return TEnvVersionInfo;
     })();
-    Util.TEnvVersionInfo = TEnvVersionInfo;    
+    Util.TEnvVersionInfo = TEnvVersionInfo;
     ;
     ;
     var TEnvOriData = (function () {
-        function TEnvOriData() { }
+        function TEnvOriData() {
+        }
         return TEnvOriData;
     })();
-    Util.TEnvOriData = TEnvOriData;    
+    Util.TEnvOriData = TEnvOriData;
     ;
+    // 系统信息基类
     var TEnvSystemInfoBase = (function () {
         function TEnvSystemInfoBase(ori) {
             this.strArchitecture = "x86";
             this.strPlatform = ori.nav.platform || "Unknown";
-            if(ori.userAgent.match(/ia64/i)) {
+            if (this.strPlatform.match(/arm/i)) {
+                this.strArchitecture = "arm";
+            }
+            else if (ori.userAgent.match(/ia64/i)) {
                 this.strArchitecture = "ia64";
-            } else if(ori.userAgent.match(/win64|wow64|x64|x86_64/i)) {
+            }
+            else if (ori.userAgent.match(/x64|x86_64/i)) {
                 this.strArchitecture = "x86_64";
             }
         }
@@ -119,27 +135,20 @@ var Util;
             return false;
         };
         return TEnvSystemInfoBase;
-    })();    
+    })();
     ;
+    // Windows系统信息
     var TEnvSystemWindowsInfo = (function (_super) {
         __extends(TEnvSystemWindowsInfo, _super);
         function TEnvSystemWindowsInfo(ori) {
-                _super.call(this, ori);
+            _super.call(this, ori);
             this.strOSName = "Windows";
             this.strOSKernel = "Windows";
-            this.strArchitecture = "x86";
             this.bIsMobile = false;
             this._init_branch(ori.userAgent);
+            if (ori.nav.cpuClass)
+                this.strArchitecture = ori.nav.cpuClass;
         }
-        TEnvSystemWindowsInfo.__nt_kernel_name_map = {
-            "6.3": "Microsoft Windows 8.1/Microsoft Windows RT 8.1/Windows Server 2012 R2",
-            "6.2": "Microsoft Windows 8/Microsoft Windows RT/Windows Server 2012",
-            "6.1": "Microsoft Windows 7/Windows Server 2008 R2",
-            "6.0": "Microsoft Windows Vista/Windows Server 2008",
-            "5.2": "Windows Server 2003",
-            "5.1": "Microsoft Windows XP",
-            "5.0": "Microsoft Windows 2000"
-        };
         TEnvSystemWindowsInfo.prototype.getOSName = function () {
             return this.strOSName;
         };
@@ -154,72 +163,85 @@ var Util;
         };
         TEnvSystemWindowsInfo.prototype._init_branch = function (ua) {
             do {
-                if(ua.match(/windows nt/i)) {
+                // NT核心
+                if (ua.match(/windows nt/i)) {
                     var t_ver = TEnvVersionInfo.GetVersion(ua, /windows nt ([\d.]+)/i, 1);
                     this.strOSKernel = "Windows NT " + t_ver;
-                    if(ua.match(/ia64/i)) {
+                    if (ua.match(/ia64/i))
                         this.strArchitecture = "ia64";
-                    } else if(ua.match(/win64|wow64|x64|x86_64/i)) {
+                    else if (ua.match(/win64|wow64|x64|x86_64/i))
                         this.strArchitecture = "x86_64";
-                    }
-                    if(this.strArchitecture == "ia64" && "5.2" == t_ver.toString()) {
+                    if (this.strArchitecture == "ia64" && "5.2" == t_ver.toString())
                         this.strOSName = "Microsoft Windows XP/Windows Server 2003";
-                    } else if(TEnvSystemWindowsInfo.__nt_kernel_name_map[t_ver.toString()]) {
+                    else if (TEnvSystemWindowsInfo.__nt_kernel_name_map[t_ver.toString()])
                         this.strOSName = TEnvSystemWindowsInfo.__nt_kernel_name_map[t_ver.toString()];
-                    } else {
+                    else
                         this.strOSName = "Windows NT Kernel " + t_ver.toString();
-                    }
                     break;
                 }
+                // Window phone 7
                 var t_ver = TEnvVersionInfo.GetVersion(ua, /windows phone os ([\d.]+)/i, 1);
-                if(null !== t_ver) {
+                if (null !== t_ver) {
                     this.strOSName = "Microsoft Windows Phone " + t_ver.toString();
                     this.strArchitecture = "ARM";
                     this.bIsMobile = true;
                     break;
                 }
+                // Window phone 8+
                 t_ver = TEnvVersionInfo.GetVersion(ua, /windows phone ([\d.]+)/i, 1);
-                if(null !== t_ver) {
+                if (null !== t_ver) {
                     this.strOSName = "Microsoft Windows Phone " + t_ver.toString();
+                    this.strArchitecture = "ARM";
                     this.bIsMobile = true;
                     break;
                 }
-                if(ua.match(/windows ce/i)) {
+                // Windows CE
+                if (ua.match(/windows ce/i)) {
                     this.strOSName = "Microsoft Windows CE/Windows Mobile";
                     this.strArchitecture = "ARM";
                     this.bIsMobile = true;
                     break;
                 }
-                if(ua.match(/windows 95/i)) {
+                if (ua.match(/windows 95/i)) {
                     this.strOSName = "Microsoft Windows 95";
                     break;
                 }
-                if(ua.match(/windows 98/i)) {
-                    if(ua.match(/win 9x 4.90/i)) {
+                if (ua.match(/windows 98/i)) {
+                    if (ua.match(/win 9x 4.90/i))
                         this.strOSName = "Microsoft Windows ME";
-                    } else {
+                    else
                         this.strOSName = "Microsoft Windows 98";
-                    }
                     break;
                 }
-            }while(false);
-            if(ua.match(/xbox/i)) {
+            } while (false);
+            if (ua.match(/xbox/i)) {
                 this.strOSName = "Microsoft XBox";
             }
-            if(ua.match(/arm/i)) {
-                this.strArchitecture = "ARM";
-            }
+            var try_match_arch = ua.match(/\barm|\bx86\b|\bx86_64\b|\bi\d86\b/i);
+            if (try_match_arch)
+                this.strArchitecture = try_match_arch[0];
+        };
+        TEnvSystemWindowsInfo.__nt_kernel_name_map = {
+            "10.0": "Microsoft Windows 10/Microsoft Windows RT 10/Windows Server 10",
+            "6.4": "Microsoft Windows 10/Microsoft Windows RT 10/Windows Server 10",
+            "6.3": "Microsoft Windows 8.1/Microsoft Windows RT 8.1/Windows Server 2012 R2",
+            "6.2": "Microsoft Windows 8/Microsoft Windows RT/Windows Server 2012",
+            "6.1": "Microsoft Windows 7/Windows Server 2008 R2",
+            "6.0": "Microsoft Windows Vista/Windows Server 2008",
+            "5.2": "Windows Server 2003",
+            "5.1": "Microsoft Windows XP",
+            "5.0": "Microsoft Windows 2000",
         };
         return TEnvSystemWindowsInfo;
-    })(TEnvSystemInfoBase);    
+    })(TEnvSystemInfoBase);
     ;
+    // Linux系统信息
     var TEnvSystemLinuxInfo = (function (_super) {
         __extends(TEnvSystemLinuxInfo, _super);
         function TEnvSystemLinuxInfo(ori) {
-                _super.call(this, ori);
+            _super.call(this, ori);
             this.strOSName = "Linux";
             this.strOSKernel = "Linux";
-            this.strArchitecture = "x86";
             this.bIsMobile = false;
             this._init_branch(ori.userAgent);
         }
@@ -237,54 +259,38 @@ var Util;
         };
         TEnvSystemLinuxInfo.prototype._init_branch = function (ua) {
             do {
-                if(ua.match(/android/i)) {
-                    this.strArchitecture = "ARM";
+                if (ua.match(/android/i)) {
+                    this.strArchitecture = "ARM"; /** Android 默认ARM架构 **/
                     this.strOSName = "Google Android";
                     var t_ver = TEnvVersionInfo.GetVersion(ua, /android ([\d.]+)/i, 1);
-                    if(null !== t_ver) {
+                    if (null !== t_ver)
                         this.strOSName += " " + t_ver.toString();
-                    }
                     break;
                 }
-                var pub_linux_reg = [
-                    /Ubuntu/i, 
-                    /Fedora/i, 
-                    /RedHat/i, 
-                    /Debian/i, 
-                    /SUSE/i, 
-                    /CentOS/i
-                ];
-                for(var i = 0; i < pub_linux_reg.length; ++i) {
-                    if(ua.match(pub_linux_reg[i])) {
+                var pub_linux_reg = [/Ubuntu/i, /Fedora/i, /RedHat/i, /Debian/i, /SUSE/i, /CentOS/i];
+                for (var i = 0; i < pub_linux_reg.length; ++i) {
+                    if (ua.match(pub_linux_reg[i])) {
                         this.strOSName = pub_linux_reg[i].source + " Linux";
                         break;
                     }
                 }
-            }while(false);
-            if(ua.match(/mobile/i) || ua.match(/tablet/i)) {
+            } while (false);
+            if (ua.match(/mobile/i) || ua.match(/tablet/i))
                 this.bIsMobile = true;
-            }
-            do {
-                if(ua.match(/x86_64/i)) {
-                    this.strArchitecture = "x86_64";
-                    break;
-                }
-                if(ua.match(/arm/i)) {
-                    this.strArchitecture = "ARM";
-                    break;
-                }
-            }while(false);
+            var try_match_arch = ua.match(/\barm|\bx86\b|\bx86_64\b|\bi\d86\b/i);
+            if (try_match_arch)
+                this.strArchitecture = try_match_arch[0];
         };
         return TEnvSystemLinuxInfo;
-    })(TEnvSystemInfoBase);    
+    })(TEnvSystemInfoBase);
     ;
+    // Mac和IOS系统信息
     var TEnvSystemMacIOSInfo = (function (_super) {
         __extends(TEnvSystemMacIOSInfo, _super);
         function TEnvSystemMacIOSInfo(ori) {
-                _super.call(this, ori);
+            _super.call(this, ori);
             this.strOSName = "Mac";
             this.strOSKernel = "Mac";
-            this.strArchitecture = "x86";
             this.bIsMobile = false;
             this._init_branch(ori.userAgent);
         }
@@ -302,42 +308,44 @@ var Util;
         };
         TEnvSystemMacIOSInfo.prototype._init_branch = function (ua) {
             do {
-                if(ua.match(/macintosh/i)) {
+                if (ua.match(/macintosh/i)) {
                     this.strOSName = "Apple Mac OS X";
                     break;
-                } else {
-                    this.strArchitecture = "ARM";
+                }
+                else {
+                    this.strArchitecture = "ARM"; /** IOS 默认ARM架构 **/
                     this.strOSName = "Apple iOS";
                     break;
                 }
-            }while(false);
-            if(ua.match(/mobile/i)) {
+                var try_match_arch = ua.match(/\barm|\bx86\b|\bx86_64\b|\bi\d86\b/i);
+                if (try_match_arch)
+                    this.strArchitecture = try_match_arch[0];
+            } while (false);
+            if (ua.match(/mobile/i))
                 this.bIsMobile = true;
-            }
             var _ver_str = ua.match(/(ppc mac os x|intel mac os x|cpu iphone os|cpu os) ([\d_]+)/i);
-            if(_ver_str && _ver_str.length > 2) {
+            if (_ver_str && _ver_str.length > 2) {
                 var t_ver = new TEnvVersionInfo(_ver_str[2].replace(/_/g, "."));
                 this.strOSName += " " + t_ver.toString();
-                if(this.strOSName == "Apple Mac OS X") {
-                    if(t_ver.greaterEqualThan(new TEnvVersionInfo("10.6"))) {
+                if (this.strOSName == "Apple Mac OS X") {
+                    if (t_ver.greaterEqualThan(new TEnvVersionInfo("10.6")))
                         this.strArchitecture = "x86_64";
-                    } else if(ua.match(/ppc mac os x/i)) {
+                    else if (ua.match(/ppc mac os x/i))
                         this.strArchitecture = "PowerPC";
-                    }
                 }
             }
             this.strOSKernel = "Apple Darwin";
         };
         return TEnvSystemMacIOSInfo;
-    })(TEnvSystemInfoBase);    
+    })(TEnvSystemInfoBase);
     ;
+    // 其他系统信息
     var TEnvSystemOtherInfo = (function (_super) {
         __extends(TEnvSystemOtherInfo, _super);
         function TEnvSystemOtherInfo(ori) {
-                _super.call(this, ori);
+            _super.call(this, ori);
             this.strOSName = "Unknown";
             this.strOSKernel = "Unknown";
-            this.strArchitecture = "x86";
             this.bIsMobile = false;
             this._init_branch(ori.userAgent);
         }
@@ -355,43 +363,47 @@ var Util;
         };
         TEnvSystemOtherInfo.prototype._init_branch = function (ua) {
             do {
-                if(ua.match(/blackberry/i)) {
+                if (ua.match(/blackberry/i)) {
                     this.strOSName = "BlackBerry OS";
                     this.strOSKernel = "RIM";
                     this.strArchitecture = "ARM";
                     this.bIsMobile = true;
                     break;
                 }
-                if(ua.match(/symbianos|symbos/i)) {
+                if (ua.match(/symbianos|symbos/i)) {
                     this.strOSName = "Nokia Symbian";
                     this.strOSKernel = "Nokia Symbian";
                     this.strArchitecture = "ARM";
                     this.bIsMobile = true;
                     break;
                 }
-                if(ua.match(/solaris|sunos/i)) {
+                if (ua.match(/solaris|sunos/i)) {
                     this.strOSName = "Sun Solaris";
                     this.strOSKernel = "OpenSource Unix-Like";
                     break;
                 }
-                if(ua.match(/bsd/i)) {
+                if (ua.match(/bsd/i)) {
                     this.strOSName = ua.match(/\w*bsd/i)[0];
                     this.strOSKernel = "BSD";
                     break;
                 }
-                if(ua.match(/j2me/i)) {
+                if (ua.match(/j2me/i)) {
                     this.strOSName = "J2ME OS- java based environment";
                     this.strOSKernel = "J2ME";
                     this.strArchitecture = "Unknown";
                     this.bIsMobile = true;
                     break;
                 }
-            }while(false);
+                var try_match_arch = ua.match(/\barm|\bx86\b|\bx86_64\b|\bi\d86\b/i);
+                if (try_match_arch)
+                    this.strArchitecture = try_match_arch[0];
+            } while (false);
         };
         return TEnvSystemOtherInfo;
-    })(TEnvSystemInfoBase);    
+    })(TEnvSystemInfoBase);
     ;
     ;
+    // 浏览器检测基类
     var TEnvBrowserInfoBase = (function () {
         function TEnvBrowserInfoBase(ori, sysInfo) {
             this.strRenderMode = "Unknown";
@@ -437,16 +449,16 @@ var Util;
             return this.bIsCookieEnabled;
         };
         return TEnvBrowserInfoBase;
-    })();    
+    })();
     ;
+    // Opera浏览器检测类
     var TEnvBrowserOperaInfo = (function (_super) {
         __extends(TEnvBrowserOperaInfo, _super);
         function TEnvBrowserOperaInfo(ori, sysInfo) {
-                _super.call(this, ori, sysInfo);
+            _super.call(this, ori, sysInfo);
             this.strBrowserName = "Opera";
             this.strBrowserShortName = "Opera";
             this.strBrowserKernelName = "Presto";
-            this.bIsMobile = false;
             this.bIsMobile = sysInfo.isMobile();
             this._init_branch(ori.userAgent, sysInfo);
         }
@@ -470,50 +482,48 @@ var Util;
         };
         TEnvBrowserOperaInfo.prototype._init_branch = function (ua, sysInfo) {
             do {
-                if(ua.match(/opera mobi/i)) {
+                if (ua.match(/opera mobi/i)) {
                     this.strBrowserName = "Opera Mobile";
                     this.bIsMobile = true;
                     break;
                 }
-                if(ua.match(/opera mini/i)) {
+                if (ua.match(/opera mini/i)) {
                     this.strBrowserName = "Opera Mini";
                     this.bIsMobile = true;
                     break;
                 }
-            }while(false);
+            } while (false);
             do {
-                if(ua.match(/mozilla/i)) {
+                if (ua.match(/mozilla/i)) {
                     this.stBrowserVersion = this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /opera ([\w.]+)/i, 1);
                     break;
                 }
-                if(ua.match(/opera mini/i)) {
+                if (ua.match(/opera mini/i)) {
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /version\/([\w.]+)/i, 1);
                     this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /presto\/([\w.]+)/i, 1);
                     break;
                 }
                 this.stBrowserVersion = this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /version\/([\w.]+)/i, 1) || new TEnvVersionInfo("0");
-            }while(false);
+            } while (false);
         };
         return TEnvBrowserOperaInfo;
-    })(TEnvBrowserInfoBase);    
+    })(TEnvBrowserInfoBase);
     ;
+    // IE浏览器检测类
     var TEnvBrowserIEInfo = (function (_super) {
         __extends(TEnvBrowserIEInfo, _super);
         function TEnvBrowserIEInfo(ori, sysInfo) {
-                _super.call(this, ori, sysInfo);
+            _super.call(this, ori, sysInfo);
             this.strBrowserName = "Internet Explorer";
             this.strBrowserShortName = "IE";
             this.strBrowserKernelName = "Trident";
-            this.strBrowserArchitecture = "x86";
-            this.bIsMobile = false;
             this.strAdditional = "";
             this.bIsCompatMode = false;
-            this.bIsMobile = sysInfo.isMobile();
             this.strBrowserArchitecture = _super.prototype.getBrowserArchitecture.call(this);
             this._init_branch(ori.userAgent, sysInfo);
-            if(ori.nav.cpuClass) {
+            // 覆盖浏览器架构信息
+            if (ori.nav.cpuClass)
                 this.strBrowserArchitecture = ori.nav.cpuClass;
-            }
         }
         TEnvBrowserIEInfo.prototype.getBrowserName = function () {
             return this.strBrowserName;
@@ -543,91 +553,160 @@ var Util;
             return this.bIsCompatMode;
         };
         TEnvBrowserIEInfo.prototype._init_branch = function (ua, sysInfo) {
+            // 检测浏览器版本
             var _checked_ie_version = TEnvVersionInfo.GetVersion(ua, /msie ([\w.]+)/i, 1);
-            if(null === _checked_ie_version) {
+            if (null === _checked_ie_version)
                 _checked_ie_version = TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
-            }
-            if(null === _checked_ie_version) {
+            if (null === _checked_ie_version)
                 this.stBrowserVersion = new TEnvVersionInfo("");
-            }
             this.stBrowserVersion = _checked_ie_version;
+            // 检测内核版本
             this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /trident\/([\w.]+)/i, 1);
-            if(null == this.stBrowserKernelVersion) {
+            if (null == this.stBrowserKernelVersion)
                 this.stBrowserKernelVersion = new TEnvVersionInfo("Unkown");
-            }
             do {
-                if(ua.match(/theworld/i)) {
+                //The World
+                if (ua.match(/theworld/i)) {
                     this.strBrowserName = "TheWorld Browser";
                     this.strBrowserShortName = "TheWorld";
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/qqbrowser/i)) {
+                //Tencent QQBrowser
+                if (ua.match(/qqbrowser/i)) {
                     this.strBrowserName = "Tencent QQBrowser";
                     this.strBrowserShortName = "QQBrowser";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /qqbrowser ([\w.]+)/i, 1) || new TEnvVersionInfo("");
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/tencenttraveler/i)) {
+                //Tencent Traveler
+                if (ua.match(/tencenttraveler/i)) {
                     this.strBrowserName = "Tencent Traveler";
                     this.strBrowserShortName = "Traveler";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /tencenttraveler ([\w.]+)/i, 1) || new TEnvVersionInfo("");
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/maxthon/i)) {
+                //Maxthon
+                if (ua.match(/maxthon/i)) {
                     this.strBrowserName = "Maxthon";
                     this.strBrowserShortName = "Maxthon";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /maxthon(\/| )([\w.]+)/i, 1) || new TEnvVersionInfo("1.0");
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/avant/i)) {
+                //Avant
+                if (ua.match(/avant/i)) {
                     this.strBrowserName = "Avant Browser";
                     this.strBrowserShortName = "Avant";
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/360se/i)) {
+                //360SE
+                if (ua.match(/360se/i)) {
                     this.strBrowserName = "Qihoo 360 Safe Browser";
                     this.strBrowserShortName = "360SE";
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-                if(ua.match(/se ([\d.]+)/i)) {
+                //Sogou
+                if (ua.match(/se ([\d.]+)/i)) {
                     this.strBrowserName = "Sohu Sogou";
                     this.strBrowserShortName = "Sogou";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /se ([\w.]+)/i, 1) || new TEnvVersionInfo("1.0");
                     this.strAdditional = " with Microsoft Internet Explorer " + _checked_ie_version.toString();
                     break;
                 }
-            }while(false);
-            if(ua.match(/ia64/i)) {
+            } while (false);
+            if (ua.match(/ia64/i))
                 this.strBrowserArchitecture = "IA64";
-            } else if(ua.match(/win64|x64|x86_64/i)) {
+            else if (ua.match(/win64|x64|x86_64/i))
                 this.strBrowserArchitecture = "x86_64";
-            }
-            if(ua.match(/iemobile/i)) {
+            if (ua.match(/iemobile/i))
                 this.bIsMobile = true;
-            }
-            if(parseInt(_checked_ie_version.toString()) == 7 && this.stBrowserKernelVersion.greaterEqualThan(new TEnvVersionInfo("4"))) {
+            // 检测兼容性视图
+            if (parseInt(_checked_ie_version.toString()) == 7 && this.stBrowserKernelVersion.greaterEqualThan(new TEnvVersionInfo("4"))) {
                 this.bIsCompatMode = true;
             }
         };
         return TEnvBrowserIEInfo;
-    })(TEnvBrowserInfoBase);    
+    })(TEnvBrowserInfoBase);
     ;
+    // IE浏览器检测类
+    var TEnvBrowserEdgeInfo = (function (_super) {
+        __extends(TEnvBrowserEdgeInfo, _super);
+        function TEnvBrowserEdgeInfo(ori, sysInfo) {
+            _super.call(this, ori, sysInfo);
+            this.strBrowserName = "Edge";
+            this.strBrowserShortName = "Edge";
+            this.strBrowserKernelName = "Edge";
+            this.strAdditional = "";
+            this.bIsCompatMode = false;
+            this.strBrowserArchitecture = _super.prototype.getBrowserArchitecture.call(this);
+            this._init_branch(ori.userAgent, sysInfo);
+            // 覆盖浏览器架构信息
+            if (ori.nav.cpuClass)
+                this.strBrowserArchitecture = ori.nav.cpuClass;
+        }
+        TEnvBrowserEdgeInfo.prototype.getBrowserName = function () {
+            return this.strBrowserName;
+        };
+        TEnvBrowserEdgeInfo.prototype.getBrowserShortName = function () {
+            return this.strBrowserShortName;
+        };
+        TEnvBrowserEdgeInfo.prototype.getBrowserVersion = function () {
+            return this.stBrowserVersion;
+        };
+        TEnvBrowserEdgeInfo.prototype.getBrowserKernelName = function () {
+            return this.strBrowserKernelName;
+        };
+        TEnvBrowserEdgeInfo.prototype.getBrowserKernelVersion = function () {
+            return this.stBrowserKernelVersion;
+        };
+        TEnvBrowserEdgeInfo.prototype.getAdditional = function () {
+            return this.strAdditional;
+        };
+        TEnvBrowserEdgeInfo.prototype.getBrowserArchitecture = function () {
+            return this.strBrowserArchitecture;
+        };
+        TEnvBrowserEdgeInfo.prototype.isMobile = function () {
+            return this.bIsMobile;
+        };
+        TEnvBrowserEdgeInfo.prototype.isCompatMode = function () {
+            return this.bIsCompatMode;
+        };
+        TEnvBrowserEdgeInfo.prototype._init_branch = function (ua, sysInfo) {
+            // 检测浏览器版本
+            var _checked_version = TEnvVersionInfo.GetVersion(ua, /edge\/([\w.]+)/i, 1);
+            if (null === _checked_version)
+                _checked_version = TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
+            if (null === _checked_version)
+                this.stBrowserVersion = new TEnvVersionInfo("");
+            this.stBrowserVersion = _checked_version;
+            // 检测内核版本
+            this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /trident\/([\w.]+)/i, 1);
+            if (null == this.stBrowserKernelVersion)
+                this.stBrowserKernelVersion = new TEnvVersionInfo("Unkown");
+            do {
+            } while (false);
+            if (ua.match(/ia64/i))
+                this.strBrowserArchitecture = "IA64";
+            else if (ua.match(/win64|x64|x86_64/i))
+                this.strBrowserArchitecture = "x86_64";
+        };
+        return TEnvBrowserEdgeInfo;
+    })(TEnvBrowserInfoBase);
+    ;
+    // Webkit浏览器检测类
     var TEnvBrowserWebkitInfo = (function (_super) {
         __extends(TEnvBrowserWebkitInfo, _super);
         function TEnvBrowserWebkitInfo(ori, sysInfo) {
-                _super.call(this, ori, sysInfo);
+            _super.call(this, ori, sysInfo);
             this.strBrowserName = "Apple Safari";
             this.strBrowserShortName = "Safari";
             this.strBrowserKernelName = "Webkit";
-            this.bIsMobile = false;
             this.strAdditional = "";
-            this.bIsMobile = sysInfo.isMobile();
             this._init_branch(ori.userAgent, sysInfo);
         }
         TEnvBrowserWebkitInfo.prototype.getBrowserName = function () {
@@ -652,14 +731,16 @@ var Util;
             return this.bIsMobile;
         };
         TEnvBrowserWebkitInfo.prototype._init_branch = function (ua, sysInfo) {
+            // 检测浏览器版本
             var _checked_webkit_version = TEnvVersionInfo.GetVersion(ua, /version\/([\w.]+)/i, 1);
             this.stBrowserVersion = _checked_webkit_version || new TEnvVersionInfo("");
+            // 检测内核版本
             this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /(applewebkit|Safari)\/([\w.]+)/i, 2);
-            if(null == this.stBrowserKernelVersion) {
+            if (null == this.stBrowserKernelVersion)
                 this.stBrowserKernelVersion = _checked_webkit_version;
-            }
+            // 检测Chrome
             var kernel_name = "Apple Safari";
-            if(ua.match(/chrome|chromium/i)) {
+            if (ua.match(/chrome|chromium/i)) {
                 this.strBrowserName = "Google Chrome";
                 this.strBrowserShortName = "Chrome";
                 kernel_name = "Google " + ua.match(/chrome|chromium/i)[0];
@@ -667,68 +748,74 @@ var Util;
                 this.stBrowserVersion = _checked_webkit_version;
             }
             do {
-                if(ua.match(/tencenttraveler/i)) {
+                //Tencent Traveler
+                if (ua.match(/tencenttraveler/i)) {
                     this.strBrowserName = "Tencent Traveler";
                     this.strBrowserShortName = "Traveler";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /tencenttraveler ([\w.]+)/i, 1) || _checked_webkit_version;
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/maxthon/i)) {
+                //Maxthon
+                if (ua.match(/maxthon/i)) {
                     this.strBrowserName = "Maxthon";
                     this.strBrowserShortName = "Maxthon";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /maxthon(\/| )([\w.]+)/i, 1) || new TEnvVersionInfo("1.0");
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/360se/i)) {
+                //360SE
+                if (ua.match(/360se/i)) {
                     this.strBrowserName = "Qihoo 360 Safe Browser";
                     this.strBrowserShortName = "360SE";
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/se ([\d.]+)/i)) {
+                //Sogou
+                if (ua.match(/se ([\d.]+)/i)) {
                     this.strBrowserName = "Sohu Sogou";
                     this.strBrowserShortName = "Sogou";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /se ([\w.]+)/i, 1) || _checked_webkit_version;
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/browserng/i)) {
+                //BrowserNG
+                if (ua.match(/browserng/i)) {
                     this.strBrowserName = "Nokia BrowserNG";
                     this.strBrowserShortName = "BrowNG";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /browserng\/([\w.]+)/i, 1) || _checked_webkit_version;
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/chromeplus/i)) {
+                //Chrome Plus
+                if (ua.match(/chromeplus/i)) {
                     this.strBrowserName = "Tencent Chrome Plus";
                     this.strBrowserShortName = "Chrome Plus";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /chromeplus\/([\w.]+)/i, 1) || _checked_webkit_version;
                     this.strAdditional = " with " + kernel_name + " " + _checked_webkit_version.toString();
                     break;
                 }
-                if(ua.match(/android/i) && ua.match(/version\/([\w.]+)/i)) {
+                //Chrome Lite
+                if (ua.match(/android/i) && ua.match(/version\/([\w.]+)/i)) {
                     this.strBrowserName = "Google Android Browser";
                     this.strBrowserShortName = "Android Browser";
                     this.bIsMobile = true;
                     break;
                 }
-            }while(false);
+            } while (false);
         };
         return TEnvBrowserWebkitInfo;
-    })(TEnvBrowserInfoBase);    
+    })(TEnvBrowserInfoBase);
     ;
+    // Firefox浏览器检测类
     var TEnvBrowserFirefoxInfo = (function (_super) {
         __extends(TEnvBrowserFirefoxInfo, _super);
         function TEnvBrowserFirefoxInfo(ori, sysInfo) {
-                _super.call(this, ori, sysInfo);
+            _super.call(this, ori, sysInfo);
             this.strBrowserName = "Mozilla FireFox";
             this.strBrowserShortName = "FF";
             this.strBrowserKernelName = "Gecko";
-            this.bIsMobile = false;
             this.strAdditional = "";
-            this.bIsMobile = sysInfo.isMobile();
             this._init_branch(ori.userAgent, sysInfo);
         }
         TEnvBrowserFirefoxInfo.prototype.getBrowserName = function () {
@@ -753,26 +840,26 @@ var Util;
             return this.bIsMobile;
         };
         TEnvBrowserFirefoxInfo.prototype._init_branch = function (ua, sysInfo) {
+            // 检测浏览器版本
             var _checked_ff_version = TEnvVersionInfo.GetVersion(ua, /firefox\/([\w.]+)/i, 1) || TEnvVersionInfo.GetVersion(ua, /rv:([\w.]+)/i, 1);
             this.stBrowserVersion = _checked_ff_version || new TEnvVersionInfo("");
+            // 检测内核版本
             this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /gecko\/([\w.]+)/i, 1);
-            if(null == this.stBrowserKernelVersion) {
+            if (null == this.stBrowserKernelVersion)
                 this.stBrowserKernelVersion = _checked_ff_version;
-            }
         };
         return TEnvBrowserFirefoxInfo;
-    })(TEnvBrowserInfoBase);    
+    })(TEnvBrowserInfoBase);
     ;
+    // 其他浏览器检测类
     var TEnvBrowserOtherInfo = (function (_super) {
         __extends(TEnvBrowserOtherInfo, _super);
         function TEnvBrowserOtherInfo(ori, sysInfo) {
-                _super.call(this, ori, sysInfo);
+            _super.call(this, ori, sysInfo);
             this.strBrowserName = "Unknown";
             this.strBrowserShortName = "Unknown";
             this.strBrowserKernelName = "Unknown";
-            this.bIsMobile = false;
             this.strAdditional = "";
-            this.bIsMobile = sysInfo.isMobile();
             this._init_branch(ori.userAgent, sysInfo);
         }
         TEnvBrowserOtherInfo.prototype.getBrowserName = function () {
@@ -797,10 +884,12 @@ var Util;
             return this.bIsMobile;
         };
         TEnvBrowserOtherInfo.prototype._init_branch = function (ua, sysInfo) {
+            // 检测浏览器版本
             var _checked_other_version = new TEnvVersionInfo("0");
             this.stBrowserVersion = this.stBrowserKernelVersion = _checked_other_version;
             do {
-                if(ua.match(/konqueror|khtml/i)) {
+                //Konqueror
+                if (ua.match(/konqueror|khtml/i)) {
                     this.strBrowserName = "KDE Konqueror";
                     this.strBrowserShortName = "Konqueror";
                     this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /konqueror\/([\w.]+)/i, 1) || _checked_other_version;
@@ -808,31 +897,33 @@ var Util;
                     this.stBrowserKernelVersion = TEnvVersionInfo.GetVersion(ua, /khtml\/([\w.]+)/i, 1) || _checked_other_version;
                     break;
                 }
-                if(ua.match(/gobrowser/i)) {
+                //Go Browser
+                if (ua.match(/gobrowser/i)) {
                     this.strBrowserName = "Nokia Go Browser";
                     this.strBrowserShortName = "GoBrow";
                     this.stBrowserKernelVersion = this.stBrowserVersion = TEnvVersionInfo.GetVersion(ua, /gobrowser\/([\w.]+)/i, 1) || new TEnvVersionInfo("0.0");
                     break;
                 }
-            }while(false);
+            } while (false);
         };
         return TEnvBrowserOtherInfo;
-    })(TEnvBrowserInfoBase);    
+    })(TEnvBrowserInfoBase);
     ;
     ;
+    // 插件信息
     var TEnvPluginInfo = (function () {
         function TEnvPluginInfo(obj) {
             this.stPluginName = obj.name || obj.filename || "";
-            if(obj.version) {
+            if (obj.version) {
                 this.stVersion = new TEnvVersionInfo(obj.version);
-            } else {
+            }
+            else {
                 var reg_exp = /\d([\d. ]|(\w[\d]+))+/gi;
                 var t_ver = ((obj.description) ? obj.description.match(reg_exp) : false) || this.stPluginName.match(reg_exp);
-                if(t_ver) {
+                if (t_ver)
                     this.stVersion = new TEnvVersionInfo(t_ver[t_ver.length - 1]);
-                } else {
+                else
                     this.stVersion = new TEnvVersionInfo("");
-                }
             }
         }
         TEnvPluginInfo.prototype.getPluginName = function () {
@@ -843,13 +934,14 @@ var Util;
         };
         return TEnvPluginInfo;
     })();
-    Util.TEnvPluginInfo = TEnvPluginInfo;    
+    Util.TEnvPluginInfo = TEnvPluginInfo;
     ;
+    // IE下.Net插件信息
     var TEnvPluginIEDotNetInfo = (function () {
         function TEnvPluginIEDotNetInfo(ua, dotnet_reg, pname) {
             this.stPluginName = "";
             this.stVersion = new TEnvVersionInfo("");
-            if(ua.match(dotnet_reg)) {
+            if (ua.match(dotnet_reg)) {
                 this.stPluginName = pname;
                 var t_ver = ua.match(dotnet_reg)[0].match(/\d[\d.]+/i);
                 this.stVersion = new TEnvVersionInfo(t_ver ? t_ver[0] : "");
@@ -862,8 +954,9 @@ var Util;
             return this.stVersion;
         };
         return TEnvPluginIEDotNetInfo;
-    })();    
+    })();
     ;
+    // IE下Silverlight插件信息
     var TEnvPluginIESilverlightInfo = (function () {
         function TEnvPluginIESilverlightInfo(ver) {
             this.stPluginName = "Silverlight";
@@ -876,111 +969,98 @@ var Util;
             return this.stVersion;
         };
         return TEnvPluginIESilverlightInfo;
-    })();    
+    })();
     ;
     var TEnvironment = (function () {
         function TEnvironment() {
-            this.PluginInfo = {
-            };
+            // 插件信息
+            this.PluginInfo = {};
             this.OriData = new TEnvOriData();
             this._init_ori_data(this.OriData);
-            if(this.OriData.userAgent.match(/windows/i)) {
+            // 构造系统信息
+            if (this.OriData.userAgent.match(/windows/i))
                 this.SysInfo = new TEnvSystemWindowsInfo(this.OriData);
-            } else if(this.OriData.userAgent.match(/linux|android/i)) {
+            else if (this.OriData.userAgent.match(/linux|android/i))
                 this.SysInfo = new TEnvSystemLinuxInfo(this.OriData);
-            } else if(this.OriData.userAgent.match(/macintosh|iphone|ipad|ipod/i)) {
+            else if (this.OriData.userAgent.match(/macintosh|iphone|ipad|ipod/i))
                 this.SysInfo = new TEnvSystemMacIOSInfo(this.OriData);
-            } else {
+            else
                 this.SysInfo = new TEnvSystemOtherInfo(this.OriData);
-            }
-            if(this.OriData.userAgent.match(/opera|pesto/i)) {
+            // 构造浏览器信息
+            if (this.OriData.userAgent.match(/opera|pesto/i))
                 this.BrowserInfo = new TEnvBrowserOperaInfo(this.OriData, this.SysInfo);
-            } else if(this.OriData.userAgent.match(/msie|trident/i)) {
+            else if (this.OriData.userAgent.match(/msie|trident/i))
                 this.BrowserInfo = new TEnvBrowserIEInfo(this.OriData, this.SysInfo);
-            } else if(this.OriData.userAgent.match(/safari|applewebkit/i)) {
+            else if (this.OriData.userAgent.match(/edge/i))
+                this.BrowserInfo = new TEnvBrowserEdgeInfo(this.OriData, this.SysInfo);
+            else if (this.OriData.userAgent.match(/safari|applewebkit/i))
                 this.BrowserInfo = new TEnvBrowserWebkitInfo(this.OriData, this.SysInfo);
-            } else if(this.OriData.userAgent.match(/firefox|gecko/i)) {
+            else if (this.OriData.userAgent.match(/firefox|gecko/i))
                 this.BrowserInfo = new TEnvBrowserFirefoxInfo(this.OriData, this.SysInfo);
-            } else {
+            else
                 this.BrowserInfo = new TEnvBrowserOtherInfo(this.OriData, this.SysInfo);
-            }
-            if(this.OriData.nav.plugins) {
-                try  {
-                    for(var i = 0; i < this.OriData.nav.plugins.length; ++i) {
+            // 构造插件信息
+            if (this.OriData.nav.plugins) {
+                try {
+                    for (var i = 0; i < this.OriData.nav.plugins.length; ++i) {
                         var t_plugin = new TEnvPluginInfo(this.OriData.nav.plugins[i]);
-                        if(t_plugin.getPluginName() == "") {
+                        if (t_plugin.getPluginName() == "")
                             continue;
-                        }
                         var pname = t_plugin.getPluginName().toLowerCase();
-                        if(this.PluginInfo[pname]) {
-                            if(t_plugin.getPluginVersion().toString()) {
+                        if (this.PluginInfo[pname]) {
+                            if (t_plugin.getPluginVersion().toString())
                                 this.PluginInfo[pname] = t_plugin;
-                            }
                             continue;
                         }
                         this.PluginInfo[pname] = t_plugin;
                     }
-                } catch (e) {
+                }
+                catch (e) {
                 }
             }
-            if("Trident" == this.BrowserInfo.getBrowserKernelName()) {
-                try  {
+            // 特殊插件 -- IE下 .Net 和 Silverlight 运行时
+            if ("Trident" == this.BrowserInfo.getBrowserKernelName()) {
+                try {
+                    // DotNet
                     var dot_net_arr = [
-                        {
-                            reg: /.net clr 2.0/i,
-                            pname: ".Net 2.0"
-                        }, 
-                        {
-                            reg: /.net clr 3.0/i,
-                            pname: ".Net 3.0"
-                        }, 
-                        {
-                            reg: /.net clr 3.5/i,
-                            pname: ".Net 3.5"
-                        }, 
-                        {
-                            reg: /.net4.0c/i,
-                            pname: ".Net 4.0 Client"
-                        }, 
-                        {
-                            reg: /.net4.0e/i,
-                            pname: ".Net 4.0 Full"
-                        }
+                        { reg: /.net clr 2.0/i, pname: ".Net 2.0" },
+                        { reg: /.net clr 3.0/i, pname: ".Net 3.0" },
+                        { reg: /.net clr 3.5/i, pname: ".Net 3.5" },
+                        { reg: /.net4.0c/i, pname: ".Net 4.0 Client" },
+                        { reg: /.net4.0e/i, pname: ".Net 4.0 Full" }
                     ];
-                    for(var i = 0; i < dot_net_arr.length; ++i) {
+                    for (var i = 0; i < dot_net_arr.length; ++i) {
                         var tdn_plugin = new TEnvPluginIEDotNetInfo(this.OriData.userAgent, dot_net_arr[i].reg, dot_net_arr[i].pname);
-                        if("" == tdn_plugin.getPluginName()) {
+                        if ("" == tdn_plugin.getPluginName())
                             continue;
-                        }
                         this.PluginInfo[dot_net_arr[i].pname.toLowerCase()] = tdn_plugin;
                     }
+                    // Sillverlight
                     var silver_start_ver = 2;
                     var silverlight_activex = new ActiveXObject("AgControl.AgControl");
-                    while(true) {
-                        if(false == silverlight_activex.IsVersionSupported(silver_start_ver + ".0")) {
+                    while (true) {
+                        if (false == silverlight_activex.IsVersionSupported(silver_start_ver + ".0"))
                             break;
-                        }
                         ++silver_start_ver;
                     }
-                    if(silver_start_ver > 2) {
+                    if (silver_start_ver > 2) {
                         --silver_start_ver;
                         var silver_start_ver_s = 0;
-                        while(silverlight_activex.IsVersionSupported(silver_start_ver + "." + silver_start_ver_s)) {
+                        while (silverlight_activex.IsVersionSupported(silver_start_ver + "." + silver_start_ver_s))
                             ++silver_start_ver_s;
-                        }
                         --silver_start_ver_s;
                         this.PluginInfo["silverlight"] = new TEnvPluginIESilverlightInfo(new TEnvVersionInfo(silver_start_ver + "." + silver_start_ver_s));
                     }
-                } catch (e) {
+                }
+                catch (e) {
                 }
             }
+            // 结束
         }
+        // 初始化原始信息
         TEnvironment.prototype._init_ori_data = function (obj) {
-            obj.doc = document || {
-            };
-            obj.nav = navigator || {
-                userAgent: ""
-            };
+            obj.doc = document || {};
+            obj.nav = navigator || { userAgent: "" };
             obj.userAgent = obj.nav.userAgent || "";
         };
         TEnvironment.prototype.getOriInfo = function () {
@@ -1001,22 +1081,29 @@ var Util;
         };
         return TEnvironment;
     })();
-    Util.TEnvironment = TEnvironment;    
+    Util.TEnvironment = TEnvironment;
     ;
+    /**
+     * Get the information of current environment.
+     * @package Util
+     * @return The information of current environment.
+     * @example	var bro = Util.getEnvironment();
+     * @version	2.0.0
+     * @since	2.0.0
+     */
     function getEnvironment() {
         return new TEnvironment();
     }
     Util.getEnvironment = getEnvironment;
     ;
     (function () {
-        try  {
-            if(jQuery) {
+        try {
+            if (jQuery)
                 jQuery.extend({
                     environment: getEnvironment()
                 });
-            }
-        } catch (e) {
+        }
+        catch (e) {
         }
     })();
 })(Util || (Util = {}));
-//@ sourceMappingURL=jquery.browser.js.map
