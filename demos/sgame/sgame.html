@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>追男神训练工具</title>
+    <script type="text/javascript" src="sgame/sgame.js"></script>
+
+    <style type="text/css">
+        body div {
+            text-align: center;
+            margin: auto;
+        }
+        body div h3 {
+            text-align: center;
+            margin: auto;
+            display: inline-block;
+            color: Gray;
+        }
+
+        #pics {
+            clear: both;
+            display: block;
+            margin: auto; 
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h3 id="notice"></h3>
+    <img alt="loading..." src="sgame/640.jpg" border="0" usemap="#btns" id="pics"/>
+    <map name="btns" id="btns">
+        <area shape="rect" coords="0,308,640,396" href="javascript:goto(2);" alt="开始"/>
+        <area shape="rect" coords="0,420,640,508" href="javascript:alert('谁说可以读档的？');" alt="谁说可以读档的"/>
+        <area shape="rect" coords="0,512,640,600" href="javascript:alert('谁说可以退出的？');" alt="谁说可以退出的"/>
+    </map>
+</div>
+
+<script type="text/javascript">
+    (function () {
+        goto(1);
+    })();
+</script>
+</body>
+
+</html>
